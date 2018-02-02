@@ -8,10 +8,10 @@ from preprocess import augment_generator
 def build_parser():
     parser = ArgumentParser()
     parser.add_argument('--vols',
-            dest='vol_files', help='Training volumes folder',
+            dest='vol_files', help='Training volumes files',
             type=str, required=True)
     parser.add_argument('--segs',
-            dest='seg_files', help='Training segmentations folder',
+            dest='seg_files', help='Training segmentations files',
             type=str, required=True)
     return parser
 
@@ -26,8 +26,8 @@ def main():
         vol_file = 'data/raw/{p}/{p}_{a}.nii.gz'.format(p=p, a=a)
         vol_files.append(vol_file)
 
-    segs = np.array(volread(file) for file in seg_files)
-    vols = np.array(volread(file) for file in vol_files)
+    vols = np.array([volread(file) for file in vol_files])
+    segs = np.array([volread(file) for file in seg_files])
 
     aug_gen = augment_generator(vols, segs)
     aug_vol, aug_seg = next(aug_gen)
@@ -35,7 +35,7 @@ def main():
     nib.save(aug_seg, 'data/test/seg.nii.gz')
 
 def volread(filename):
-    return nib.load(filename).get_data()
+    return np.squeeze(nib.load(filename).get_data())
 
 if __name__ == '__main__':
     main()
