@@ -8,23 +8,23 @@ from preprocess import augment_generator
 def build_parser():
     parser = ArgumentParser()
     parser.add_argument('--vols',
-            dest='vol_files', help='Training volumes files',
-            type=str, required=True)
+            dest='vol_files', help='Training volume files',
+            type=str, default='data/raw/04*/*.nii.gz')
     parser.add_argument('--segs',
-            dest='seg_files', help='Training segmentations files',
-            type=str, required=True)
+            dest='seg_files', help='Training segmentation files',
+            type=str, default='data/labels/04*/*_placenta.nii.gz')
     return parser
 
 def main():
-    # parser = build_parser()
-    # options = parser.parse_args()
+    parser = build_parser()
+    options = parser.parse_args()
 
-    seg_files = glob.glob('data/labels/043015/*_placenta.nii.gz')
-    vol_files = []
-    for seg_file in seg_files:
-        p, a = re.split('/|_', seg_file)[-3:-1]
-        vol_file = 'data/raw/{p}/{p}_{a}.nii.gz'.format(p=p, a=a)
-        vol_files.append(vol_file)
+    vol_path = options.vol_files.split('*/*')
+    seg_path = options.seg_files.split('*/*')
+    
+    seg_files = glob.glob(options.seg_files)
+    vol_files = [seg_file.replace(seg_path[0], vol_path[0]).replace(seg_path[1], vol_path[1])
+                 for seg_file in seg_files]
 
     vols = np.array([volread(file) for file in vol_files])
     segs = np.array([volread(file) for file in seg_files])
