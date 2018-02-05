@@ -23,7 +23,8 @@ def main():
     seg_path = options.seg_files.split('*/*')
     
     seg_files = glob.glob(options.seg_files)
-    vol_files = [seg_file.replace(seg_path[0], vol_path[0]).replace(seg_path[1], vol_path[1])
+    vol_files = [seg_file.replace(seg_path[0], vol_path[0])
+                         .replace(seg_path[1], vol_path[1])
                  for seg_file in seg_files]
 
     vols = np.array([volread(file) for file in vol_files])
