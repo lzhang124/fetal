@@ -31,8 +31,8 @@ def main():
 
     aug_gen = augment_generator(vols, segs)
     aug_vol, aug_seg = next(aug_gen)
-    nib.save(aug_vol, 'data/test/vol.nii.gz')
-    nib.save(aug_seg, 'data/test/seg.nii.gz')
+    nib.Nifti1Image(aug_vol, np.eye(4)).to_filename('data/test/vol.nii.gz')
+    nib.Nifti1Image(aug_seg, np.eye(4)).to_filename('data/test/seg.nii.gz')
 
 def volread(filename):
     return np.squeeze(nib.load(filename).get_data())
