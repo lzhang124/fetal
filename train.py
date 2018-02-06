@@ -2,6 +2,7 @@ import glob
 import nibabel as nib
 import numpy as np
 import re
+import time
 from argparse import ArgumentParser
 from preprocess import augment_generator
 
@@ -14,6 +15,8 @@ def build_parser():
     return parser
 
 def main():
+    start = time.time()
+
     parser = build_parser()
     options = parser.parse_args()
 
@@ -31,6 +34,9 @@ def main():
     aug_vol, aug_seg = next(aug_gen)
     volsave(aug_vol, 'data/test/vol.nii.gz')
     volsave(aug_seg, 'data/test/seg.nii.gz')
+
+    end = time.time()
+    print('total time:', end - start)
 
 def volread(filename):
     return np.squeeze(nib.load(filename).get_data())
