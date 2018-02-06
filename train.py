@@ -41,7 +41,7 @@ def main():
 def volread(filename):
     return np.squeeze(nib.load(filename).get_data())
 
-def volsave(vol, filname):
+def volsave(vol, filename):
     nib.Nifti1Image(np.squeeze(vol).astype('int16'), np.eye(4)).to_filename(filename)
 
 if __name__ == '__main__':
