@@ -10,6 +10,6 @@ startup_script=${placenta_dir}/scripts/run.sh
 
 remote_ssh=${username}@${remote_machine}.csail.mit.edu
 
-run_cmd="ssh -t ${remote_ssh} '${startup_script}; cd ${placenta_dir}; bash -l'"
+run_cmd="ssh -t ${remote_ssh} '${startup_script}'"
 
 eval ${run_cmd}
