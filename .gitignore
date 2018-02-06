@@ -109,5 +109,5 @@ venv.bak/
 data/
 
 # outputs
-*.err
-*.out
+# *.err
+# *.out
