@@ -3,6 +3,7 @@ from keras.preprocessing.image import ImageDataGenerator
 
 def augment_generator(vols,
                       segs,
+                      batch_size=1,
                       rotation_range=90.,
                       width_shift_range=0.1,
                       height_shift_range=0.1,
@@ -26,8 +27,8 @@ def augment_generator(vols,
     seg_datagen = ImageDataGenerator(**data_gen_args)
 
     seed = 12345
-    vol_generator = vol_datagen.flow(vols, seed=seed)
-    seg_generator = seg_datagen.flow(segs, seed=seed)
+    vol_generator = vol_datagen.flow(vols, seed=seed, batch_size=batch_size)
+    seg_generator = seg_datagen.flow(segs, seed=seed, batch_size=batch_size)
 
     aug_generator = zip(vol_generator, seg_generator)
     return aug_generator

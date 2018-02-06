@@ -12,6 +12,8 @@ def build_parser():
             type=str, default='data/raw/04*/*.nii.gz')
     parser.add_argument('--segs', dest='seg_files', help='Training segmentation files',
             type=str, default='data/labels/04*/*_placenta.nii.gz')
+    parser.add_argument('--batch-size', dest='batch_size', help='Training batch size',
+            type=int, default=1)
     return parser
 
 def main():
