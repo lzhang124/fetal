@@ -1,6 +1,7 @@
 import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 
+
 def augment_generator(vols,
                       segs,
                       batch_size=1,
