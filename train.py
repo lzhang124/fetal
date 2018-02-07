@@ -27,8 +27,8 @@ def main():
     aug_gen = augment_data(options.vol_files, options.seg_files)
     aug_vols, aug_segs = next(aug_gen)
     for i in range(aug_vols.shape[0]):
-        volsave(aug_vols[i], 'data/test/vol_{}.nii.gz'.format(i)s)
-        volsave(aug_segs[i], 'data/test/seg_{}.nii.gz'.format(i)s)
+        volsave(aug_vols[i], 'data/test/vol_{}.nii.gz'.format(i))
+        volsave(aug_segs[i], 'data/test/seg_{}.nii.gz'.format(i))
 
     end = time.time()
     print('total time:', end - start)
