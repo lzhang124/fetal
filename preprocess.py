@@ -4,7 +4,7 @@ from keras.preprocessing.image import ImageDataGenerator
 
 def augment_generator(vols,
                       segs,
-                      batch_size=1,
+                      batch_size=32,
                       rotation_range=90.,
                       width_shift_range=0.1,
                       height_shift_range=0.1,

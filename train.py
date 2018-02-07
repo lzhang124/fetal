@@ -24,7 +24,7 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
-    aug_gen = augment_data(options.vol_files, options.seg_files)
+    aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size)
     aug_vols, aug_segs = next(aug_gen)
     for i in range(aug_vols.shape[0]):
         volsave(aug_vols[i], 'data/test/vol_{}.nii.gz'.format(i))
@@ -34,7 +34,7 @@ def main():
     print('total time:', end - start)
 
 
-def augment_data(vol_files, seg_files):
+def augment_data(vol_files, seg_files, batch_size):
     vol_path = vol_files.split('*/*')
     seg_path = seg_files.split('*/*')
     
@@ -45,7 +45,7 @@ def augment_data(vol_files, seg_files):
     vols = np.array([volread(file) for file in vol_files])
     segs = np.array([volread(file) for file in seg_files])
 
-    return augment_generator(vols, segs)
+    return augment_generator(vols, segs, batch_size)
 
 
 def volread(filename):
