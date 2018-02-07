@@ -42,8 +42,8 @@ def augment_data(vol_files, seg_files, batch_size):
     vol_files = [seg_file.replace(seg_path[0], vol_path[0]).replace(seg_path[1], vol_path[1])
                  for seg_file in seg_files]
 
-    vols = np.array([volread(file) for file in vol_files])
-    segs = np.array([volread(file) for file in seg_files])
+    vols = np.array([volread(file) for file in vol_files] * (batch_size // len(seg_files) + 1))
+    segs = np.array([volread(file) for file in seg_files] * (batch_size // len(seg_files) + 1))
 
     return augment_generator(vols, segs, batch_size)
 
