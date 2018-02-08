@@ -388,10 +388,10 @@ class NumpyArrayIterator(Iterator):
             x = self.image_data_generator.random_transform(x.astype(K.floatx()))
             batch_x[i] = x
         if self.save_to_dir:
-            for i, j in enumerate(index_array):
+            for i in range(len(batch_x)):
                 img = array_to_img(batch_x[i])
                 fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix,
-                                                                  index=j,
+                                                                  index=i,
                                                                   hash=np.random.randint(1e4),
                                                                   format=self.save_format)
                 img.to_filename(os.path.join(self.save_to_dir, fname))
