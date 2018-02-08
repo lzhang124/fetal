@@ -23,6 +23,22 @@ from keras import backend as K
 from keras.utils.data_utils import Sequence
 
 
+def transform_matrix_offset_center(matrix, shape):
+    o_x = float(shape[0]) / 2 + 0.5
+    o_y = float(shape[1]) / 2 + 0.5
+    o_z = float(shape[2]) / 2 + 0.5
+    offset_matrix = np.array([[1, 0, 0, o_x],
+                              [0, 1, 0, o_y],
+                              [0, 0, 1, o_z],
+                              [0, 0, 0, 1]])
+    reset_matrix = np.array([[1, 0, 0, -o_x],
+                             [0, 1, 0, -o_y],
+                             [0, 0, 1, -o_z],
+                             [0, 0, 0, 1]])
+    transform_matrix = np.dot(np.dot(offset_matrix, matrix), reset_matrix)
+    return transform_matrix
+
+
 def apply_transform(x, transform_matrix, fill_mode='nearest', cval=0.):
     """Apply the image transformation specified by a matrix.
 
@@ -214,6 +230,7 @@ class ImageDataGenerator(object):
             transform_matrix = zoom_matrix if transform_matrix is None else np.dot(transform_matrix, zoom_matrix)
 
         if transform_matrix is not None:
+            transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)
             x = apply_transform(x, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
 
         if self.flip:
@@ -326,7 +343,6 @@ class NumpyArrayIterator(Iterator):
         batch_size: Integer, size of a batch.
         shuffle: Boolean, whether to shuffle the data between epochs.
         seed: Random seed for data shuffling.
-        data_format: String, one of `channels_first`, `channels_last`.
         save_to_dir: Optional directory where to save the pictures
             being yielded, in a viewable format. This is useful
             for visualizing the random transformations being
@@ -397,77 +413,77 @@ class NumpyArrayIterator(Iterator):
         return self._get_batches_of_transformed_samples(index_array)
 
 
-def _count_valid_files_in_directory(directory, white_list_formats, follow_links):
-    """Count files with extension in `white_list_formats` contained in directory.
+# def _count_valid_files_in_directory(directory, white_list_formats, follow_links):
+#     """Count files with extension in `white_list_formats` contained in directory.
 
-    # Arguments
-        directory: absolute path to the directory
-            containing files to be counted
-        white_list_formats: set of strings containing allowed extensions for
-            the files to be counted.
-        follow_links: boolean.
+#     # Arguments
+#         directory: absolute path to the directory
+#             containing files to be counted
+#         white_list_formats: set of strings containing allowed extensions for
+#             the files to be counted.
+#         follow_links: boolean.
 
-    # Returns
-        the count of files with extension in `white_list_formats` contained in
-        the directory.
-    """
-    def _recursive_list(subpath):
-        return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
+#     # Returns
+#         the count of files with extension in `white_list_formats` contained in
+#         the directory.
+#     """
+#     def _recursive_list(subpath):
+#         return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
 
-    samples = 0
-    for _, _, files in _recursive_list(directory):
-        for fname in files:
-            is_valid = False
-            for extension in white_list_formats:
-                if fname.lower().endswith('.tiff'):
-                    warnings.warn('Using \'.tiff\' files with multiple bands will cause distortion. '
-                                  'Please verify your output.')
-                if fname.lower().endswith('.' + extension):
-                    is_valid = True
-                    break
-            if is_valid:
-                samples += 1
-    return samples
+#     samples = 0
+#     for _, _, files in _recursive_list(directory):
+#         for fname in files:
+#             is_valid = False
+#             for extension in white_list_formats:
+#                 if fname.lower().endswith('.tiff'):
+#                     warnings.warn('Using \'.tiff\' files with multiple bands will cause distortion. '
+#                                   'Please verify your output.')
+#                 if fname.lower().endswith('.' + extension):
+#                     is_valid = True
+#                     break
+#             if is_valid:
+#                 samples += 1
+#     return samples
 
 
-def _list_valid_filenames_in_directory(directory, white_list_formats,
-                                       class_indices, follow_links):
-    """List paths of files in `subdir` with extensions in `white_list_formats`.
+# def _list_valid_filenames_in_directory(directory, white_list_formats,
+#                                        class_indices, follow_links):
+#     """List paths of files in `subdir` with extensions in `white_list_formats`.
 
-    # Arguments
-        directory: absolute path to a directory containing the files to list.
-            The directory name is used as class label and must be a key of `class_indices`.
-        white_list_formats: set of strings containing allowed extensions for
-            the files to be counted.
-        class_indices: dictionary mapping a class name to its index.
-        follow_links: boolean.
+#     # Arguments
+#         directory: absolute path to a directory containing the files to list.
+#             The directory name is used as class label and must be a key of `class_indices`.
+#         white_list_formats: set of strings containing allowed extensions for
+#             the files to be counted.
+#         class_indices: dictionary mapping a class name to its index.
+#         follow_links: boolean.
 
-    # Returns
-        classes: a list of class indices
-        filenames: the path of valid files in `directory`, relative from
-            `directory`'s parent (e.g., if `directory` is "dataset/class1",
-            the filenames will be ["class1/file1.jpg", "class1/file2.jpg", ...]).
-    """
-    def _recursive_list(subpath):
-        return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
+#     # Returns
+#         classes: a list of class indices
+#         filenames: the path of valid files in `directory`, relative from
+#             `directory`'s parent (e.g., if `directory` is "dataset/class1",
+#             the filenames will be ["class1/file1.jpg", "class1/file2.jpg", ...]).
+#     """
+#     def _recursive_list(subpath):
+#         return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
 
-    classes = []
-    filenames = []
-    subdir = os.path.basename(directory)
-    basedir = os.path.dirname(directory)
-    for root, _, files in _recursive_list(directory):
-        for fname in sorted(files):
-            is_valid = False
-            for extension in white_list_formats:
-                if fname.lower().endswith('.' + extension):
-                    is_valid = True
-                    break
-            if is_valid:
-                classes.append(class_indices[subdir])
-                # add filename relative to directory
-                absolute_path = os.path.join(root, fname)
-                filenames.append(os.path.relpath(absolute_path, basedir))
-    return classes, filenames
+#     classes = []
+#     filenames = []
+#     subdir = os.path.basename(directory)
+#     basedir = os.path.dirname(directory)
+#     for root, _, files in _recursive_list(directory):
+#         for fname in sorted(files):
+#             is_valid = False
+#             for extension in white_list_formats:
+#                 if fname.lower().endswith('.' + extension):
+#                     is_valid = True
+#                     break
+#             if is_valid:
+#                 classes.append(class_indices[subdir])
+#                 # add filename relative to directory
+#                 absolute_path = os.path.join(root, fname)
+#                 filenames.append(os.path.relpath(absolute_path, basedir))
+#     return classes, filenames
 
 
 # class DirectoryIterator(Iterator):
