@@ -266,11 +266,11 @@ class Iterator(Sequence):
         self.index_generator = self._flow_index()
 
     def _set_index_array(self):
+        repeat = (self.n + self.batch_size - 1) // self.n
         if self.shuffle:
-            self.index_array = np.ravel([np.random.permutation(self.n) for _ in range(len(self))])
+            self.index_array = np.ravel([np.random.permutation(self.n) for _ in range(repeat)])
         else:
-            self.index_array = np.ravel([np.arange(self.n)] * len(self))
-        print(len(self.index_array))
+            self.index_array = np.ravel([np.arange(self.n)] * repeat)
 
     def __getitem__(self, idx):
         if idx >= len(self):
