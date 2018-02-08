@@ -25,8 +25,7 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
-    aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size,
-                           save_dir='data/test/')
+    aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size)
     aug_vols, aug_segs = next(aug_gen)
 
     # train
@@ -47,7 +46,7 @@ def augment_data(vol_files, seg_files, batch_size):
     vols = np.array([volread(file) for file in vol_files])
     segs = np.array([volread(file) for file in seg_files])
 
-    return augment_generator(vols, segs, batch_size)
+    return augment_generator(vols, segs, batch_size, save_dir='data/test/')
 
 
 def volread(filename):
