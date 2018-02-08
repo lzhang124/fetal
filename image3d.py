@@ -386,78 +386,92 @@ class NumpyArrayIterator(Iterator):
         batch_y = self.y[index_array]
         return batch_x, batch_y
 
+    def next(self):
+        """For python 2.x.
 
-# def _count_valid_files_in_directory(directory, white_list_formats, follow_links):
-#     """Count files with extension in `white_list_formats` contained in directory.
-
-#     # Arguments
-#         directory: absolute path to the directory
-#             containing files to be counted
-#         white_list_formats: set of strings containing allowed extensions for
-#             the files to be counted.
-#         follow_links: boolean.
-
-#     # Returns
-#         the count of files with extension in `white_list_formats` contained in
-#         the directory.
-#     """
-#     def _recursive_list(subpath):
-#         return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
-
-#     samples = 0
-#     for _, _, files in _recursive_list(directory):
-#         for fname in files:
-#             is_valid = False
-#             for extension in white_list_formats:
-#                 if fname.lower().endswith('.tiff'):
-#                     warnings.warn('Using \'.tiff\' files with multiple bands will cause distortion. '
-#                                   'Please verify your output.')
-#                 if fname.lower().endswith('.' + extension):
-#                     is_valid = True
-#                     break
-#             if is_valid:
-#                 samples += 1
-#     return samples
+        # Returns
+            The next batch.
+        """
+        # Keeps under lock only the mechanism which advances
+        # the indexing of each batch.
+        with self.lock:
+            index_array = next(self.index_generator)
+        # The transformation of images is not under thread lock
+        # so it can be done in parallel
+        return self._get_batches_of_transformed_samples(index_array)
 
 
-# def _list_valid_filenames_in_directory(directory, white_list_formats,
-#                                        class_indices, follow_links):
-#     """List paths of files in `subdir` with extensions in `white_list_formats`.
+def _count_valid_files_in_directory(directory, white_list_formats, follow_links):
+    """Count files with extension in `white_list_formats` contained in directory.
 
-#     # Arguments
-#         directory: absolute path to a directory containing the files to list.
-#             The directory name is used as class label and must be a key of `class_indices`.
-#         white_list_formats: set of strings containing allowed extensions for
-#             the files to be counted.
-#         class_indices: dictionary mapping a class name to its index.
-#         follow_links: boolean.
+    # Arguments
+        directory: absolute path to the directory
+            containing files to be counted
+        white_list_formats: set of strings containing allowed extensions for
+            the files to be counted.
+        follow_links: boolean.
 
-#     # Returns
-#         classes: a list of class indices
-#         filenames: the path of valid files in `directory`, relative from
-#             `directory`'s parent (e.g., if `directory` is "dataset/class1",
-#             the filenames will be ["class1/file1.jpg", "class1/file2.jpg", ...]).
-#     """
-#     def _recursive_list(subpath):
-#         return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
+    # Returns
+        the count of files with extension in `white_list_formats` contained in
+        the directory.
+    """
+    def _recursive_list(subpath):
+        return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
 
-#     classes = []
-#     filenames = []
-#     subdir = os.path.basename(directory)
-#     basedir = os.path.dirname(directory)
-#     for root, _, files in _recursive_list(directory):
-#         for fname in sorted(files):
-#             is_valid = False
-#             for extension in white_list_formats:
-#                 if fname.lower().endswith('.' + extension):
-#                     is_valid = True
-#                     break
-#             if is_valid:
-#                 classes.append(class_indices[subdir])
-#                 # add filename relative to directory
-#                 absolute_path = os.path.join(root, fname)
-#                 filenames.append(os.path.relpath(absolute_path, basedir))
-#     return classes, filenames
+    samples = 0
+    for _, _, files in _recursive_list(directory):
+        for fname in files:
+            is_valid = False
+            for extension in white_list_formats:
+                if fname.lower().endswith('.tiff'):
+                    warnings.warn('Using \'.tiff\' files with multiple bands will cause distortion. '
+                                  'Please verify your output.')
+                if fname.lower().endswith('.' + extension):
+                    is_valid = True
+                    break
+            if is_valid:
+                samples += 1
+    return samples
+
+
+def _list_valid_filenames_in_directory(directory, white_list_formats,
+                                       class_indices, follow_links):
+    """List paths of files in `subdir` with extensions in `white_list_formats`.
+
+    # Arguments
+        directory: absolute path to a directory containing the files to list.
+            The directory name is used as class label and must be a key of `class_indices`.
+        white_list_formats: set of strings containing allowed extensions for
+            the files to be counted.
+        class_indices: dictionary mapping a class name to its index.
+        follow_links: boolean.
+
+    # Returns
+        classes: a list of class indices
+        filenames: the path of valid files in `directory`, relative from
+            `directory`'s parent (e.g., if `directory` is "dataset/class1",
+            the filenames will be ["class1/file1.jpg", "class1/file2.jpg", ...]).
+    """
+    def _recursive_list(subpath):
+        return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
+
+    classes = []
+    filenames = []
+    subdir = os.path.basename(directory)
+    basedir = os.path.dirname(directory)
+    for root, _, files in _recursive_list(directory):
+        for fname in sorted(files):
+            is_valid = False
+            for extension in white_list_formats:
+                if fname.lower().endswith('.' + extension):
+                    is_valid = True
+                    break
+            if is_valid:
+                classes.append(class_indices[subdir])
+                # add filename relative to directory
+                absolute_path = os.path.join(root, fname)
+                filenames.append(os.path.relpath(absolute_path, basedir))
+    return classes, filenames
 
 
 # class DirectoryIterator(Iterator):
