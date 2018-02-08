@@ -19,8 +19,8 @@ import multiprocessing.pool
 from functools import partial
 import nibabel as nib
 
-from .. import backend as K
-from ..utils.data_utils import Sequence
+from keras import backend as K
+from keras.utils.data_utils import Sequence
 
 
 def apply_transform(x, transform_matrix, fill_mode='nearest', cval=0.):
