@@ -25,7 +25,8 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
-    aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size)
+    aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size,
+                           save_dir='data/test/')
 
     # save examples
     aug_vols, aug_segs = next(aug_gen)

@@ -10,7 +10,8 @@ def augment_generator(vols,
                       shear_range=0.2,
                       zoom_range=0.2,
                       fill_mode='nearest',
-                      flip=True):
+                      flip=True,
+                      save_dir=None):
     """
     Creates generator that performs random data augmentations.
     """
@@ -24,8 +25,10 @@ def augment_generator(vols,
     seg_datagen = ImageDataGenerator(**data_gen_args)
 
     seed = 12345
-    vol_generator = vol_datagen.flow(vols, seed=seed, batch_size=batch_size, shuffle=True, save_to_dir='data/test/', save_prefix='vol')
-    seg_generator = seg_datagen.flow(segs, seed=seed, batch_size=batch_size, shuffle=True, save_to_dir='data/test/', save_prefix='seg')
+    vol_generator = vol_datagen.flow(vols, seed=seed, batch_size=batch_size, shuffle=True,
+                                     save_to_dir=save_dir, save_prefix='vol')
+    seg_generator = seg_datagen.flow(segs, seed=seed, batch_size=batch_size, shuffle=True,
+                                     save_to_dir=save_dir, save_prefix='seg')
 
     aug_generator = zip(vol_generator, seg_generator)
     return aug_generator
