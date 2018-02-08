@@ -107,10 +107,6 @@ class ImageDataGenerator(object):
         self.cval = cval
         self.flip = flip
 
-        self.x_axis = 1
-        self.y_axis = 2
-        self.z_axis = 3
-
         if np.isscalar(zoom_range):
             self.zoom_range = [1 - zoom_range, 1 + zoom_range]
         elif len(zoom_range) == 2:
@@ -192,9 +188,9 @@ class ImageDataGenerator(object):
         if self.shift_range:
             tx, ty, tz = np.random.uniform(-self.shift_range, self.shift_range, 3)
             if self.shift_range < 1:
-                tx *= x.shape[img_x_axis]
-                ty *= x.shape[img_y_axis]
-                tz *= x.shape[img_z_axis]
+                tx *= x.shape[0]
+                ty *= x.shape[1]
+                tz *= x.shape[2]
             shift_matrix = np.array([[1, 0, 0, tx],
                                      [0, 1, 0, ty],
                                      [0, 0, 1, tz],
