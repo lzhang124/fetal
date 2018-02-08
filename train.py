@@ -46,7 +46,7 @@ def augment_data(vol_files, seg_files, batch_size):
     vols = np.array([volread(file) for file in vol_files])
     segs = np.array([volread(file) for file in seg_files])
 
-    return augment_generator(vols, segs, batch_size, save_dir='data/test/')
+    return augment_generator(vols, segs, batch_size)
 
 
 def volread(filename):
