@@ -1,29 +1,25 @@
 import numpy as np
-from keras.preprocessing.image import ImageDataGenerator
+from image3d import ImageDataGenerator
 
 
 def augment_generator(vols,
                       segs,
-                      batch_size=32,
+                      batch_size=1,
                       rotation_range=90.,
-                      width_shift_range=0.1,
-                      height_shift_range=0.1,
+                      shift_range=0.1,
                       shear_range=0.2,
                       zoom_range=0.2,
                       fill_mode='nearest',
-                      horizontal_flip=True,
-                      vertical_flip=True):
+                      flip=True):
     """
     Creates generator that performs random data augmentations.
     """
     data_gen_args = dict(rotation_range=rotation_range,
-                         width_shift_range=width_shift_range,
-                         height_shift_range=height_shift_range,
+                         shift_range=shift_range,
                          shear_range=shear_range,
                          zoom_range=zoom_range,
                          fill_mode=fill_mode,
-                         horizontal_flip=horizontal_flip,
-                         vertical_flip=vertical_flip)
+                         flip=flip)
     vol_datagen = ImageDataGenerator(**data_gen_args)
     seg_datagen = ImageDataGenerator(**data_gen_args)
 

@@ -5,6 +5,7 @@ import re
 import time
 from argparse import ArgumentParser
 from preprocess import augment_generator
+# from models import UNet
 
 
 def build_parser():
@@ -14,7 +15,7 @@ def build_parser():
     parser.add_argument('--segs', dest='seg_files', help='Training segmentation files',
             type=str, default='data/labels/04*/*_placenta.nii.gz')
     parser.add_argument('--batch-size', dest='batch_size', help='Training batch size',
-            type=int, default=32)
+            type=int, default=1)
     return parser
 
 
@@ -25,10 +26,15 @@ def main():
     options = parser.parse_args()
 
     aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size)
+
+    # save examples
     aug_vols, aug_segs = next(aug_gen)
     for i in range(aug_vols.shape[0]):
         volsave(aug_vols[i], 'data/test/vol_{}.nii.gz'.format(i))
         volsave(aug_segs[i], 'data/test/seg_{}.nii.gz'.format(i))
+
+    # train
+    # model = UNet()
 
     end = time.time()
     print('total time:', end - start)
@@ -42,8 +48,8 @@ def augment_data(vol_files, seg_files, batch_size):
     vol_files = [seg_file.replace(seg_path[0], vol_path[0]).replace(seg_path[1], vol_path[1])
                  for seg_file in seg_files]
 
-    vols = np.array([volread(file) for file in vol_files] * (batch_size // len(seg_files) + 1))
-    segs = np.array([volread(file) for file in seg_files] * (batch_size // len(seg_files) + 1))
+    vols = np.array([volread(file) for file in vol_files])
+    segs = np.array([volread(file) for file in seg_files])
 
     return augment_generator(vols, segs, batch_size)
 
