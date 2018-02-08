@@ -234,7 +234,7 @@ class ImageDataGenerator(object):
             x = apply_transform(x, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
 
         if self.flip:
-            for axis in range(1, 4):
+            for axis in range(3):
                 if np.random.random() < 0.5:
                     x = flip_axis(x, axis)
 
