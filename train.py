@@ -27,12 +27,7 @@ def main():
 
     aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size,
                            save_dir='data/test/')
-
-    # save examples
     aug_vols, aug_segs = next(aug_gen)
-    # for i in range(aug_vols.shape[0]):
-    #     volsave(aug_vols[i], 'data/test/vol_{}.nii.gz'.format(i))
-    #     volsave(aug_segs[i], 'data/test/seg_{}.nii.gz'.format(i))
 
     # train
     # model = UNet()
