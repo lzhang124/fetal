@@ -266,9 +266,10 @@ class Iterator(Sequence):
         self.index_generator = self._flow_index()
 
     def _set_index_array(self):
-        self.index_array = np.arange(self.n)
         if self.shuffle:
-            self.index_array = np.random.permutation(self.n)
+            self.index_array = np.ravel([np.random.permutation(self.n) for _ in range(len(self))])
+        else:
+            self.index_array = np.ravel([np.arange(self.n)] * len(self))
 
     def __getitem__(self, idx):
         if idx >= len(self):
@@ -354,7 +355,7 @@ class NumpyArrayIterator(Iterator):
     """
 
     def __init__(self, x, y, image_data_generator,
-                 batch_size=32, shuffle=False, seed=None,
+                 batch_size=32, shuffle=True, seed=None,
                  save_to_dir=None, save_prefix='', save_format='png'):
         if y is not None and len(x) != len(y):
             raise ValueError('x (images tensor) and y (labels) '
