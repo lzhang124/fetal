@@ -4,7 +4,7 @@ from image3d import ImageDataGenerator
 
 def augment_generator(vols,
                       segs,
-                      batch_size=1,
+                      batch_size=32,
                       rotation_range=90.,
                       shift_range=0.1,
                       shear_range=0.2,
@@ -24,8 +24,8 @@ def augment_generator(vols,
     seg_datagen = ImageDataGenerator(**data_gen_args)
 
     seed = 12345
-    vol_generator = vol_datagen.flow(vols, seed=seed, batch_size=batch_size, shuffle=True)
-    seg_generator = seg_datagen.flow(segs, seed=seed, batch_size=batch_size, shuffle=True)
+    vol_generator = vol_datagen.flow(vols, seed=seed, batch_size=batch_size, shuffle=True, save_to_dir='data/test/', prefix='vol')
+    seg_generator = seg_datagen.flow(segs, seed=seed, batch_size=batch_size, shuffle=True, save_to_dir='data/test/', prefix='seg')
 
     aug_generator = zip(vol_generator, seg_generator)
     return aug_generator
