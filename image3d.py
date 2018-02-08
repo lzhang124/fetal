@@ -390,9 +390,8 @@ class NumpyArrayIterator(Iterator):
         if self.save_to_dir:
             for i in range(len(batch_x)):
                 img = array_to_img(batch_x[i])
-                fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix,
+                fname = '{prefix}_{index}.{format}'.format(prefix=self.save_prefix,
                                                                   index=i,
-                                                                  hash=np.random.randint(1e4),
                                                                   format=self.save_format)
                 img.to_filename(os.path.join(self.save_to_dir, fname))
         if self.y is None:
