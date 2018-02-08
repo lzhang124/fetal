@@ -38,7 +38,7 @@ def main():
 def augment_data(vol_files, seg_files, batch_size):
     vol_path = vol_files.split('*/*')
     seg_path = seg_files.split('*/*')
-    
+
     seg_files = glob.glob(seg_files)
     vol_files = [seg_file.replace(seg_path[0], vol_path[0]).replace(seg_path[1], vol_path[1])
                  for seg_file in seg_files]

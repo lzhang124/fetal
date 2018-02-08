@@ -25,9 +25,9 @@ def augment_generator(vols,
     seg_datagen = ImageDataGenerator(**data_gen_args)
 
     seed = 12345
-    vol_generator = vol_datagen.flow(vols, seed=seed, batch_size=batch_size, shuffle=True,
+    vol_generator = vol_datagen.flow(vols, seed=seed, batch_size=batch_size,
                                      save_to_dir=save_dir, save_prefix='vol')
-    seg_generator = seg_datagen.flow(segs, seed=seed, batch_size=batch_size, shuffle=True,
+    seg_generator = seg_datagen.flow(segs, seed=seed, batch_size=batch_size,
                                      save_to_dir=save_dir, save_prefix='seg')
 
     aug_generator = zip(vol_generator, seg_generator)
