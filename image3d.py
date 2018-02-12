@@ -344,7 +344,8 @@ class VolSegIterator(Iterator):
 
         self.image_transformer = image_transformer
         self.save_to_dir = save_to_dir
-        self.save_prefix = save_prefix
+        self.x_prefix = x_prefix
+        self.y_prefix = y_prefix
         self.save_format = save_format
         super(NumpyArrayIterator, self).__init__(x.shape[0], batch_size, shuffle, seed)
 
