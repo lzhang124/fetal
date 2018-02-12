@@ -41,7 +41,7 @@ class AugmentGenerator(VolSegIterator):
                                              flip=flip)
 
         super(AugmentGenerator, self).__init__(vols, segs, image_transformer,
-                                           batch_size=batch_size,
-                                           save_to_dir=save_to_dir,
-                                           x_prefix='vol',
-                                           y_prefix='seg')
+                                               batch_size=batch_size,
+                                               save_to_dir=save_to_dir,
+                                               x_prefix='vol',
+                                               y_prefix='seg')
