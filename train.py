@@ -22,10 +22,8 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
-    aug_gen = AugmentGenerator(options.vol_files, options.seg_files,
-                               batch_size=options.batch_size,
-                               save_to_dir='data/test/')
-    aug_vols, aug_segs = next(aug_gen)
+    aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size)
+    print(aug_gen.shape)
 
     # train
     # model = UNet()

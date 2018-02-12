@@ -148,7 +148,9 @@ class ImageTransformer(object):
         transform_matrix = None
 
         if self.rotation_range:
-            rx, ry, rz = np.deg2rad(np.random.uniform(-self.rotation_range, self.rotation_range, 3))
+            rx, ry, rz = np.deg2rad(np.random.uniform(-self.rotation_range,
+                                                      self.rotation_range,
+                                                      3))
             Rx = np.array([[1, 0, 0, 0],
                            [0, np.cos(rx), -np.sin(rx), 0],
                            [0, np.sin(rx), np.cos(rx), 0],
@@ -174,15 +176,23 @@ class ImageTransformer(object):
                                      [0, 1, 0, ty],
                                      [0, 0, 1, tz],
                                      [0, 0, 0, 1]])
-            transform_matrix = shift_matrix if transform_matrix is None else np.dot(transform_matrix, shift_matrix)
+            if transform_matrix is None:
+                transform_matrix = shift_matrix
+            else:
+                transform_matrix = np.dot(transform_matrix, shift_matrix)
 
         if self.shear_range:
-            sxy, sxz, syx, syz, szx, szy = np.random.uniform(-self.shear_range, self.shear_range, 6)
+            sxy, sxz, syx, syz, szx, szy = np.random.uniform(-self.shear_range,
+                                                             self.shear_range,
+                                                             6)
             shear_matrix = np.array([[1, sxy, sxz, 0],
                                      [syx, 1, syz, 0], 
                                      [szx, szy, 1, 0],
                                      [0, 0, 0, 1]])
-            transform_matrix = shear_matrix if transform_matrix is None else np.dot(transform_matrix, shear_matrix)
+            if transform_matrix is None:
+                transform_matrix = shear_matrix
+            else:
+                transform_matrix = np.dot(transform_matrix, shear_matrix)
 
         if self.zoom_range[0] == 1 and self.zoom_range[1] == 1:
             zx, zy, zz = 1, 1, 1
@@ -190,7 +200,10 @@ class ImageTransformer(object):
                                     [0, zy, 0, 0],
                                     [0, 0, zz, 0],
                                     [0, 0, 0, 1]])
-            transform_matrix = zoom_matrix if transform_matrix is None else np.dot(transform_matrix, zoom_matrix)
+            if transform_matrix is None:
+                transform_matrix = zoom_matrix
+            else:
+                transform_matrix = np.dot(transform_matrix, zoom_matrix)
 
         if transform_matrix is not None:
             transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)
@@ -340,6 +353,7 @@ class VolSegIterator(Iterator):
                              'Found: x.shape = %s, y.shape = %s' %
                              (self.x.shape, self.y.shape))
 
+        self.shape = self.x.shape[1:]
         self.image_transformer = image_transformer
         self.save_to_dir = save_to_dir
         self.x_prefix = x_prefix
