@@ -77,8 +77,8 @@ def array_to_img(x):
     return nib.Nifti1Image(x.astype('int16'), np.eye(4))
 
 
-class ImageDataGenerator(object):
-    """Generate minibatches of image data with real-time data augmentation.
+class ImageTransformer(object):
+    """Transforms image data.
 
     # Arguments
         rotation_range: degrees (0 to 180).
@@ -129,26 +129,16 @@ class ImageDataGenerator(object):
             raise ValueError('`shear_range` should be a float. '
                              'Received arg: ', shear_range)
 
-    def flow(self, x, y=None, batch_size=32, shuffle=True, seed=None,
-             save_to_dir=None, save_prefix='', save_format='nii.gz'):
-        return NumpyArrayIterator(
-            x, y, self,
-            batch_size=batch_size,
-            shuffle=shuffle,
-            seed=seed,
-            save_to_dir=save_to_dir,
-            save_prefix=save_prefix,
-            save_format=save_format)
-
-    def random_transform(self, x, seed=None):
-        """Randomly augment a single image tensor.
+    def random_transform(self, x, y=None, seed=None):
+        """Randomly augment a single image tensor and optionally its label.
 
         # Arguments
             x: 3D tensor, single image.
+            y: 3D tensor, label of x. Must be the same shape as x.
             seed: random seed.
 
         # Returns
-            A randomly transformed version of the input (same shape).
+            A randomly transformed version of the input and label (same shape).
         """
         if seed is not None:
             np.random.seed(seed)
@@ -205,13 +195,17 @@ class ImageDataGenerator(object):
         if transform_matrix is not None:
             transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)
             x = apply_transform(x, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
+            y = apply_transform(y, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
 
         if self.flip:
             for axis in range(3):
                 if np.random.random() < 0.5:
                     x = flip_axis(x, axis)
+                    y = flip_axis(y, axis)
 
-        return x
+        if y is None:
+            return x
+        return x, y
 
 
 class Iterator(Sequence):
@@ -307,14 +301,14 @@ class Iterator(Sequence):
         raise NotImplementedError
 
 
-class NumpyArrayIterator(Iterator):
-    """Iterator yielding data from a Numpy array.
+class VolSegIterator(Iterator):
+    """Iterator yielding data for volumes and segmentations.
 
     # Arguments
         x: Numpy array of input data.
-        y: Numpy array of targets data.
-        image_data_generator: Instance of `ImageDataGenerator`
-            to use for random transformations and normalization.
+        y: Numpy array of label data.
+        image_transformer: Instance of `ImageTransformer`
+            to use for random transformations.
         batch_size: Integer, size of a batch.
         shuffle: Boolean, whether to shuffle the data between epochs.
         seed: Random seed for data shuffling.
@@ -328,15 +322,9 @@ class NumpyArrayIterator(Iterator):
             (if `save_to_dir` is set).
     """
 
-    def __init__(self, x, y, image_data_generator,
+    def __init__(self, x, y, image_transformer,
                  batch_size=32, shuffle=True, seed=None,
-                 save_to_dir=None, save_prefix='', save_format='png'):
-        if y is not None and len(x) != len(y):
-            raise ValueError('x (images tensor) and y (labels) '
-                             'should have the same length. '
-                             'Found: x.shape = %s, y.shape = %s' %
-                             (np.asarray(x).shape, np.asarray(y).shape))
-
+                 save_to_dir=None, x_prefix='', y_prefix='', save_format='nii.gz'):
         self.x = np.asarray(x, dtype=K.floatx())
 
         if self.x.ndim != 4:
@@ -344,10 +332,17 @@ class NumpyArrayIterator(Iterator):
                              'should have rank 4. You passed an array '
                              'with shape', self.x.shape)
         if y is not None:
-            self.y = np.asarray(y)
+            self.y = np.asarray(y, dtype=K.floatx())
         else:
             self.y = None
-        self.image_data_generator = image_data_generator
+
+        if y is not None and self.x.shape != self.y.shape:
+            raise ValueError('x (images tensor) and y (labels) '
+                             'should have the same shape. '
+                             'Found: x.shape = %s, y.shape = %s' %
+                             (self.x.shape, self.y.shape))
+
+        self.image_transformer = image_transformer
         self.save_to_dir = save_to_dir
         self.save_prefix = save_prefix
         self.save_format = save_format
@@ -356,20 +351,40 @@ class NumpyArrayIterator(Iterator):
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x = np.zeros(tuple([len(index_array)] + list(self.x.shape)[1:]),
                            dtype=K.floatx())
+        if self.y is None:
+            for i, j in enumerate(index_array):
+                x = self.x[j]
+                x = self.image_transformer.random_transform(x.astype(K.floatx()))
+                batch_x[i] = x
+            if self.save_to_dir:
+                for i in range(len(batch_x)):
+                    img = array_to_img(batch_x[i])
+                    fname = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
+                                                               index=i,
+                                                               format=self.save_format)
+                    img.to_filename(os.path.join(self.save_to_dir, fname))
+            return batch_x
+
+        batch_y = np.zeros(tuple([len(index_array)] + list(self.y.shape)[1:]),
+                               dtype=K.floatx())      
         for i, j in enumerate(index_array):
-            x = self.x[j]
-            x = self.image_data_generator.random_transform(x.astype(K.floatx()))
+            x, y = self.x[j], self.y[j]
+            x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
+                                                           y.astype(K.floatx()))
             batch_x[i] = x
+            batch_y[i] = y
         if self.save_to_dir:
             for i in range(len(batch_x)):
-                img = array_to_img(batch_x[i])
-                fname = '{prefix}_{index}.{format}'.format(prefix=self.save_prefix,
-                                                                  index=i,
-                                                                  format=self.save_format)
-                img.to_filename(os.path.join(self.save_to_dir, fname))
-        if self.y is None:
-            return batch_x
-        batch_y = self.y[index_array]
+                img_x = array_to_img(batch_x[i])
+                img_y = array_to_img(batch_y[i])
+                fname_x = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
+                                                             index=i,
+                                                             format=self.save_format)
+                fname_y = '{prefix}_{index}.{format}'.format(prefix=self.y_prefix,
+                                                             index=i,
+                                                             format=self.save_format)
+                img_x.to_filename(os.path.join(self.save_to_dir, fname_x))
+                img_y.to_filename(os.path.join(self.save_to_dir, fname_y))
         return batch_x, batch_y
 
     def next(self):

@@ -4,7 +4,7 @@ import numpy as np
 import re
 import time
 from argparse import ArgumentParser
-from preprocess import augment_generator
+from preprocess import AugmentGenerator
 # from models import UNet
 
 
@@ -25,7 +25,9 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
-    aug_gen = augment_data(options.vol_files, options.seg_files, options.batch_size)
+    aug_gen = AugmentGenerator(options.vol_files, options.seg_files,
+                               batch_size=options.batch_size,
+                               save_to_dir='data/test/')
     aug_vols, aug_segs = next(aug_gen)
 
     # train
@@ -33,24 +35,6 @@ def main():
 
     end = time.time()
     print('total time:', end - start)
-
-
-def augment_data(vol_files, seg_files, batch_size):
-    vol_path = vol_files.split('*/*')
-    seg_path = seg_files.split('*/*')
-
-    seg_files = glob.glob(seg_files)
-    vol_files = [seg_file.replace(seg_path[0], vol_path[0]).replace(seg_path[1], vol_path[1])
-                 for seg_file in seg_files]
-
-    vols = np.array([volread(file) for file in vol_files])
-    segs = np.array([volread(file) for file in seg_files])
-
-    return augment_generator(vols, segs, batch_size)
-
-
-def volread(filename):
-    return np.squeeze(nib.load(filename).get_data())
 
 
 if __name__ == '__main__':
