@@ -27,10 +27,7 @@ class AugmentGenerator(VolSegIterator):
         self.seg_files = glob.glob(seg_files)
         self.vol_files = [seg_file.replace(seg_path[0], vol_path[0])
                                   .replace(seg_path[1], vol_path[1])
-                          for seg_file in seg_files]
-
-        print(self.vol_files)
-        print(self.seg_files)
+                          for seg_file in self.seg_files]
 
         vols = np.array([volread(file) for file in self.vol_files])
         segs = np.array([volread(file) for file in self.seg_files])
