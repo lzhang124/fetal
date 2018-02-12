@@ -328,7 +328,7 @@ class VolSegIterator(Iterator):
         self.x = np.asarray(x, dtype=K.floatx())
 
         if self.x.ndim != 4:
-            raise ValueError('Input data in `NumpyArrayIterator` '
+            raise ValueError('Input data in `VolSegIterator` '
                              'should have rank 4. You passed an array '
                              'with shape', self.x.shape)
         if y is not None:
@@ -347,7 +347,7 @@ class VolSegIterator(Iterator):
         self.x_prefix = x_prefix
         self.y_prefix = y_prefix
         self.save_format = save_format
-        super(NumpyArrayIterator, self).__init__(x.shape[0], batch_size, shuffle, seed)
+        super(VolSegIterator, self).__init__(x.shape[0], batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x = np.zeros(tuple([len(index_array)] + list(self.x.shape)[1:]),
