@@ -203,9 +203,7 @@ class ImageTransformer(object):
                     x = flip_axis(x, axis)
                     y = flip_axis(y, axis)
 
-        if y is None:
-            return x
-        return x, y
+        return x if y is None else x, y
 
 
 class Iterator(Sequence):
@@ -357,36 +355,33 @@ class VolSegIterator(Iterator):
                 x = self.x[j]
                 x = self.image_transformer.random_transform(x.astype(K.floatx()))
                 batch_x[i] = x
-            if self.save_to_dir:
-                for i in range(len(batch_x)):
-                    img = array_to_img(batch_x[i])
-                    fname = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
+        else:
+            batch_y = np.zeros(tuple([len(index_array)] + list(self.y.shape)[1:]),
+                               dtype=K.floatx())      
+            for i, j in enumerate(index_array):
+                x, y = self.x[j], self.y[j]
+                x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
+                                                               y.astype(K.floatx()))
+                batch_x[i] = x
+                batch_y[i] = y
+
+        if self.save_to_dir:
+            for i in range(len(batch_x)):
+                img = array_to_img(batch_x[i])
+                fname = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
+                                                           index=i,
+                                                           format=self.save_format)
+                img.to_filename(os.path.join(self.save_to_dir, fname))
+
+            if self.y is not None:
+                for i in range(len(batch_y)):
+                    img = array_to_img(batch_y[i])
+                    fname = '{prefix}_{index}.{format}'.format(prefix=self.y_prefix,
                                                                index=i,
                                                                format=self.save_format)
                     img.to_filename(os.path.join(self.save_to_dir, fname))
-            return batch_x
-
-        batch_y = np.zeros(tuple([len(index_array)] + list(self.y.shape)[1:]),
-                               dtype=K.floatx())      
-        for i, j in enumerate(index_array):
-            x, y = self.x[j], self.y[j]
-            x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
-                                                           y.astype(K.floatx()))
-            batch_x[i] = x
-            batch_y[i] = y
-        if self.save_to_dir:
-            for i in range(len(batch_x)):
-                img_x = array_to_img(batch_x[i])
-                img_y = array_to_img(batch_y[i])
-                fname_x = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
-                                                             index=i,
-                                                             format=self.save_format)
-                fname_y = '{prefix}_{index}.{format}'.format(prefix=self.y_prefix,
-                                                             index=i,
-                                                             format=self.save_format)
-                img_x.to_filename(os.path.join(self.save_to_dir, fname_x))
-                img_y.to_filename(os.path.join(self.save_to_dir, fname_y))
-        return batch_x, batch_y
+        
+        return batch_x if self.y is None else batch_x, batch_y
 
     def next(self):
         """For python 2.x.
