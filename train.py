@@ -1,7 +1,4 @@
-import glob
-import nibabel as nib
 import numpy as np
-import re
 import time
 from argparse import ArgumentParser
 from preprocess import AugmentGenerator
