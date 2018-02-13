@@ -105,8 +105,9 @@ venv.bak/
 
 .DS_Store
 
-# data
+# data and models
 data/
+models/
 
 # outputs
 *.err
