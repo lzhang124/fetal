@@ -1,3 +1,6 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
 import numpy as np
 import time
 from argparse import ArgumentParser
@@ -13,6 +16,8 @@ def build_parser():
             type=str, default='data/labels/04*/*_placenta.nii.gz')
     parser.add_argument('--batch-size', dest='batch_size', help='Training batch size',
             type=int, default=32)
+    parser.add_argument('--model', dest='model_file', help='Pretrained model file',
+            type=str)
     return parser
 
 
@@ -24,7 +29,7 @@ def main():
 
     aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size)
 
-    model = UNet(aug_gen.shape + (1,))
+    model = UNet(aug_gen.shape + (1,), options.model_file)
     UNet.train(aug_gen)
 
     end = time.time()
