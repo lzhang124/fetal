@@ -2,7 +2,7 @@ import numpy as np
 import time
 from argparse import ArgumentParser
 from preprocess import AugmentGenerator
-# from models import UNet
+from models import UNet
 
 
 def build_parser():
@@ -23,10 +23,8 @@ def main():
     options = parser.parse_args()
 
     aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size)
-    print(aug_gen.shape)
 
-    # train
-    # model = UNet()
+    model = UNet(aug_gen.shape + (1,))
 
     end = time.time()
     print('total time:', end - start)
