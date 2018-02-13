@@ -54,7 +54,7 @@ class UNet(Model):
         pool4 = MaxPooling3D(pool_size=(2, 2, 2))(conv4)
 
         conv5 = Conv3D(512, (3, 3, 3), activation='relu', padding='same')(pool4)
-        conv5 = Conv3D(512, (3, 3, 3), activation='relu', padding='same')(conv4)
+        conv5 = Conv3D(512, (3, 3, 3), activation='relu', padding='same')(conv5)
 
         up6 = Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv5)
         conc6 = concatenate([up6, conv4], axis=4)
