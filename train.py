@@ -25,6 +25,7 @@ def main():
     aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size)
 
     model = UNet(aug_gen.shape + (1,))
+    UNet.train(aug_gen)
 
     end = time.time()
     print('total time:', end - start)
