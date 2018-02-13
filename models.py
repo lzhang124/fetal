@@ -63,18 +63,18 @@ class UNet(Model):
 
         up7 = Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv6)
         conc7 = concatenate([up7, conv3], axis=4)
-        conv7 = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conc7)
-        conv7 = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv7)
+        conv7 = Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conc7)
+        conv7 = Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv7)
 
         up8 = Conv3DTranspose(64, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv7)
         conc8 = concatenate([up8, conv2], axis=4)
-        conv8 = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conc8)
-        conv8 = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv8)
+        conv8 = Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conc8)
+        conv8 = Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv8)
 
         up9 = Conv3DTranspose(32, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv8)
         conc9 = concatenate([up9, conv1], axis=4)
-        conv9 = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conc9)
-        conv9 = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv9)
+        conv9 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conc9)
+        conv9 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv9)
 
         outputs = Conv3D(1, (1, 1, 1), activation='sigmoid')(conv9)
 
