@@ -2,12 +2,13 @@ import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import logging
+logging.basicConfig(level=logging.INFO)
+
 import numpy as np
 import time
 from argparse import ArgumentParser
 from preprocess import AugmentGenerator
 from models import UNet
-
 
 
 def build_parser():
