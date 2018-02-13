@@ -1,11 +1,13 @@
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
+import logging
 import numpy as np
 import time
 from argparse import ArgumentParser
 from preprocess import AugmentGenerator
 from models import UNet
+
 
 
 def build_parser():
@@ -27,13 +29,16 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
+    logging.info('Creating data generator.')
     aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size)
 
+    logging.info('Compiling model.')
     model = UNet(aug_gen.shape + (1,), options.model_file)
+    logging.info('Training model.')
     UNet.train(aug_gen)
 
     end = time.time()
-    print('total time:', end - start)
+    logging.info('total time:', end - start)
 
 
 if __name__ == '__main__':
