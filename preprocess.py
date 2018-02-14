@@ -18,9 +18,9 @@ def volread(filename):
         raise ValueError('The input size {size} is not supported.'.format(size=vol.shape))
 
     # convert to target shape
-    dx = (VOL_SHAPE[0] - TARGET_SHAPE[0]) / 2
-    dy = (VOL_SHAPE[1] - TARGET_SHAPE[1]) / 2
-    dz = (TARGET_SHAPE[2] - VOL_SHAPE[2]) / 2
+    dx = (VOL_SHAPE[0] - TARGET_SHAPE[0]) // 2
+    dy = (VOL_SHAPE[1] - TARGET_SHAPE[1]) // 2
+    dz = (TARGET_SHAPE[2] - VOL_SHAPE[2]) // 2
     test = np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
                   'constant', constant_values=(0, 0))
     print(test.shape)
