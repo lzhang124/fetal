@@ -12,7 +12,7 @@ def volread(filename):
     vol = nib.load(filename).get_data()
     
     # need to add channel axis
-    if vol.ndims == 3:
+    if vol.ndim == 3:
         vol = vol[..., np.newaxis]
     if vol.shape != VOL_SHAPE:
         raise ValueError('The input size {size} is not supported.'.format(size=vol.shape))
