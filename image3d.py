@@ -338,9 +338,9 @@ class VolSegIterator(Iterator):
                  save_to_dir=None, x_prefix='', y_prefix='', save_format='nii.gz'):
         self.x = np.asarray(x, dtype=K.floatx())
 
-        if self.x.ndim != 4:
+        if self.x.ndim != 5:
             raise ValueError('Input data in `VolSegIterator` '
-                             'should have rank 4. You passed an array '
+                             'should have rank 5. You passed an array '
                              'with shape', self.x.shape)
         if y is not None:
             self.y = np.asarray(y, dtype=K.floatx())

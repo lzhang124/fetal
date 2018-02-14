@@ -4,8 +4,29 @@ import numpy as np
 from image3d import ImageTransformer, VolSegIterator
 
 
+VOL_SHAPE = (150, 150, 110, 1)
+TARGET_SHAPE = (128, 128, 128, 1)
+
+
 def volread(filename):
-    return np.squeeze(nib.load(filename).get_data())
+    vol = nib.load(filename).get_data()
+    
+    # need to add channel axis
+    if vol.ndims == 3:
+        vol = vol[..., np.newaxis]
+    if vol.shape != VOL_SHAPE:
+        raise ValueError('The input size {size} is not supported.'.format(size=vol.shape))
+
+    # convert to target shape
+    dx = (VOL_SHAPE[0] - TARGET_SHAPE[0]) / 2
+    dy = (VOL_SHAPE[1] - TARGET_SHAPE[1]) / 2
+    dz = (TARGET_SHAPE[2] - VOL_SHAPE[2]) / 2
+    test = np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
+                  'constant', constant_values=(0, 0))
+    print test.shape
+    raise Error
+    return np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
+                  'constant', constant_values=(0, 0))
 
 
 class AugmentGenerator(VolSegIterator):
