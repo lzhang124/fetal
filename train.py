@@ -34,7 +34,8 @@ def main():
     aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size)
 
     logging.info('Compiling model.')
-    model = UNet(aug_gen.shape + (1,), options.model_file)
+    print(aug_gen.shape)
+    model = UNet(aug_gen.shape, options.model_file)
     logging.info('Training model.')
     UNet.train(aug_gen)
 

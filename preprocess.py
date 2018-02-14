@@ -15,17 +15,19 @@ def volread(filename):
     if vol.ndim == 3:
         vol = vol[..., np.newaxis]
     if vol.shape != VOL_SHAPE:
-        raise ValueError('The input size {size} is not supported.'.format(size=vol.shape))
+        raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
 
     # convert to target shape
     dx = (VOL_SHAPE[0] - TARGET_SHAPE[0]) // 2
     dy = (VOL_SHAPE[1] - TARGET_SHAPE[1]) // 2
     zeros = np.zeros((TARGET_SHAPE[0], TARGET_SHAPE[1], (TARGET_SHAPE[2] - VOL_SHAPE[2]) // 2, 1))
-    test = np.concatenate([zeros, vol[dx:-dx, dy:-dy, :], zeros], axis=2)
-    print(test.shape)
-    raise Error
-    return np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
-                  'constant', constant_values=(0, 0))
+    
+    resized = np.concatenate([zeros, vol[dx:-dx, dy:-dy, :], zeros], axis=2)
+    if resized.shape != TARGET_SHAPE:
+        raise ValueError('The resized shape {shape} '
+                         'does not match the target shape {target}'.format(shape=resized.shape,
+                                                                           target=TARGET_SHAPE))
+    return resized
 
 
 class AugmentGenerator(VolSegIterator):
