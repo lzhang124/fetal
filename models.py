@@ -76,7 +76,7 @@ class UNet(Model):
 
         outputs = Conv3D(1, (1, 1, 1), activation='sigmoid')(conv9)
 
-        model = Model(inputs=[inputs], outputs=[outputs])
+        model = Model(inputs=inputs, outputs=outputs)
         model.compile(optimizers=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
 
         return model
