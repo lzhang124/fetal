@@ -22,7 +22,7 @@ def volread(filename):
     dy = (VOL_SHAPE[1] - TARGET_SHAPE[1]) // 2
     dz = (TARGET_SHAPE[2] - VOL_SHAPE[2]) // 2
     zeros = np.zeros((TARGET_SHAPE[0], TARGET_SHAPE[1], dz))
-    test = np.stack(zeros, vol[dx:-dx, dy:-dy, :], zeros)
+    test = np.stack([zeros, vol[dx:-dx, dy:-dy, :], zeros])
     print(test.shape)
     raise Error
     return np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
