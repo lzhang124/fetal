@@ -21,8 +21,8 @@ def volread(filename):
     dx = (VOL_SHAPE[0] - TARGET_SHAPE[0]) // 2
     dy = (VOL_SHAPE[1] - TARGET_SHAPE[1]) // 2
     dz = (TARGET_SHAPE[2] - VOL_SHAPE[2]) // 2
-    test = np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
-                  'constant', constant_values=(0, 0))
+    zeros = np.zeros((TARGET_SHAPE[0], TARGET_SHAPE[1], dz))
+    test = np.stack(zeros, vol[dx:-dx, dy:-dy, :], zeros)
     print(test.shape)
     raise Error
     return np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
