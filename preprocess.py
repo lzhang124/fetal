@@ -20,8 +20,7 @@ def volread(filename):
     # convert to target shape
     dx = (VOL_SHAPE[0] - TARGET_SHAPE[0]) // 2
     dy = (VOL_SHAPE[1] - TARGET_SHAPE[1]) // 2
-    zeros = np.zeros((TARGET_SHAPE[0], TARGET_SHAPE[1], (TARGET_SHAPE[2] - VOL_SHAPE[2]) // 2))
-    print(vol[dx:-dx, dy:-dy, :].shape, zeros.shape)
+    zeros = np.zeros((TARGET_SHAPE[0], TARGET_SHAPE[1], (TARGET_SHAPE[2] - VOL_SHAPE[2]) // 2, 1))
     test = np.stack([zeros, vol[dx:-dx, dy:-dy, :], zeros], axis=2)
     print(test.shape)
     raise Error
