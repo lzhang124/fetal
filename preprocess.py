@@ -23,7 +23,7 @@ def volread(filename):
     dz = (TARGET_SHAPE[2] - VOL_SHAPE[2]) / 2
     test = np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
                   'constant', constant_values=(0, 0))
-    print test.shape
+    print(test.shape)
     raise Error
     return np.pad(vol[dx:-dx, dy:-dy, :], ((dz, dz), (dz, dz), (0, 0)),
                   'constant', constant_values=(0, 0))
