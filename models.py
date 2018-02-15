@@ -4,6 +4,9 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 
+import keras
+print keras.__version__
+
 
 def dice_coef(y_true, y_pred):
     y_true_f = K.flatten(y_true)
