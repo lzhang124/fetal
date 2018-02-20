@@ -16,7 +16,7 @@ def dice_coef_loss(y_true, y_pred):
     return -dice_coef(y_true, y_pred)
 
 
-class Model:
+class BaseModel:
     def __init__(self, input_shape, filename=None):
         self.input_shape = input_shape
         self.model = self._new_model() if filename is None else load_model(filename)
@@ -31,7 +31,7 @@ class Model:
         raise NotImplementedError()
 
 
-class UNet(Model):
+class UNet(BaseModel):
     def _new_model(self):
         inputs = Input(shape=self.input_shape)
 
