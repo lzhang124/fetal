@@ -36,7 +36,7 @@ def main():
     logging.info('Compiling model.')
     model = UNet(aug_gen.shape, options.model_file)
     logging.info('Training model.')
-    UNet.train(aug_gen)
+    model.train(aug_gen)
 
     end = time.time()
     logging.info('total time:', end - start)
