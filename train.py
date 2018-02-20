@@ -31,12 +31,14 @@ def main():
     options = parser.parse_args()
 
     logging.info('Creating data generator.')
-    aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size)
+    aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size, save_to_dir='data/test/')
 
-    logging.info('Compiling model.')
-    model = UNet(aug_gen.shape, options.model_file)
-    logging.info('Training model.')
-    model.train(aug_gen)
+    aug_gen.next()
+
+    # logging.info('Compiling model.')
+    # model = UNet(aug_gen.shape, options.model_file)
+    # logging.info('Training model.')
+    # model.train(aug_gen)
 
     end = time.time()
     logging.info('total time:', end - start)
