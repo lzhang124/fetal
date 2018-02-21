@@ -82,7 +82,7 @@ class UNet(BaseModel):
         return model
 
     def train(self, generator, epochs=10):
-        model_checkpoint = ModelCheckpoint('unet_weights.{epoch:02d}-{loss:.2f}.hdf5',
+        model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.2f}.hdf5',
                                            monitor='loss',
                                            save_best_only=True)
 
