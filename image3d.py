@@ -39,12 +39,17 @@ def transform_matrix_offset_center(matrix, shape):
     return transform_matrix
 
 
-def apply_transform(x, transform_matrix, fill_mode='nearest', cval=0.):
+def apply_transform(x,
+                    transform_matrix,
+                    channel_axis=3,
+                    fill_mode='nearest',
+                    cval=0.):
     """Apply the image transformation specified by a matrix.
 
     # Arguments
-        x: 3D numpy array, single image.
+        x: 4D numpy array, single image.
         transform_matrix: Numpy array specifying the geometric transformation.
+        channel_axis: Index of axis for channels in the input tensor.
         fill_mode: Points outside the boundaries of the input
             are filled according to the given mode
             (one of `{'constant', 'nearest', 'reflect', 'wrap'}`).
@@ -54,15 +59,18 @@ def apply_transform(x, transform_matrix, fill_mode='nearest', cval=0.):
     # Returns
         The transformed version of the input.
     """
+    x = np.rollaxis(x, channel_axis, 0)
     final_affine_matrix = transform_matrix[:-1, :-1]
     final_offset = transform_matrix[:-1, -1]
-    x = ndi.interpolation.affine_transform(
-        x,
-        final_affine_matrix,
-        final_offset,
-        order=1,
-        mode=fill_mode,
-        cval=cval)
+    channel_images = [ndi.interpolation.affine_transform(
+                      channel,
+                      final_affine_matrix,
+                      final_offset,
+                      order=1,
+                      mode=fill_mode,
+                      cval=cval) for channel in x]
+    x = np.stack(channel_images, axis=0)
+    x = np.rollaxis(x, 0, channel_axis + 1)
     return x
 
 
@@ -207,8 +215,6 @@ class ImageTransformer(object):
 
         if transform_matrix is not None:
             transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)
-            print(transform_matrix.shape)
-            print(x.shape)
             x = apply_transform(x, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
             y = apply_transform(y, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
 
