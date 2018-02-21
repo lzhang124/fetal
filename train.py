@@ -33,15 +33,13 @@ def main():
     logging.info('Creating data generator.')
     aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size, save_to_dir='data/test/')
 
-    aug_gen.next()
-
-    # logging.info('Compiling model.')
-    # model = UNet(aug_gen.shape, options.model_file)
-    # logging.info('Training model.')
-    # model.train(aug_gen)
+    logging.info('Compiling model.')
+    model = UNet(aug_gen.shape, options.model_file)
+    logging.info('Training model.')
+    model.train(aug_gen)
 
     end = time.time()
-    logging.info('total time:', end - start)
+    logging.info('total time: {}s'.format(end - start))
 
 
 if __name__ == '__main__':
