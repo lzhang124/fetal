@@ -18,7 +18,7 @@ def build_parser():
     parser.add_argument('--segs', dest='seg_files', help='Training segmentation files',
                         type=str, default='data/labels/04*/*_placenta.nii.gz')
     parser.add_argument('--batch-size', dest='batch_size', help='Training batch size',
-                        type=int, default=32)
+                        type=int, default=6)
     parser.add_argument('--model', dest='model_file', help='Pretrained model file',
                         type=str)
     return parser
@@ -31,7 +31,7 @@ def main():
     options = parser.parse_args()
 
     logging.info('Creating data generator.')
-    aug_gen = AugmentGenerator(options.vol_files, options.seg_files, batch_size=options.batch_size, save_to_dir='data/test/')
+    aug_gen = AugmentGenerator(options.vol_files, options.seg_files, options.batch_size)
 
     logging.info('Compiling model.')
     model = UNet(aug_gen.shape, options.model_file)

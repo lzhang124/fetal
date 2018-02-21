@@ -34,6 +34,7 @@ class AugmentGenerator(VolSegIterator):
     def __init__(self,
                  vol_files,
                  seg_files,
+                 batch_size,
                  rotation_range=90.,
                  shift_range=0.1,
                  shear_range=0.2,
@@ -41,7 +42,6 @@ class AugmentGenerator(VolSegIterator):
                  fill_mode='nearest',
                  cval=0.,
                  flip=True,
-                 batch_size=32,
                  save_to_dir=None):
         vol_path = vol_files.split('*/*')
         seg_path = seg_files.split('*/*')
