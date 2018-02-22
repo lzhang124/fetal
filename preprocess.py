@@ -1,19 +1,18 @@
 import glob
-import nibabel as nib
 import numpy as np
 from image3d import ImageTransformer, VolSegIterator
+from util import read_vol
 
 
 VOL_SHAPE = (150, 150, 110, 1)
 TARGET_SHAPE = (128, 128, 128, 1)
 
 
-def volread(filename):
-    vol = nib.load(filename).get_data()
-    
-    # need to add channel axis
-    if vol.ndim == 3:
-        vol = vol[..., np.newaxis]
+def normalize(vol, mean, std):
+    return (vol - mean) / std
+
+
+def resize(vol):
     if vol.shape != VOL_SHAPE:
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
 
@@ -28,6 +27,18 @@ def volread(filename):
                          'does not match the target shape {target}'.format(shape=resized.shape,
                                                                            target=TARGET_SHAPE))
     return resized
+
+
+def preprocess(files):
+    vols = [read_vol(file) for file in files]
+
+    mean = np.mean(vols, axis=0)
+    std = np.std(vols, axis=0)
+    vols = [normalize(vol) for vol in vols]
+
+    vols = [resize(vol) for vol in vols]
+
+    return np.array(vols)
 
 
 class AugmentGenerator(VolSegIterator):
@@ -51,8 +62,8 @@ class AugmentGenerator(VolSegIterator):
                                   .replace(seg_path[1], vol_path[1])
                           for seg_file in self.seg_files]
 
-        vols = np.array([volread(file) for file in self.vol_files])
-        segs = np.array([volread(file) for file in self.seg_files])
+        vols = preprocess(self.vol_files)
+        segs = preprocess(self.seg_files)
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -67,3 +78,17 @@ class AugmentGenerator(VolSegIterator):
                                                save_to_dir=save_to_dir,
                                                x_prefix='vol',
                                                y_prefix='seg')
+
+
+class VolumeGenerator:
+    def __init__(self, vol_files):
+        self.vol_files = glob.glob(vol_files)
+
+    def __len__(self):
+        return len(self.vol_files)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        preprocess(self.vol_files)

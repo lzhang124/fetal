@@ -3,6 +3,7 @@ from keras.layers import concatenate, Input, Conv3D, MaxPooling3D, Conv3DTranspo
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
+from util import save_vol
 
 
 def dice_coef(y_true, y_pred):
@@ -82,11 +83,11 @@ class UNet(BaseModel):
         return model
 
     def train(self, generator, epochs=10):
-        model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.2f}.hdf5',
+        model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.4f}.hdf5',
                                            monitor='loss',
                                            save_best_only=True)
 
         self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint])
 
-    def predict(self, inputs):
-        raise NotImplementedError()
+    def predict(self, generator):
+        preds = self.model.predict_generator(generator)

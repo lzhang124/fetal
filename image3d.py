@@ -17,7 +17,7 @@ import threading
 import warnings
 import multiprocessing.pool
 from functools import partial
-import nibabel as nib
+from util import save_vol
 
 from keras import backend as K
 from keras.utils.data_utils import Sequence
@@ -79,10 +79,6 @@ def flip_axis(x, axis):
     x = x[::-1, ...]
     x = x.swapaxes(0, axis)
     return x
-
-
-def array_to_img(x):
-    return nib.Nifti1Image(x.astype('int16'), np.eye(4))
 
 
 class ImageTransformer(object):
@@ -301,8 +297,6 @@ class Iterator(Sequence):
                                    current_index + self.batch_size]
 
     def __iter__(self):
-        # Needed if we want to do something like:
-        # for x, y in data_gen.flow(...):
         return self
 
     def __next__(self, *args, **kwargs):
@@ -389,19 +383,17 @@ class VolSegIterator(Iterator):
 
         if self.save_to_dir:
             for i in range(len(batch_x)):
-                img = array_to_img(batch_x[i])
                 fname = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
                                                            index=i,
                                                            format=self.save_format)
-                img.to_filename(os.path.join(self.save_to_dir, fname))
+                save_vol(batch_x[i], os.path.join(self.save_to_dir, fname))
 
             if self.y is not None:
                 for i in range(len(batch_y)):
-                    img = array_to_img(batch_y[i])
                     fname = '{prefix}_{index}.{format}'.format(prefix=self.y_prefix,
                                                                index=i,
                                                                format=self.save_format)
-                    img.to_filename(os.path.join(self.save_to_dir, fname))
+                    save_vol(batch_y[i], os.path.join(self.save_to_dir, fname))
         
         return batch_x if self.y is None else batch_x, batch_y
 
