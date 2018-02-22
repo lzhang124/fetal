@@ -34,7 +34,7 @@ def preprocess(files):
 
     mean = np.mean(vols, axis=0)
     std = np.std(vols, axis=0)
-    vols = [normalize(vol) for vol in vols]
+    vols = [normalize(vol, mean, std) for vol in vols]
 
     vols = [resize(vol) for vol in vols]
 
