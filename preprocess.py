@@ -1,12 +1,12 @@
 import glob
 import numpy as np
 from image3d import ImageTransformer, VolSegIterator
-from sklearn.preprocessing import scale
-from util import read_vol
+from keras.utils.data_utils import Sequence
 
 
 VOL_SHAPE = (150, 150, 110, 1)
 TARGET_SHAPE = (128, 128, 128, 1)
+MAX_VALUE = 1024.
 
 
 def resize(vol):
@@ -26,11 +26,15 @@ def resize(vol):
     return resized
 
 
-def preprocess(files):
-    vols = [read_vol(file) for file in files]
-    vols = scale(vols)
-    vols = [resize(vol) for vol in vols]
-    return np.array(vols)
+def rescale(vol):
+    return vol / MAX_VALUE
+
+
+def preprocess(file):
+    vol = read_vol(file)
+    vol = rescale(vol)
+    vol = resize(vol)
+    return vol
 
 
 class AugmentGenerator(VolSegIterator):
@@ -54,8 +58,8 @@ class AugmentGenerator(VolSegIterator):
                                   .replace(seg_path[1], vol_path[1])
                           for seg_file in self.seg_files]
 
-        vols = preprocess(self.vol_files)
-        segs = preprocess(self.seg_files)
+        vols = np.array([preprocess(file) for file in self.vol_files])
+        segs = np.array([preprocess(file) for file in self.seg_files])
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -72,15 +76,29 @@ class AugmentGenerator(VolSegIterator):
                                                y_prefix='seg')
 
 
-class VolumeGenerator:
+class VolumeGenerator(Sequence):
     def __init__(self, vol_files):
         self.vol_files = glob.glob(vol_files)
+        self.n = len(self.vol_files)
+        self.idx = 0
 
     def __len__(self):
         return len(self.vol_files)
 
+    def __getitem__(self, idx):
+        return preprocess(self.vol_files[idx])
+
     def __iter__(self):
+        self.idx = 0
         return self
 
     def __next__(self):
-        preprocess(self.vol_files)
+        return self.next()
+
+    def next(self):
+        if self.idx < self.n:
+            vol = preprocess(self.vol_files[self.idx])
+            self.idx += 1
+            return vol
+        else:
+            raise StopIteration()

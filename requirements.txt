@@ -1,6 +1,5 @@
 numpy
 scipy
-scikit-learn
 nibabel
 keras
 tensorflow
