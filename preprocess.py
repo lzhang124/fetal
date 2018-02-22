@@ -1,17 +1,12 @@
 import glob
 import numpy as np
 from image3d import ImageTransformer, VolSegIterator
+from sklearn.preprocessing import scale
 from util import read_vol
 
 
 VOL_SHAPE = (150, 150, 110, 1)
 TARGET_SHAPE = (128, 128, 128, 1)
-
-
-def normalize(vol, mean, std):
-    print((vol-mean).shape)
-    print(std.shape)
-    return (vol - mean) / std
 
 
 def resize(vol):
@@ -33,13 +28,8 @@ def resize(vol):
 
 def preprocess(files):
     vols = [read_vol(file) for file in files]
-
-    mean = np.mean(vols, axis=0)
-    std = np.std(vols, axis=0)
-    vols = [normalize(vol, mean, std) for vol in vols]
-
+    vols = scale(vols)
     vols = [resize(vol) for vol in vols]
-
     return np.array(vols)
 
 
