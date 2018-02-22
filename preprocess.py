@@ -9,6 +9,9 @@ TARGET_SHAPE = (128, 128, 128, 1)
 
 
 def normalize(vol, mean, std):
+    print(vol.shape)
+    print(mean.shape)
+    print(std.shape)
     return (vol - mean) / std
 
 
