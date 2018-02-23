@@ -355,7 +355,6 @@ class VolSegIterator(Iterator):
                              'Found: x.shape = %s, y.shape = %s' %
                              (self.x.shape, self.y.shape))
 
-        self.shape = self.x.shape[1:]
         self.image_transformer = image_transformer
         self.save_to_dir = save_to_dir
         self.x_prefix = x_prefix

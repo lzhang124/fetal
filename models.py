@@ -18,8 +18,7 @@ def dice_coef_loss(y_true, y_pred):
 
 
 class BaseModel:
-    def __init__(self, input_shape, filename=None):
-        self.input_shape = input_shape
+    def __init__(self, filename=None):
         if filename is None:
             self.model = self._new_model()
         else:
@@ -41,7 +40,7 @@ class BaseModel:
 
 class UNet(BaseModel):
     def _new_model(self):
-        inputs = Input(shape=self.input_shape)
+        inputs = Input(shape=TARGET_SHAPE)
 
         conv1 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(inputs)
         conv1 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv1)

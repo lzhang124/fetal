@@ -5,11 +5,6 @@ from keras.utils.data_utils import Sequence
 from util import read_vol
 
 
-VOL_SHAPE = (150, 150, 110, 1)
-TARGET_SHAPE = (128, 128, 128, 1)
-MAX_VALUE = 2400.
-
-
 def resize(vol):
     if vol.shape != VOL_SHAPE:
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))

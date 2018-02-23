@@ -2,9 +2,6 @@ import nibabel as nib
 import numpy as np
 
 
-MAX_VALUE = 2400.
-
-
 def read_vol(filename):
     vol = nib.load(filename).get_data()
     
