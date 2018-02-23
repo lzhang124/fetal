@@ -78,9 +78,10 @@ class AugmentGenerator(VolSegIterator):
 
 
 class VolumeGenerator(Sequence):
-    def __init__(self, vol_files, batch_size):
+    def __init__(self, vol_files, batch_size, rescale=True):
         self.vol_files = glob.glob(vol_files)
         self.batch_size = batch_size
+        self.funcs = [rescale, resize] if rescale else [resize]
         self.n = len(self.vol_files)
         self.idx = 0
 
@@ -88,8 +89,8 @@ class VolumeGenerator(Sequence):
         return (self.n + self.batch_size - 1) // self.batch_size
 
     def __getitem__(self, idx):
-        return preprocess(self.vol_files[self.batch_size * idx:
-                                         self.batch_size * (idx + 1)])
+        return preprocess(self.vol_files[self.batch_size * idx:self.batch_size * (idx + 1)],
+                          self.funcs)
 
     def __iter__(self):
         self.idx = 0
@@ -102,7 +103,7 @@ class VolumeGenerator(Sequence):
         if self.idx < self.n:
             batch = []
             for self.idx in range(self.idx, min(self.idx + self.batch_size, self.n)):
-                batch.append(preprocess(self.vol_files[self.idx]))
+                batch.append(preprocess(self.vol_files[self.idx], self.funcs))
             self.idx += 1
             return np.array(batch)
         else:

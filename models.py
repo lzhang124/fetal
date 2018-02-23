@@ -91,3 +91,4 @@ class UNet(BaseModel):
 
     def predict(self, generator):
         preds = self.model.predict_generator(generator)
+        print(preds.shape)
