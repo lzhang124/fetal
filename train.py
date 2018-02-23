@@ -46,7 +46,7 @@ def main():
 
     if options.pred_files:
         logging.info('Making predictions.')
-        pred_gen = VolumeGenerator(options.pred_files)
+        pred_gen = VolumeGenerator(options.pred_files, options.batch_size)
         model.predict(pred_gen)
 
     end = time.time()
