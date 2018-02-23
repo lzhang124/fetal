@@ -14,8 +14,9 @@ def read_vol(filename):
     return vol
 
 
-def save_vol(vol, filename):
+def save_vol(vol, filename, scale=False):
     if type(vol) is np.ndarray:
-        vol *= MAX_VALUE
+        if scale:
+            vol *= MAX_VALUE
         vol = nib.Nifti1Image(vol.astype('int16'), np.eye(4))
     vol.to_filename(filename)

@@ -386,7 +386,7 @@ class VolSegIterator(Iterator):
                 fname = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
                                                            index=i,
                                                            format=self.save_format)
-                save_vol(batch_x[i], os.path.join(self.save_to_dir, fname))
+                save_vol(batch_x[i], os.path.join(self.save_to_dir, fname), scale=True)
 
             if self.y is not None:
                 for i in range(len(batch_y)):
