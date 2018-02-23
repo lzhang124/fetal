@@ -20,9 +20,16 @@ def dice_coef_loss(y_true, y_pred):
 class BaseModel:
     def __init__(self, input_shape, filename=None):
         self.input_shape = input_shape
-        self.model = self._new_model() if filename is None else load_model(filename)
+        if filename is None:
+            self.model = self._new_model()
+        else:
+            self.model = load_model(filename)
+        self._compile()
 
     def _new_model(self):
+        raise NotImplementedError()
+
+    def _compile(self):
         raise NotImplementedError()
 
     def train(self, generator):
@@ -78,14 +85,16 @@ class UNet(BaseModel):
         outputs = Conv3D(1, (1, 1, 1), activation='sigmoid')(conv9)
 
         model = Model(inputs=inputs, outputs=outputs)
-        model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
-
         return model
 
+    def _compile(self):
+        self.model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
+
     def train(self, generator, epochs=10):
-        model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.4f}.hdf5',
+        model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.4f}.h5',
                                            monitor='loss',
-                                           save_best_only=True)
+                                           save_best_only=True,
+                                           save_weights_only=True)
 
         self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint])
 
