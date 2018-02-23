@@ -36,19 +36,18 @@ def main():
 
     logging.info('Creating data generator.')
     aug_gen = AugmentGenerator(options.vol_files, options.seg_files, options.batch_size, save_to_dir="data/test/")
-    next(aug_gen)
 
-    # logging.info('Compiling model.')
-    # model = UNet(aug_gen.shape, options.model_file)
+    logging.info('Compiling model.')
+    model = UNet(aug_gen.shape, options.model_file)
 
-    # if options.train:
-    #     logging.info('Training model.')
-    #     model.train(aug_gen)
+    if options.train:
+        logging.info('Training model.')
+        model.train(aug_gen)
 
-    # if options.pred_files:
-    #     logging.info('Making predictions.')
-    #     pred_gen = VolumeGenerator(options.pred_files)
-    #     model.predict(pred_gen)
+    if options.pred_files:
+        logging.info('Making predictions.')
+        pred_gen = VolumeGenerator(options.pred_files)
+        model.predict(pred_gen)
 
     end = time.time()
     logging.info('total time: {}s'.format(end - start))
