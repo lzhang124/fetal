@@ -31,10 +31,10 @@ def rescale(vol):
     return vol / MAX_VALUE
 
 
-def preprocess(file):
+def preprocess(file, funcs=[rescale, resize]):
     vol = read_vol(file)
-    vol = rescale(vol)
-    vol = resize(vol)
+    for f in funcs:
+        vol = f(vol)
     return vol
 
 
@@ -60,7 +60,7 @@ class AugmentGenerator(VolSegIterator):
                           for seg_file in self.seg_files]
 
         vols = np.array([preprocess(file) for file in self.vol_files])
-        segs = np.array([preprocess(file) for file in self.seg_files])
+        segs = np.array([preprocess(file, funcs=[resize]) for file in self.seg_files])
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
