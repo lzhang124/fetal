@@ -2,6 +2,7 @@ import glob
 import numpy as np
 from image3d import ImageTransformer, VolSegIterator
 from keras.utils.data_utils import Sequence
+from util import read_vol
 
 
 VOL_SHAPE = (150, 150, 110, 1)
