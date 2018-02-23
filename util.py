@@ -2,6 +2,9 @@ import nibabel as nib
 import numpy as np
 
 
+MAX_VALUE = 2400.
+
+
 def read_vol(filename):
     vol = nib.load(filename).get_data()
     
@@ -13,5 +16,6 @@ def read_vol(filename):
 
 def save_vol(vol, filename):
     if type(vol) is np.ndarray:
+        vol *= MAX_VALUE
         vol = nib.Nifti1Image(vol.astype('int16'), np.eye(4))
     vol.to_filename(filename)
