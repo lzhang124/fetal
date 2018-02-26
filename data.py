@@ -26,7 +26,7 @@ class AugmentGenerator(VolSegIterator):
                                   .replace(seg_path[1], vol_path[1])
                           for seg_file in self.seg_files]
 
-        vols = np.array([preprocess(file, funcs=['resize']) for file in self.vol_files])
+        vols = np.array([preprocess(file) for file in self.vol_files])
         segs = np.array([preprocess(file, funcs=['resize']) for file in self.seg_files])
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
