@@ -27,7 +27,7 @@ class AugmentGenerator(VolSegIterator):
                           for seg_file in self.seg_files]
 
         vols = np.array([preprocess(file) for file in self.vol_files])
-        segs = np.array([preprocess(file, funcs=[resize]) for file in self.seg_files])
+        segs = np.array([preprocess(file, funcs=['resize']) for file in self.seg_files])
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -48,7 +48,7 @@ class VolumeGenerator(Sequence):
     def __init__(self, vol_files, batch_size, rescale=True):
         self.vol_files = glob.glob(vol_files)
         self.batch_size = batch_size
-        self.funcs = [rescale, resize] if rescale else [resize]
+        self.funcs = ['rescale', 'resize'] if rescale else ['resize']
         self.n = len(self.vol_files)
         self.idx = 0
 
