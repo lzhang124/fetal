@@ -100,6 +100,7 @@ class UNet(BaseModel):
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator)
+        print(np.max(preds[0]))
         for i in range(preds.shape[0]):
             fname = generator.files[i].split('/')[-1]
             save_vol(postprocess(preds[i], funcs=['resize']), os.path.join(path, fname))
