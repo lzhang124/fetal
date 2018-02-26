@@ -1,5 +1,6 @@
 import constants
 import os
+import numpy as np
 from keras.models import Model
 from keras.layers import concatenate, Input, Conv3D, MaxPooling3D, Conv3DTranspose
 from keras.optimizers import Adam
