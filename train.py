@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 import numpy as np
 import time
 from argparse import ArgumentParser
-from preprocess import AugmentGenerator, VolumeGenerator
+from data import AugmentGenerator, VolumeGenerator
 from models import UNet
 
 
