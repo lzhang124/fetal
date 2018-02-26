@@ -28,7 +28,7 @@ def rescale(vol):
     return vol / constants.MAX_VALUE
 
 
-def preprocess(files, funcs=[rescale, resize]):
+def preprocess(file, funcs=[rescale, resize]):
     vol = read_vol(file)
     for f in funcs:
         vol = f(vol)
