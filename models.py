@@ -1,3 +1,4 @@
+import constants
 from keras.models import load_model, Model
 from keras.layers import concatenate, Input, Conv3D, MaxPooling3D, Conv3DTranspose
 from keras.optimizers import Adam
@@ -40,7 +41,7 @@ class BaseModel:
 
 class UNet(BaseModel):
     def _new_model(self):
-        inputs = Input(shape=TARGET_SHAPE)
+        inputs = Input(shape=constants.TARGET_SHAPE)
 
         conv1 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(inputs)
         conv1 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv1)
