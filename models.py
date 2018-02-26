@@ -90,7 +90,7 @@ class UNet(BaseModel):
     def _compile(self):
         self.model.compile(optimizer=Adam(lr=1e-3), loss=dice_coef_loss, metrics=[dice_coef])
 
-    def train(self, generator, epochs=10):
+    def train(self, generator, epochs):
         model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.4f}.h5',
                                            monitor='loss',
                                            save_best_only=True,

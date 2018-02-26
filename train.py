@@ -22,6 +22,9 @@ def build_parser():
     parser.add_argument('-b', '--batch-size',
                         metavar='BATCH_SIZE', help='Training batch size',
                         dest='batch_size', type=int, default=1)
+    parser.add_argument('-e', '--epochs',
+                        metavar='EPOCHS', help='Training epochs',
+                        dest='epochs', type=int, default=30)
     parser.add_argument('-m', '--model',
                         metavar='MODEL_FILE', help='Pretrained model file',
                         dest='model', type=str)
@@ -42,7 +45,7 @@ def main():
         aug_gen = AugmentGenerator(options.train[0], options.train[1], options.batch_size)
 
         logging.info('Training model.')
-        model.train(aug_gen)
+        model.train(aug_gen, options.epochs)
 
     if options.predict:
         logging.info('Making predictions.')
