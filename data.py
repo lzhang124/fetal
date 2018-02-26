@@ -2,7 +2,7 @@ import glob
 import numpy as np
 from image3d import ImageTransformer, VolSegIterator
 from keras.utils.data_utils import Sequence
-from preprocess import preprocess
+from process import preprocess
 
 
 class AugmentGenerator(VolSegIterator):
@@ -45,11 +45,11 @@ class AugmentGenerator(VolSegIterator):
 
 
 class VolumeGenerator(Sequence):
-    def __init__(self, vol_files, batch_size, rescale=True):
-        self.vol_files = glob.glob(vol_files)
+    def __init__(self, files, batch_size, rescale=True):
+        self.files = glob.glob(files)
         self.batch_size = batch_size
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
-        self.n = len(self.vol_files)
+        self.n = len(self.files)
         self.idx = 0
 
     def __len__(self):
@@ -57,7 +57,7 @@ class VolumeGenerator(Sequence):
 
     def __getitem__(self, idx):
         batch = []
-        for file in self.vol_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
+        for file in self.files[self.batch_size * idx:self.batch_size * (idx + 1)]:
             batch.append(preprocess(file, self.funcs))
         return np.array(batch)            
 
@@ -72,7 +72,7 @@ class VolumeGenerator(Sequence):
         if self.idx < self.n:
             batch = []
             for self.idx in range(self.idx, min(self.idx + self.batch_size, self.n)):
-                batch.append(preprocess(self.vol_files[self.idx], self.funcs))
+                batch.append(preprocess(self.files[self.idx], self.funcs))
             self.idx += 1
             return np.array(batch)
         else:

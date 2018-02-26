@@ -1,9 +1,11 @@
 import constants
+import os
 from keras.models import Model
 from keras.layers import concatenate, Input, Conv3D, MaxPooling3D, Conv3DTranspose
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
+from process import postprocess
 from util import save_vol
 
 
@@ -96,6 +98,8 @@ class UNet(BaseModel):
 
         self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint])
 
-    def predict(self, generator):
+    def predict(self, generator, path):
         preds = self.model.predict_generator(generator)
-        print(preds.shape)
+        for i in range(preds.shape[0]):
+            fname = generator.files[i].split('/')[-1]
+            save_vol(postprocess(preds[i], funcs=['resize']), os.path.join(path, fname))
