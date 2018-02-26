@@ -1,5 +1,5 @@
 import constants
-from keras.models import load_model, Model
+from keras.models import Model
 from keras.layers import concatenate, Input, Conv3D, MaxPooling3D, Conv3DTranspose
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
@@ -20,10 +20,9 @@ def dice_coef_loss(y_true, y_pred):
 
 class BaseModel:
     def __init__(self, filename=None):
-        if filename is None:
-            self.model = self._new_model()
-        else:
-            self.model = load_model(filename)
+        self._new_model()
+        if filename is not None:
+            self.model.load_weights(filename)
         self._compile()
 
     def _new_model(self):
@@ -84,8 +83,7 @@ class UNet(BaseModel):
 
         outputs = Conv3D(1, (1, 1, 1), activation='sigmoid')(conv9)
 
-        model = Model(inputs=inputs, outputs=outputs)
-        return model
+        self.model = Model(inputs=inputs, outputs=outputs)
 
     def _compile(self):
         self.model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
