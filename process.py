@@ -69,6 +69,7 @@ POST_FUNCTIONS = {
 
 
 def postprocess(vol, funcs=['rescale', 'resize']):
+    vol = np.round(vol)
     for f in funcs:
         vol = POST_FUNCTIONS[f](vol)
     return vol

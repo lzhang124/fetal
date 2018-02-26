@@ -1,6 +1,5 @@
 import constants
 import os
-import numpy as np
 from keras.models import Model
 from keras.layers import concatenate, Input, Conv3D, MaxPooling3D, Conv3DTranspose
 from keras.optimizers import Adam
@@ -101,7 +100,6 @@ class UNet(BaseModel):
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator)
-        print(np.max(preds[0]))
         for i in range(preds.shape[0]):
             fname = generator.files[i].split('/')[-1]
             save_vol(postprocess(preds[i], funcs=['resize']), os.path.join(path, fname))
