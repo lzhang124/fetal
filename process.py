@@ -67,4 +67,4 @@ def postprocess(vol, funcs=['resize']):
     vol = np.round(vol)
     for f in funcs:
         vol = POST_FUNCTIONS[f](vol)
-    return np.squeeze(vol)
+    return vol

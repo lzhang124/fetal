@@ -1,3 +1,4 @@
+import constants
 import nibabel as nib
 import numpy as np
 
@@ -14,6 +15,6 @@ def read_vol(filename):
 def save_vol(vol, filename, scale=False):
     if type(vol) is np.ndarray:
         if scale:
-            vol *= MAX_VALUE
-        vol = nib.Nifti1Image(vol.astype('int16'), np.eye(4) * [3, 3, 3, 1])
+            vol *= constants.MAX_VALUE
+        vol = nib.Nifti1Image(vol.astype('int16'), np.diag([3, 3, 3, 1]))
     vol.to_filename(filename)
