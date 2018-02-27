@@ -88,7 +88,8 @@ class UNet(BaseModel):
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def _compile(self):
-        self.model.compile(optimizer=Adam(lr=1e-6), loss=dice_coef_loss, metrics=[dice_coef])
+        # self.model.compile(optimizer=Adam(lr=1e-6), loss=dice_coef_loss, metrics=[dice_coef])
+        self.model.compile(optimizer=Adam(lr=1e-6), loss='binary_crossentropy', metrics=['accuracy'])
 
     def train(self, generator, epochs):
         model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.4f}.h5',
