@@ -24,7 +24,7 @@ def build_parser():
                         dest='batch_size', type=int, default=1)
     parser.add_argument('-e', '--epochs',
                         metavar='EPOCHS', help='Training epochs',
-                        dest='epochs', type=int, default=30)
+                        dest='epochs', type=int, default=100)
     parser.add_argument('-m', '--model',
                         metavar='MODEL_FILE', help='Pretrained model file',
                         dest='model', type=str)
