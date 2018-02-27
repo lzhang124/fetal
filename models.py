@@ -88,7 +88,7 @@ class UNet(BaseModel):
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def _compile(self):
-        self.model.compile(optimizer=Adam(lr=1e-4), loss=dice_coef_loss, metrics=[dice_coef])
+        self.model.compile(optimizer=Adam(lr=1e-4), loss=dice_coef_loss, metrics=[dice_coef])s
 
     def train(self, generator, epochs):
         model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.4f}.h5',
@@ -102,4 +102,4 @@ class UNet(BaseModel):
         preds = self.model.predict_generator(generator)
         for i in range(preds.shape[0]):
             fname = generator.files[i].split('/')[-1]
-            save_vol(postprocess(preds[i], funcs=['resize']), os.path.join(path, fname))
+            save_vol(postprocess(preds[i]), os.path.join(path, fname))

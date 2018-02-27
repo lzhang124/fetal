@@ -58,18 +58,13 @@ def uncrop(vol):
     return resized
 
 
-def unscale(vol):
-    return vol * constants.MAX_VALUE
-
-
 POST_FUNCTIONS = {
     'resize': uncrop,
-    'rescale': unscale,
 }
 
 
-def postprocess(vol, funcs=['rescale', 'resize']):
-    vol = np.round(vol)
+def postprocess(vol, funcs=['resize']):
+    vol = np.round(np.squeeze(vol))
     for f in funcs:
         vol = POST_FUNCTIONS[f](vol)
     return vol
