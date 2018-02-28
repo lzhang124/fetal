@@ -17,7 +17,6 @@ import threading
 import warnings
 import multiprocessing.pool
 from functools import partial
-from util import save_vol
 
 from keras import backend as K
 from keras.utils.data_utils import Sequence
@@ -314,8 +313,8 @@ class Iterator(Sequence):
         raise NotImplementedError
 
 
-class VolSegIterator(Iterator):
-    """Iterator yielding data for volumes and segmentations.
+class VolumeIterator(Iterator):
+    """Iterator yielding data for 3D volumes.
 
     # Arguments
         x: Numpy array of input data.
@@ -325,26 +324,18 @@ class VolSegIterator(Iterator):
         batch_size: Integer, size of a batch.
         shuffle: Boolean, whether to shuffle the data between epochs.
         seed: Random seed for data shuffling.
-        save_to_dir: Optional directory where to save the pictures
-            being yielded, in a viewable format. This is useful
-            for visualizing the random transformations being
-            applied, for debugging purposes.
-        save_prefix: String prefix to use for saving sample
-            images (if `save_to_dir` is set).
-        save_format: Format to use for saving sample images
-            (if `save_to_dir` is set).
+        generate_labels: If labels should be generated.
     """
 
     def __init__(self, x, y, image_transformer,
-                 batch_size=32, shuffle=True, seed=None,
-                 save_to_dir=None, x_prefix='', y_prefix='', save_format='nii.gz'):
+                 batch_size=32, shuffle=True, seed=None, generate_labels=True):
         self.x = np.asarray(x, dtype=K.floatx())
 
         if self.x.ndim != 5:
-            raise ValueError('Input data in `VolSegIterator` '
+            raise ValueError('Input data in `VolumeIterator` '
                              'should have rank 5. You passed an array '
                              'with shape', self.x.shape)
-        if y is not None:
+        if y:
             self.y = np.asarray(y, dtype=K.floatx())
         else:
             self.y = None
@@ -356,11 +347,8 @@ class VolSegIterator(Iterator):
                              (self.x.shape, self.y.shape))
 
         self.image_transformer = image_transformer
-        self.save_to_dir = save_to_dir
-        self.x_prefix = x_prefix
-        self.y_prefix = y_prefix
-        self.save_format = save_format
-        super(VolSegIterator, self).__init__(x.shape[0], batch_size, shuffle, seed)
+        self.generate_labels = generate_labels
+        super(VolumeIterator, self).__init__(x.shape[0], batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x = np.zeros(tuple([len(index_array)] + list(self.x.shape)[1:]),
@@ -370,31 +358,17 @@ class VolSegIterator(Iterator):
                 x = self.x[j]
                 x = self.image_transformer.random_transform(x.astype(K.floatx()))
                 batch_x[i] = x
-        else:
-            batch_y = np.zeros(tuple([len(index_array)] + list(self.y.shape)[1:]),
-                               dtype=K.floatx())      
-            for i, j in enumerate(index_array):
-                x, y = self.x[j], self.y[j]
-                x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
-                                                               y.astype(K.floatx()))
-                batch_x[i] = x
-                batch_y[i] = y
-
-        if self.save_to_dir:
-            for i in range(len(batch_x)):
-                fname = '{prefix}_{index}.{format}'.format(prefix=self.x_prefix,
-                                                           index=i,
-                                                           format=self.save_format)
-                save_vol(batch_x[i], os.path.join(self.save_to_dir, fname), scale=True)
-
-            if self.y is not None:
-                for i in range(len(batch_y)):
-                    fname = '{prefix}_{index}.{format}'.format(prefix=self.y_prefix,
-                                                               index=i,
-                                                               format=self.save_format)
-                    save_vol(batch_y[i], os.path.join(self.save_to_dir, fname))
+            return batch_x, batch_x if self.generate_labels else batch_x
         
-        return batch_x if self.y is None else batch_x, batch_y
+        batch_y = np.zeros(tuple([len(index_array)] + list(self.y.shape)[1:]),
+                           dtype=K.floatx())      
+        for i, j in enumerate(index_array):
+            x, y = self.x[j], self.y[j]
+            x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
+                                                           y.astype(K.floatx()))
+            batch_x[i] = x
+            batch_y[i] = y
+        return batch_x, batch_y
 
     def next(self):
         """For python 2.x.

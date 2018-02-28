@@ -8,16 +8,25 @@ import numpy as np
 import time
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolumeGenerator
-from models import UNet
+from models import AutoEncoder, UNet
+
+
+MODEL_TYPE = {
+    'unet': UNet,
+    'autoencoder': AutoEncoder
+}
 
 
 def build_parser():
     parser = ArgumentParser()
+    parser.add_argument('-m', '--model',
+                        metavar='MODEL', help='Type of model',
+                        dest='model', type=str)
     parser.add_argument('-t', '--train',
-                        metavar=('VOL_FILES', 'SEG_FILES'), help='Train model',
-                        dest='train', type=str, nargs=2)
+                        metavar=('INPUT_FILES', 'LABEL_FILES'), help='Train model',
+                        dest='train', type=str, nargs=+)
     parser.add_argument('-p', '--predict',
-                        metavar=('PRED_FILES', 'SAVE_PATH'), help='Predict segmentations',
+                        metavar=('INPUT_FILES', 'SAVE_PATH'), help='Predict segmentations',
                         dest='predict', type=str, nargs=2)
     parser.add_argument('-b', '--batch-size',
                         metavar='BATCH_SIZE', help='Training batch size',
@@ -25,9 +34,9 @@ def build_parser():
     parser.add_argument('-e', '--epochs',
                         metavar='EPOCHS', help='Training epochs',
                         dest='epochs', type=int, default=100)
-    parser.add_argument('-m', '--model',
+    parser.add_argument('-f', '--model-file',
                         metavar='MODEL_FILE', help='Pretrained model file',
-                        dest='model', type=str)
+                        dest='model_file', type=str)
     return parser
 
 
@@ -38,11 +47,12 @@ def main():
     options = parser.parse_args()
 
     logging.info('Compiling model.')
-    model = UNet(options.model)
+    model = MODEL_TYPE[options.model](options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')
-        aug_gen = AugmentGenerator(options.train[0], options.train[1], options.batch_size)
+        labels = None if len(options.train) < 2 else options.train[1]
+        aug_gen = AugmentGenerator(options.train[0], labels, options.batch_size)
 
         logging.info('Training model.')
         model.train(aug_gen, options.epochs)

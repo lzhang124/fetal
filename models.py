@@ -1,7 +1,7 @@
 import constants
 import os
 from keras.models import Model
-from keras.layers import concatenate, Input, Conv3D, MaxPooling3D, Conv3DTranspose
+from keras.layers import concatenate, Conv3D, Conv3DTranspose, Dense, Input, MaxPooling3D
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
@@ -33,11 +33,20 @@ class BaseModel:
     def _compile(self):
         raise NotImplementedError()
 
-    def train(self, generator):
-        raise NotImplementedError()
+    def train(self, generator, epochs):
+        fname = 'models/{}_weights'.format(self.__class__.__name__.lower())
+        model_checkpoint = ModelCheckpoint(fname + '.{epoch:02d}-{loss:.4f}.h5',
+                                           monitor='loss',
+                                           save_best_only=True,
+                                           save_weights_only=True)
 
-    def predict(self, inputs):
-        raise NotImplementedError()
+        self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint])
+
+    def predict(self, generator, path):
+        preds = self.model.predict_generator(generator)
+        for i in range(preds.shape[0]):
+            fname = generator.files[i].split('/')[-1]
+            save_vol(postprocess(preds[i]), os.path.join(path, fname))
 
 
 class UNet(BaseModel):
@@ -88,18 +97,43 @@ class UNet(BaseModel):
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def _compile(self):
-        self.model.compile(optimizer=Adam(lr=1e-4), loss=dice_coef_loss, metrics=[dice_coef])
+        self.model.compile(optimizer=Adam(lr=1e-4),
+                           loss=dice_coef_loss,
+                           metrics=[dice_coef])
 
-    def train(self, generator, epochs):
-        model_checkpoint = ModelCheckpoint('models/unet_weights.{epoch:02d}-{loss:.4f}.h5',
-                                           monitor='loss',
-                                           save_best_only=True,
-                                           save_weights_only=True)
 
-        self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint])
+class AutoEncoder(BaseModel):
+    def _new_model(self):
+        inputs = Input(shape=constants.TARGET_SHAPE)
 
-    def predict(self, generator, path):
-        preds = self.model.predict_generator(generator)
-        for i in range(preds.shape[0]):
-            fname = generator.files[i].split('/')[-1]
-            save_vol(postprocess(preds[i]), os.path.join(path, fname))
+        conv1 = Conv3D(16, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(inputs)
+        conv1 = Conv3D(16, (3, 3, 3), activation='relu', padding='same')(conv1)
+
+        conv2 = Conv3D(32, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv1)
+        conv2 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv2)
+
+        conv3 = Conv3D(64, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv2)
+        conv3 = Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv3)
+
+        conv4 = Conv3D(1, (3, 3, 3), strides=(3, 3, 3), activation='relu', padding='same')(conv3)
+        embed = Dense(64)(conv4)
+        dense = Dense(128, activation='relu')(embed)
+
+        up5 = Conv3DTranspose(64, (7, 7, 7), strides=(3, 3, 3), activation='relu', padding='same')(dense)
+        conv5 = Conv3D(64, (3, 3, 3), activation='relu', padding='same')(up5)
+
+        up6 = Conv3DTranspose(32, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv5)
+        conv6 = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(up6)
+
+        up7 = Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv6)
+        conv7 = Conv3D(16, (3, 3, 3), activation='relu', padding='same')(up7)
+
+        up8 = Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv7)
+        outputs = Conv3D(1, (3, 3, 3), padding='same')(up8)
+
+        self.model = Model(inputs=inputs, outputs=outputs)
+
+    def _compile(self):
+        self.model.compile(optimizer=Adam(lr=1e-4),
+                           loss='binary_crossentropy',
+                           metrics=['accuracy'])

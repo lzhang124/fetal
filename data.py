@@ -1,14 +1,14 @@
 import glob
 import numpy as np
-from image3d import ImageTransformer, VolSegIterator
+from image3d import ImageTransformer, VolumeIterator
 from keras.utils.data_utils import Sequence
 from process import preprocess
 
 
-class AugmentGenerator(VolSegIterator):
+class AugmentGenerator(VolumeIterator):
     def __init__(self,
-                 vol_files,
-                 seg_files,
+                 input_files,
+                 label_files,
                  batch_size,
                  rotation_range=90.,
                  shift_range=0.1,
@@ -16,18 +16,21 @@ class AugmentGenerator(VolSegIterator):
                  zoom_range=0.2,
                  fill_mode='nearest',
                  cval=0.,
-                 flip=True,
-                 save_to_dir=None):
-        vol_path = vol_files.split('*/*')
-        seg_path = seg_files.split('*/*')
+                 flip=True):
+        if label_files:
+            input_path = input_files.split('*/*')
+            label_path = label_files.split('*/*')
 
-        self.seg_files = glob.glob(seg_files)
-        self.vol_files = [seg_file.replace(seg_path[0], vol_path[0])
-                                  .replace(seg_path[1], vol_path[1])
-                          for seg_file in self.seg_files]
+            self.label_files = glob.glob(label_files)
+            self.input_files = [label_file.replace(label_path[0], input_path[0])
+                                      .replace(label_path[1], input_path[1])
+                              for label_file in self.label_files]
+        else:
+            self.input_files = glob.glob(input_files)
+            self.label_files = []
 
-        vols = np.array([preprocess(file) for file in self.vol_files])
-        segs = np.array([preprocess(file, funcs=['resize']) for file in self.seg_files])
+        inputs = np.array([preprocess(file) for file in self.input_files])
+        labels = np.array([preprocess(file, funcs=['resize']) for file in self.label_files])
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -37,11 +40,8 @@ class AugmentGenerator(VolSegIterator):
                                              cval=cval,
                                              flip=flip)
 
-        super(AugmentGenerator, self).__init__(vols, segs, image_transformer,
-                                               batch_size=batch_size,
-                                               save_to_dir=save_to_dir,
-                                               x_prefix='vol',
-                                               y_prefix='seg')
+        super(AugmentGenerator, self).__init__(inputs, labels, image_transformer,
+                                               batch_size=batch_size)
 
 
 class VolumeGenerator(Sequence):
