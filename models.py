@@ -1,4 +1,5 @@
 import constants
+import nibabel as nib
 import os
 from keras.models import Model
 from keras.layers import concatenate, Conv3D, Conv3DTranspose, Dense, Input, MaxPooling3D
