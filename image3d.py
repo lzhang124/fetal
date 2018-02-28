@@ -221,7 +221,7 @@ class ImageTransformer(object):
                     if y is not None:
                         y = flip_axis(y, axis)
 
-        return x if y is None else x, y
+        return x if y is None else (x, y)
 
 
 class Iterator(Sequence):
@@ -361,7 +361,7 @@ class VolumeIterator(Iterator):
                 x = self.image_transformer.random_transform(x.astype(K.floatx()))
                 print(x)
                 batch_x[i] = x
-            return batch_x, batch_x if self.generate_labels else batch_x
+            return (batch_x, batch_x) if self.generate_labels else batch_x
         
         batch_y = np.zeros(tuple([len(index_array)] + list(self.y.shape)[1:]),
                            dtype=K.floatx())      
@@ -371,7 +371,7 @@ class VolumeIterator(Iterator):
                                                            y.astype(K.floatx()))
             batch_x[i] = x
             batch_y[i] = y
-        return batch_x, batch_y
+        return (batch_x, batch_y)
 
     def next(self):
         """For python 2.x.
