@@ -24,7 +24,7 @@ def build_parser():
                         dest='model', type=str)
     parser.add_argument('-t', '--train',
                         metavar=('INPUT_FILES', 'LABEL_FILES'), help='Train model',
-                        dest='train', type=str, nargs=+)
+                        dest='train', type=str, nargs='+')
     parser.add_argument('-p', '--predict',
                         metavar=('INPUT_FILES', 'SAVE_PATH'), help='Predict segmentations',
                         dest='predict', type=str, nargs=2)
