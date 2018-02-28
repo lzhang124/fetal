@@ -12,9 +12,9 @@ def read_vol(filename):
     return vol
 
 
-def save_vol(vol, filename, scale=False):
+def save_vol(vol, filename, header=None, scale=False):
     if type(vol) is np.ndarray:
         if scale:
             vol *= constants.MAX_VALUE
-        vol = nib.Nifti1Image(vol.astype('int16'), np.diag([3, 3, 3, 1]))
+        vol = nib.Nifti1Image(vol.astype('int16'), np.diag([3, 3, 3, 1]), header=header)
     vol.to_filename(filename)
