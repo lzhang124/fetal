@@ -335,7 +335,7 @@ class VolumeIterator(Iterator):
             raise ValueError('Input data in `VolumeIterator` '
                              'should have rank 5. You passed an array '
                              'with shape', self.x.shape)
-        if y:
+        if y is not None:
             self.y = np.asarray(y, dtype=K.floatx())
         else:
             self.y = None

@@ -21,16 +21,16 @@ class AugmentGenerator(VolumeIterator):
             input_path = input_files.split('*/*')
             label_path = label_files.split('*/*')
 
-            self.label_files = glob.glob(label_files)
-            self.input_files = [label_file.replace(label_path[0], input_path[0])
-                                      .replace(label_path[1], input_path[1])
-                              for label_file in self.label_files]
+            label_files = glob.glob(label_files)
+            input_files = [label_file.replace(label_path[0], input_path[0])
+                                     .replace(label_path[1], input_path[1])
+                              for label_file in label_files]
+            
+            inputs = np.array([preprocess(file) for file in input_files])
+            labels = np.array([preprocess(file, funcs=['resize']) for file in label_files])
         else:
-            self.input_files = glob.glob(input_files)
-            self.label_files = []
-
-        inputs = np.array([preprocess(file) for file in self.input_files])
-        labels = np.array([preprocess(file, funcs=['resize']) for file in self.label_files])
+            inputs = np.array([preprocess(file) for file in glob.glob(input_files)])
+            labels = None
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
