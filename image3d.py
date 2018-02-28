@@ -218,7 +218,8 @@ class ImageTransformer(object):
             for axis in range(3):
                 if np.random.random() < 0.5:
                     x = flip_axis(x, axis)
-                    y = flip_axis(y, axis)
+                    if y is not None:
+                        y = flip_axis(y, axis)
 
         return x if y is None else x, y
 
