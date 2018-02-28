@@ -137,3 +137,6 @@ class AutoEncoder(BaseModel):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss='binary_crossentropy',
                            metrics=['accuracy'])
+
+    def encode(self):
+        raise NotImplementedError()
