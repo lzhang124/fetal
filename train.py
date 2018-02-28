@@ -53,7 +53,7 @@ def main():
         logging.info('Creating data generator.')
         labels = None if len(options.train) < 2 else options.train[1]
         aug_gen = AugmentGenerator(options.train[0], labels, options.batch_size)
-        print('hello')
+
         logging.info('Training model.')
         model.train(aug_gen, options.epochs)
 
