@@ -211,7 +211,8 @@ class ImageTransformer(object):
         if transform_matrix is not None:
             transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)
             x = apply_transform(x, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
-            y = apply_transform(y, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
+            if y is not None:
+                y = apply_transform(y, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
 
         if self.flip:
             for axis in range(3):
