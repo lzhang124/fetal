@@ -359,7 +359,7 @@ class VolumeIterator(Iterator):
             for i, j in enumerate(index_array):
                 x = self.x[j]
                 x = self.image_transformer.random_transform(x.astype(K.floatx()))
-                print(x.shape)
+                print(x)
                 batch_x[i] = x
             return batch_x, batch_x if self.generate_labels else batch_x
         
