@@ -54,7 +54,7 @@ def main():
         labels = None if len(options.train) < 2 else options.train[1]
         aug_gen = AugmentGenerator(options.train[0], labels, options.batch_size)
         a, b = next(aug_gen)
-        print(a==b)
+        print(np.all(a==b))
 
         logging.info('Training model.')
         model.train(aug_gen, options.epochs)
