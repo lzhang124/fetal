@@ -36,6 +36,9 @@ def build_parser():
     parser.add_argument('-lr', '--learning-rate',
                         metavar='LEARNING_RATE', help='Training learning rate',
                         dest='lr', type=float, default=1e-4)
+    parser.add_argument('-n', '--name',
+                        metavar='MODEL_NAME', help='Name of model',
+                        dest='name', type=str)
     parser.add_argument('-f', '--model-file',
                         metavar='MODEL_FILE', help='Pretrained model file',
                         dest='model_file', type=str)
@@ -49,7 +52,7 @@ def main():
     options = parser.parse_args()
 
     logging.info('Compiling model.')
-    model = MODEL_TYPE[options.model](options.lr, options.model_file)
+    model = MODEL_TYPE[options.model](options.lr, name=options.name, filename=options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')

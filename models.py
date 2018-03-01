@@ -22,7 +22,8 @@ def dice_coef_loss(y_true, y_pred):
 
 
 class BaseModel:
-    def __init__(self, lr, filename=None):
+    def __init__(self, name, lr, filename=None):
+        self.name = name if name else self.__class__.__name__.lower()
         self._new_model()
         if filename is not None:
             self.model.load_weights(filename)
@@ -35,7 +36,7 @@ class BaseModel:
         raise NotImplementedError()
 
     def train(self, generator, epochs):
-        fname = 'models/{}_weights'.format(self.__class__.__name__.lower())
+        fname = 'models/{}_weights'.format(self.name)
         model_checkpoint = ModelCheckpoint(fname + '.{epoch:02d}-{loss:.4f}.h5',
                                            monitor='loss',
                                            save_best_only=True,
