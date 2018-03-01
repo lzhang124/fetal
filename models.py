@@ -122,6 +122,7 @@ class AutoEncoder(BaseModel):
         flat = layers.Flatten()(conv4)
         embed = layers.Dense(64)(flat)
         dense = layers.Dense(128, activation='relu')(embed)
+        print(flat._keras_shape)
         reshape = layers.Reshape(flat._keras_shape)(dense)
 
         up5 = layers.Conv3DTranspose(64, (7, 7, 7), strides=(3, 3, 3), activation='relu', padding='same')(reshape)
