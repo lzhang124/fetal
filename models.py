@@ -119,22 +119,28 @@ class AutoEncoder(BaseModel):
         conv3 = layers.Conv3D(64, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv2)
         conv3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv3)
 
-        conv4 = layers.Conv3D(1, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv3)
-        flat = layers.Flatten()(conv4)
-        embed = layers.Dense(512)(flat)
-        reshape = layers.Reshape(conv4._keras_shape[1:])(embed)
+        conv4 = layers.Conv3D(128, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv3)
+        conv4 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv4)
 
-        up5 = layers.Conv3DTranspose(64, (7, 7, 7), strides=(2, 2, 2), activation='relu', padding='same')(reshape)
-        conv5 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(up5)
+        conv5 = layers.Conv3D(1, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv4)
+        flat = layers.Flatten()(conv5)
+        embed = layers.Dense(flat._keras_shape[1])(flat)
+        reshape = layers.Reshape(conv5._keras_shape[1:])(embed)
 
-        up6 = layers.Conv3DTranspose(32, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv5)
-        conv6 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(up6)
+        up6 = layers.Conv3DTranspose(128, (7, 7, 7), strides=(2, 2, 2), activation='relu', padding='same')(reshape)
+        conv6 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(up6)
 
-        up7 = layers.Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv6)
-        conv7 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(up7)
+        up7 = layers.Conv3DTranspose(64, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv6)
+        conv7 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(up7)
 
-        up8 = layers.Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv7)
-        outputs = layers.Conv3D(1, (3, 3, 3), padding='same')(up8)
+        up8 = layers.Conv3DTranspose(32, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv7)
+        conv8 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(up8)
+
+        up9 = layers.Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv8)
+        conv9 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(up9)
+
+        up10 = layers.Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv9)
+        outputs = layers.Conv3D(1, (3, 3, 3), padding='same')(up10)
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
