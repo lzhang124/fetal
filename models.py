@@ -18,7 +18,7 @@ def dice_coef(y_true, y_pred):
 
 
 def dice_coef_loss(y_true, y_pred):
-    return -dice_coef(y_true, y_pred)
+    return 1 - dice_coef(y_true, y_pred)
 
 
 class BaseModel:
@@ -103,7 +103,7 @@ class UNet(BaseModel):
     def _compile(self, lr):
         self.model.compile(optimizer=Adam(lr=lr),
                            loss='binary_crossentropy',
-                           metrics=[dice_coef])
+                           metrics=['accuracy', dice_coef])
 
 
 class AutoEncoder(BaseModel):
@@ -141,7 +141,7 @@ class AutoEncoder(BaseModel):
     def _compile(self, lr):
         self.model.compile(optimizer=Adam(lr=lr),
                            loss='binary_crossentropy',
-                           metrics=[dice_coef])
+                           metrics=['accuracy', dice_coef])
 
     def encode(self):
         raise NotImplementedError()
