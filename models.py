@@ -138,7 +138,7 @@ class AutoEncoder(BaseModel):
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def _compile(self):
-        self.model.compile(optimizer=Adam(lr=1e-4),
+        self.model.compile(optimizer=Adam(lr=1e-2),
                            loss='binary_crossentropy',
                            metrics=[dice_coef])
 
