@@ -49,7 +49,7 @@ def main():
     options = parser.parse_args()
 
     logging.info('Compiling model.')
-    model = MODEL_TYPE[options.model](options.model_file)
+    model = MODEL_TYPE[options.model](options.lr, options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')
