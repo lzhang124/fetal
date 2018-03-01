@@ -119,7 +119,7 @@ class AutoEncoder(BaseModel):
         conv3 = Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv3)
 
         conv4 = Conv3D(1, (3, 3, 3), strides=(3, 3, 3), activation='relu', padding='same')(conv3)
-        flat = Flatten(conv4)
+        flat = Flatten()(conv4)
         embed = Dense(64)(flat)
         dense = Dense(128, activation='relu')(embed)
 
