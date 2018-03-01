@@ -22,7 +22,7 @@ def dice_coef_loss(y_true, y_pred):
 
 
 class BaseModel:
-    def __init__(self, name, lr, filename=None):
+    def __init__(self, lr, name=None, filename=None):
         self.name = name if name else self.__class__.__name__.lower()
         self._new_model()
         if filename is not None:
