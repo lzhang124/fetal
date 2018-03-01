@@ -29,7 +29,8 @@ class AugmentGenerator(VolumeIterator):
             inputs = np.array([preprocess(file) for file in input_files])
             labels = np.array([preprocess(file, funcs=['resize']) for file in label_files])
         else:
-            inputs = np.array([preprocess(file) for file in glob.glob(input_files)])
+            inputs = np.array([preprocess(file, funcs=['resize'])
+                               for file in glob.glob(input_files)])
             labels = None
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
