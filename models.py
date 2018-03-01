@@ -2,7 +2,7 @@ import constants
 import nibabel as nib
 import os
 from keras.models import Model
-from keras.layers import concatenate, Conv3D, Conv3DTranspose, Dense, Input, MaxPooling3D
+from keras.layers import concatenate, Conv3D, Conv3DTranspose, Dense, Flatten, Input, MaxPooling3D
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
@@ -119,7 +119,8 @@ class AutoEncoder(BaseModel):
         conv3 = Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv3)
 
         conv4 = Conv3D(1, (3, 3, 3), strides=(3, 3, 3), activation='relu', padding='same')(conv3)
-        embed = Dense(64)(conv4)
+        flat = Flatten(conv4)
+        embed = Dense(64)(flat)
         dense = Dense(128, activation='relu')(embed)
 
         up5 = Conv3DTranspose(64, (7, 7, 7), strides=(3, 3, 3), activation='relu', padding='same')(dense)
