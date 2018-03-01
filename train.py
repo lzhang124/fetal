@@ -33,6 +33,9 @@ def build_parser():
     parser.add_argument('-e', '--epochs',
                         metavar='EPOCHS', help='Training epochs',
                         dest='epochs', type=int, default=100)
+    parser.add_argument('-lr', '--learning-rate',
+                        metavar='LEARNING_RATE', help='Training learning rate',
+                        dest='lr', type=float, default=1e-4)
     parser.add_argument('-f', '--model-file',
                         metavar='MODEL_FILE', help='Pretrained model file',
                         dest='model_file', type=str)

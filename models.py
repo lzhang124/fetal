@@ -22,16 +22,16 @@ def dice_coef_loss(y_true, y_pred):
 
 
 class BaseModel:
-    def __init__(self, filename=None):
+    def __init__(self, lr, filename=None):
         self._new_model()
         if filename is not None:
             self.model.load_weights(filename)
-        self._compile()
+        self._compile(lr)
 
     def _new_model(self):
         raise NotImplementedError()
 
-    def _compile(self):
+    def _compile(self, lr):
         raise NotImplementedError()
 
     def train(self, generator, epochs):
@@ -99,8 +99,8 @@ class UNet(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def _compile(self):
-        self.model.compile(optimizer=Adam(lr=1e-4),
+    def _compile(self, lr):
+        self.model.compile(optimizer=Adam(lr=lr),
                            loss='binary_crossentropy',
                            metrics=[dice_coef])
 
@@ -137,8 +137,8 @@ class AutoEncoder(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def _compile(self):
-        self.model.compile(optimizer=Adam(lr=1e-4),
+    def _compile(self, lr):
+        self.model.compile(optimizer=Adam(lr=lr),
                            loss='binary_crossentropy',
                            metrics=[dice_coef])
 
