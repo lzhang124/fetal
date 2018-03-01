@@ -4,7 +4,6 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import numpy as np
 import time
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolumeGenerator
@@ -53,8 +52,6 @@ def main():
         logging.info('Creating data generator.')
         labels = None if len(options.train) < 2 else options.train[1]
         aug_gen = AugmentGenerator(options.train[0], labels, options.batch_size)
-        a, b = next(aug_gen)
-        print(np.all(a==b))
 
         logging.info('Training model.')
         model.train(aug_gen, options.epochs)
