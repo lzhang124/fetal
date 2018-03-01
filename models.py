@@ -101,7 +101,7 @@ class UNet(BaseModel):
 
     def _compile(self):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=dice_coef_loss,
+                           loss='binary_crossentropy',
                            metrics=[dice_coef])
 
 
