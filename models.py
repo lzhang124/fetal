@@ -42,10 +42,10 @@ class BaseModel:
                                            save_best_only=True,
                                            save_weights_only=True)
 
-        self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint])
+        self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint], verbose=1)
 
     def predict(self, generator, path):
-        preds = self.model.predict_generator(generator)
+        preds = self.model.predict_generator(generator, verbose=1)
         for i in range(preds.shape[0]):
             fname = generator.files[i].split('/')[-1]
             # FIXME
@@ -110,44 +110,49 @@ class AutoEncoder(BaseModel):
     def _new_model(self):
         inputs = layers.Input(shape=constants.TARGET_SHAPE)
 
-        conv1 = layers.Conv3D(16, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(inputs)
-        conv1 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(conv1)
+        conv1 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(inputs)
+        pool1 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv1)
 
-        conv2 = layers.Conv3D(32, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv1)
-        conv2 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv2)
+        conv2 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(pool1)
+        pool2 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv2)
 
-        conv3 = layers.Conv3D(64, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv2)
-        conv3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv3)
+        conv3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(pool2)
+        pool3 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv3)
 
-        conv4 = layers.Conv3D(128, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv3)
-        conv4 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv4)
+        conv4 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(pool3)
+        pool4 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv4)
 
-        conv5 = layers.Conv3D(1, (3, 3, 3), strides=(2, 2, 2), activation='relu', padding='same')(conv4)
-        flat = layers.Flatten()(conv5)
+        conv5 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(pool4)
+        pool5 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv5)
+
+        flat = layers.Flatten()(pool5)
         embed = layers.Dense(flat._keras_shape[1])(flat)
-        reshape = layers.Reshape(conv5._keras_shape[1:])(embed)
+        reshape = layers.Reshape(pool5._keras_shape[1:])(embed)
 
-        up6 = layers.Conv3DTranspose(128, (7, 7, 7), strides=(2, 2, 2), activation='relu', padding='same')(reshape)
-        conv6 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(up6)
+        up6 = layers.Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(reshape)
+        conv6 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(up6)
 
-        up7 = layers.Conv3DTranspose(64, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv6)
-        conv7 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(up7)
+        up7 = layers.Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv6)
+        conv7 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(up7)
 
-        up8 = layers.Conv3DTranspose(32, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv7)
-        conv8 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(up8)
+        up8 = layers.Conv3DTranspose(64, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv7)
+        conv8 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(up8)
 
-        up9 = layers.Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv8)
-        conv9 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(up9)
+        up9 = layers.Conv3DTranspose(32, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv8)
+        conv9 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(up9)
 
-        up10 = layers.Conv3DTranspose(16, (4, 4, 4), strides=(2, 2, 2), activation='relu', padding='same')(conv9)
-        outputs = layers.Conv3D(1, (3, 3, 3), padding='same')(up10)
+        up10 = layers.Conv3DTranspose(16, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv9)
+        conv10 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(up10)
+
+        outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(conv10)
 
         self.model = Model(inputs=inputs, outputs=outputs)
+        self.encoder = Model(inputs=inputs, outputs=embed)
 
     def _compile(self, lr):
         self.model.compile(optimizer=Adam(lr=lr),
                            loss=dice_loss,
                            metrics=['accuracy', dice_coef])
 
-    def encode(self):
-        raise NotImplementedError()
+    def encode(self, volume):
+        return self.encoder.predict(volume, verbose=1)
