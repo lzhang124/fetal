@@ -73,7 +73,7 @@ def main():
     # train all
     ids = ['0430*/*', '0512*/*', '0617*/*', '0625*/*', '0813*/*', '0831*/*', '1102*/*', '1126*/*', '1221*/*', '1222*/*']
     train = ['data/raw/{}.nii.gz'.format(i) for i in ids]
-    labels = ['data/raw/{}_placenta.nii.gz'.format(i) for i in ids]
+    labels = ['data/labels/{}_placenta.nii.gz'.format(i) for i in ids]
     for i in range(len(ids)):
         logging.info('Compiling model.')
         model = MODEL_TYPE[options.model](1e-4, name='unet_placenta_{}'.format(ids[i][:4]))
