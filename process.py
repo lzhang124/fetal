@@ -5,9 +5,9 @@ from util import read_vol
 
 
 def crop(vol):
-    if vol.shape[0] < constants.TARGET_SHAPE[0] or
-       vol.shape[1] < constants.TARGET_SHAPE[1] or
-       vol.shape[2] > constants.TARGET_SHAPE[2]:
+    if vol.shape[0] < constants.TARGET_SHAPE[0]
+       or vol.shape[1] < constants.TARGET_SHAPE[1]
+       or vol.shape[2] > constants.TARGET_SHAPE[2]:
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
 
     # convert to target shape
@@ -45,9 +45,9 @@ def preprocess(file, funcs=['rescale', 'resize']):
 def uncrop(vol, shape):
     if vol.shape != constants.TARGET_SHAPE:
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
-    if shape[0] < constants.TARGET_SHAPE[0] or
-       shape[1] < constants.TARGET_SHAPE[1] or
-       shape[2] > constants.TARGET_SHAPE[2]:
+    if shape[0] < constants.TARGET_SHAPE[0]
+       or shape[1] < constants.TARGET_SHAPE[1]
+       or shape[2] > constants.TARGET_SHAPE[2]:
         raise ValueError('The target shape {shape} is not supported.'.format(shape=shape))
 
     # convert to original shape
