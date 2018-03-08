@@ -51,39 +51,22 @@ def main():
     parser = build_parser()
     options = parser.parse_args()
 
-    # logging.info('Compiling model.')
-    # model = MODEL_TYPE[options.model](options.lr, name=options.name, filename=options.model_file)
+    logging.info('Compiling model.')
+    model = MODEL_TYPE[options.model](options.lr, name=options.name, filename=options.model_file)
 
-    # if options.train:
-    #     logging.info('Creating data generator.')
-    #     labels = None if len(options.train) < 2 else options.train[1]
-    #     aug_gen = AugmentGenerator(options.train[0], labels, options.batch_size)
-
-    #     logging.info('Training model.')
-    #     model.train(aug_gen, options.epochs)
-
-    # if options.predict:
-    #     logging.info('Making predictions.')
-    #     pred_gen = VolumeGenerator(options.predict[0], options.batch_size)
-    #     model.predict(pred_gen, options.predict[1])
-
-    # end = time.time()
-    # logging.info('total time: {}s'.format(end - start))
-
-    # train all
-    ids = ['0430*/*', '0512*/*', '0617*/*', '0625*/*', '0813*/*', '0831*/*', '1102*/*', '1126*/*', '1221*/*', '1222*/*']
-    train = ['data/raw/{}.nii.gz'.format(i) for i in ids]
-    labels = ['data/labels/{}_placenta.nii.gz'.format(i) for i in ids]
-    for i in range(len(ids)):
-        logging.info('Compiling model.')
-        model = MODEL_TYPE[options.model](1e-4, name='unet_placenta_{}'.format(ids[i][:4]))
-
+    if options.train:
         logging.info('Creating data generator.')
-        aug_gen = AugmentGenerator(train[i], labels[i], options.batch_size)
+        labels = None if len(options.train) < 2 else options.train[1]
+        aug_gen = AugmentGenerator(options.train[0], labels, options.batch_size)
 
         logging.info('Training model.')
         model.train(aug_gen, options.epochs)
-        
+
+    if options.predict:
+        logging.info('Making predictions.')
+        pred_gen = VolumeGenerator(options.predict[0], options.batch_size)
+        model.predict(pred_gen, options.predict[1])
+
     end = time.time()
     logging.info('total time: {}s'.format(end - start))
 
