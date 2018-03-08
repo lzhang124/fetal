@@ -5,13 +5,13 @@ from util import read_vol
 
 
 def crop(vol):
-    if vol.shape != constants.VOL_SHAPE:
+    if vol.shape not in constants.VOL_SHAPES:
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
 
     # convert to target shape
-    dx = abs(constants.TARGET_SHAPE[0] - constants.VOL_SHAPE[0]) // 2
-    dy = abs(constants.TARGET_SHAPE[1] - constants.VOL_SHAPE[1]) // 2
-    dz = abs(constants.TARGET_SHAPE[2] - constants.VOL_SHAPE[2]) // 2
+    dx = abs(constants.TARGET_SHAPE[0] - vol.shape[0]) // 2
+    dy = abs(constants.TARGET_SHAPE[1] - vol.shape[1]) // 2
+    dz = abs(constants.TARGET_SHAPE[2] - vol.shape[2]) // 2
     zeros = np.zeros((constants.TARGET_SHAPE[0], constants.TARGET_SHAPE[1], dz, 1))
     
     resized = np.concatenate([zeros, vol[dx:-dx, dy:-dy, :], zeros], axis=2)
@@ -45,16 +45,14 @@ def uncrop(vol):
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
 
     # convert to original shape
-    dx = abs(constants.VOL_SHAPE[0] - constants.TARGET_SHAPE[0]) // 2
-    dy = abs(constants.VOL_SHAPE[1] - constants.TARGET_SHAPE[1]) // 2
-    dz = abs(constants.VOL_SHAPE[2] - constants.TARGET_SHAPE[2]) // 2
+    dx = abs(vol.shape[0] - constants.TARGET_SHAPE[0]) // 2
+    dy = abs(vol.shape[1] - constants.TARGET_SHAPE[1]) // 2
+    dz = abs(vol.shape[2] - constants.TARGET_SHAPE[2]) // 2
 
     resized = np.pad(vol[:, :, dz:-dz], ((dx, dx), (dy, dy), (0, 0), (0, 0)), 'constant')
-    if resized.shape != constants.VOL_SHAPE:
+    if resized.shape not in constants.VOL_SHAPES:
         raise ValueError('The resized shape {shape} '
-                         'does not match the target '
-                         'shape {target}'.format(shape=resized.shape,
-                                                 target=constants.VOL_SHAPE))
+                         'is not the right shape.'.format(shape=resized.shape))
     return resized
 
 
