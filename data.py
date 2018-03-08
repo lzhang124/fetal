@@ -3,6 +3,7 @@ import numpy as np
 from image3d import ImageTransformer, VolumeIterator
 from keras.utils.data_utils import Sequence
 from process import preprocess
+from util import shape
 
 
 class AugmentGenerator(VolumeIterator):
@@ -48,6 +49,7 @@ class AugmentGenerator(VolumeIterator):
 class VolumeGenerator(Sequence):
     def __init__(self, files, batch_size, rescale=True):
         self.files = glob.glob(files)
+        self.shape = shape(self.files[0])
         self.batch_size = batch_size
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
         self.n = len(self.files)

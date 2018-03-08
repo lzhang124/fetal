@@ -5,7 +5,9 @@ from util import read_vol
 
 
 def crop(vol):
-    if vol.shape not in constants.VOL_SHAPES:
+    if vol.shape[0] < constants.TARGET_SHAPE[0] or
+       vol.shape[1] < constants.TARGET_SHAPE[1] or
+       vol.shape[2] > constants.TARGET_SHAPE[2]:
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
 
     # convert to target shape
@@ -19,7 +21,7 @@ def crop(vol):
         raise ValueError('The resized shape {shape} '
                          'does not match the target '
                          'shape {target}'.format(shape=resized.shape,
-                                                    target=constants.TARGET_SHAPE))
+                                                 target=constants.TARGET_SHAPE))
     return resized
 
 
@@ -40,29 +42,23 @@ def preprocess(file, funcs=['rescale', 'resize']):
     return vol
 
 
-def uncrop(vol):
+def uncrop(vol, shape):
     if vol.shape != constants.TARGET_SHAPE:
         raise ValueError('The input shape {shape} is not supported.'.format(shape=vol.shape))
+    if shape[0] < constants.TARGET_SHAPE[0] or
+       shape[1] < constants.TARGET_SHAPE[1] or
+       shape[2] > constants.TARGET_SHAPE[2]:
+        raise ValueError('The target shape {shape} is not supported.'.format(shape=shape))
 
     # convert to original shape
-    dx = abs(vol.shape[0] - constants.TARGET_SHAPE[0]) // 2
-    dy = abs(vol.shape[1] - constants.TARGET_SHAPE[1]) // 2
-    dz = abs(vol.shape[2] - constants.TARGET_SHAPE[2]) // 2
+    dx = abs(shape.shape[0] - constants.TARGET_SHAPE[0]) // 2
+    dy = abs(shape.shape[1] - constants.TARGET_SHAPE[1]) // 2
+    dz = abs(shape.shape[2] - constants.TARGET_SHAPE[2]) // 2
 
     resized = np.pad(vol[:, :, dz:-dz], ((dx, dx), (dy, dy), (0, 0), (0, 0)), 'constant')
     if resized.shape not in constants.VOL_SHAPES:
         raise ValueError('The resized shape {shape} '
-                         'is not the right shape.'.format(shape=resized.shape))
+                         'does not match the target '
+                         'shape {target}'.format(shape=resized.shape,
+                                                 target=shape.shape))
     return resized
-
-
-POST_FUNCTIONS = {
-    'resize': uncrop,
-}
-
-
-def postprocess(vol, funcs=['resize']):
-    vol = np.round(vol)
-    for f in funcs:
-        vol = POST_FUNCTIONS[f](vol)
-    return vol

@@ -6,7 +6,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 from keras import layers
-from process import postprocess
+from process import uncrop
 from util import save_vol
 
 
@@ -50,7 +50,7 @@ class BaseModel:
             fname = generator.files[i].split('/')[-1]
             # FIXME
             header = nib.load(generator.files[i]).header
-            save_vol(postprocess(preds[i]), os.path.join(path, fname), header)
+            save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
 
 
 class UNet(BaseModel):

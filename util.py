@@ -18,3 +18,7 @@ def save_vol(vol, filename, header=None, scale=False):
             vol *= constants.MAX_VALUE
         vol = nib.Nifti1Image(vol.astype('int16'), np.diag([3, 3, 3, 1]), header=header)
     vol.to_filename(filename)
+
+
+def shape(filename):
+    return read_vol(filename).shape
