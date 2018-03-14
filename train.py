@@ -52,7 +52,7 @@ def main():
         logging.info('Creating data generator.')
         labels = None if len(options.train) < 2 else options.train[1]
         generator = VolSliceGenerator if options.seed else AugmentGenerator
-        # aug_gen = generator(options.train[0], labels, options.batch_size)
+        aug_gen = generator(options.train[0], labels, options.batch_size)
 
         # logging.info('Training model.')
         # model.train(aug_gen, options.epochs)
