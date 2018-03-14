@@ -51,7 +51,7 @@ def main():
         shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     else:
         shape = constants.TARGET_SHAPE
-        print(shape)
+    print(shape)
     model = UNet(shape, options.lr, name=options.name, filename=options.model_file)
 
     if options.train:
