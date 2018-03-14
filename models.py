@@ -1,4 +1,3 @@
-import constants
 import nibabel as nib
 import os
 from keras.models import Model
@@ -22,7 +21,8 @@ def dice_loss(y_true, y_pred):
 
 
 class BaseModel:
-    def __init__(self, lr, name=None, filename=None):
+    def __init__(self, input_size, lr, name=None, filename=None):
+        self.input_size = input_size
         self.name = name if name else self.__class__.__name__.lower()
         self._new_model()
         if filename is not None:
@@ -55,7 +55,7 @@ class BaseModel:
 
 class UNet(BaseModel):
     def _new_model(self):
-        inputs = layers.Input(shape=constants.TARGET_SHAPE)
+        inputs = layers.Input(shape=self.input_size)
 
         conv1 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(inputs)
         conv1 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv1)
@@ -108,7 +108,7 @@ class UNet(BaseModel):
 
 class AutoEncoder(BaseModel):
     def _new_model(self):
-        inputs = layers.Input(shape=constants.TARGET_SHAPE)
+        inputs = layers.Input(shape=self.input_size)
 
         conv1 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(inputs)
         pool1 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv1)

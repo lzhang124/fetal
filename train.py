@@ -4,6 +4,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import logging
 logging.basicConfig(level=logging.INFO)
 
+import constants
 import time
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolSliceGenerator, VolumeGenerator
@@ -46,18 +47,21 @@ def main():
     options = parser.parse_args()
 
     logging.info('Compiling model.')
-    model = UNet(options.lr, name=options.name, filename=options.model_file)
+    if options.seed:
+        shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
+    else:
+        shape = constants.TARGET_SHAPE
+        print(shape)
+    model = UNet(shape, options.lr, name=options.name, filename=options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')
         labels = None if len(options.train) < 2 else options.train[1]
         generator = VolSliceGenerator if options.seed else AugmentGenerator
         aug_gen = generator(options.train[0], labels, options.batch_size)
-        print(next(aug_gen)[0].shape)
-        print(next(aug_gen)[1].shape)
 
-        # logging.info('Training model.')
-        # model.train(aug_gen, options.epochs)
+        logging.info('Training model.')
+        model.train(aug_gen, options.epochs)
 
     if options.predict:
         logging.info('Making predictions.')
