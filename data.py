@@ -50,8 +50,8 @@ class VolSliceGenerator(AugmentGenerator):
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x, batch_y = super(VolSliceGenerator)._get_batches_of_transformed_samples(index_array)
         for i, j in enumerate(batch_y):
-            print(j.shape)
-            break
+            seed = np.zeros(batch_x[i].shape)
+            print(j[np.random.choice(j.shape[0]),:].shape)
         return batch_x, batch_y
 
 
