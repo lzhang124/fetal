@@ -52,6 +52,7 @@ class VolSliceGenerator(AugmentGenerator):
         for i, j in enumerate(batch_y):
             print(j.shape)
             break
+        return batch_x, batch_y
 
 
 class VolumeGenerator(Sequence):
