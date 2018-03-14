@@ -56,7 +56,7 @@ class VolSliceGenerator(AugmentGenerator):
                 r = np.random.choice(label.shape[0])
             seed[r] = label[r]
             new_batch_x[i] = np.concatenate((batch_x[i], seed), axis=-1)
-        return batch_x, batch_y
+        return new_batch_x, batch_y
 
 
 class VolumeGenerator(Sequence):
