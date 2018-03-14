@@ -54,6 +54,7 @@ def main():
         generator = VolSliceGenerator if options.seed else AugmentGenerator
         aug_gen = generator(options.train[0], labels, options.batch_size)
         print(next(aug_gen)[0].shape)
+        print(next(aug_gen)[1].shape)
 
         # logging.info('Training model.')
         # model.train(aug_gen, options.epochs)

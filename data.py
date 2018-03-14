@@ -48,10 +48,13 @@ class AugmentGenerator(VolumeIterator):
 class VolSliceGenerator(AugmentGenerator):
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x, batch_y = super()._get_batches_of_transformed_samples(index_array)
-        print(batch_x.shape, batch_y.shape)
-        for i, j in enumerate(batch_y):
+        for i, label in enumerate(batch_y):
             seed = np.zeros(batch_x[i].shape)
-            print(j[np.random.choice(j.shape[0]),:].shape)
+            r = np.random.choice(label.shape[0])
+            while not np.any(label[r]):
+                r = np.random.choice(label.shape[0])
+            seed[r] = label[r]
+            batch_x[i] = np.concatenate((batch_x[i], seed), axis=-1)
         return batch_x, batch_y
 
 
