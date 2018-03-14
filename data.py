@@ -46,6 +46,11 @@ class AugmentGenerator(VolumeIterator):
                                                batch_size=batch_size)
 
 
+class AugmentVolSliceGenerator(AugmentGenerator):
+    def __init__(self):
+        pass
+
+
 class VolumeGenerator(Sequence):
     def __init__(self, files, batch_size, rescale=True):
         self.files = glob.glob(files)

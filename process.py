@@ -51,14 +51,14 @@ def uncrop(vol, shape):
         raise ValueError('The target shape {shape} is not supported.'.format(shape=shape))
 
     # convert to original shape
-    dx = abs(shape.shape[0] - constants.TARGET_SHAPE[0]) // 2
-    dy = abs(shape.shape[1] - constants.TARGET_SHAPE[1]) // 2
-    dz = abs(shape.shape[2] - constants.TARGET_SHAPE[2]) // 2
+    dx = abs(shape[0] - constants.TARGET_SHAPE[0]) // 2
+    dy = abs(shape[1] - constants.TARGET_SHAPE[1]) // 2
+    dz = abs(shape[2] - constants.TARGET_SHAPE[2]) // 2
 
     resized = np.pad(vol[:, :, dz:-dz], ((dx, dx), (dy, dy), (0, 0), (0, 0)), 'constant')
     if resized.shape not in constants.VOL_SHAPES:
         raise ValueError('The resized shape {shape} '
                          'does not match the target '
                          'shape {target}'.format(shape=resized.shape,
-                                                 target=shape.shape))
+                                                 target=shape))
     return resized
