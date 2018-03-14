@@ -6,27 +6,21 @@ logging.basicConfig(level=logging.INFO)
 
 import time
 from argparse import ArgumentParser
-from data import AugmentGenerator, VolumeGenerator
-from models import AutoEncoder, UNet
-
-
-MODEL_TYPE = {
-    'unet': UNet,
-    'autoencoder': AutoEncoder
-}
+from data import AugmentGenerator, VolSliceGenerator, VolumeGenerator
+from models import UNet
 
 
 def build_parser():
     parser = ArgumentParser()
-    parser.add_argument('-m', '--model',
-                        metavar='MODEL', help='Type of model',
-                        dest='model', type=str)
     parser.add_argument('-t', '--train',
                         metavar=('INPUT_FILES', 'LABEL_FILES'), help='Train model',
                         dest='train', type=str, nargs='+')
     parser.add_argument('-p', '--predict',
                         metavar=('INPUT_FILES', 'SAVE_PATH'), help='Predict segmentations',
                         dest='predict', type=str, nargs=2)
+    parser.add_argument('-s', '--seed',
+                        help='Seed slices',
+                        dest='seed', action='store_true')
     parser.add_argument('-b', '--batch-size',
                         metavar='BATCH_SIZE', help='Training batch size',
                         dest='batch_size', type=int, default=1)
@@ -52,15 +46,16 @@ def main():
     options = parser.parse_args()
 
     logging.info('Compiling model.')
-    model = MODEL_TYPE[options.model](options.lr, name=options.name, filename=options.model_file)
+    model = UNet(options.lr, name=options.name, filename=options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')
         labels = None if len(options.train) < 2 else options.train[1]
-        aug_gen = AugmentGenerator(options.train[0], labels, options.batch_size)
+        generator = VolSliceGenerator if options.seed else AugmentGenerator
+        # aug_gen = generator(options.train[0], labels, options.batch_size)
 
-        logging.info('Training model.')
-        model.train(aug_gen, options.epochs)
+        # logging.info('Training model.')
+        # model.train(aug_gen, options.epochs)
 
     if options.predict:
         logging.info('Making predictions.')

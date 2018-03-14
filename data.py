@@ -46,9 +46,12 @@ class AugmentGenerator(VolumeIterator):
                                                batch_size=batch_size)
 
 
-class AugmentVolSliceGenerator(AugmentGenerator):
-    def __init__(self):
-        pass
+class VolSliceGenerator(AugmentGenerator):
+    def _get_batches_of_transformed_samples(self, index_array):
+        batch_x, batch_y = super(VolSliceGenerator)._get_batches_of_transformed_samples(index_array)
+        for i, j in enumerate(batch_y):
+            print(j.shape)
+            break
 
 
 class VolumeGenerator(Sequence):
