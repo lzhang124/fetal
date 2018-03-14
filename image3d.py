@@ -350,7 +350,7 @@ class VolumeIterator(Iterator):
 
         self.image_transformer = image_transformer
         self.generate_labels = generate_labels
-        super(VolumeIterator, self).__init__(x.shape[0], batch_size, shuffle, seed)
+        super().__init__(x.shape[0], batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x = np.zeros(tuple([len(index_array)] + list(self.x.shape)[1:]),

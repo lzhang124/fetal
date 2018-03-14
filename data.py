@@ -42,13 +42,12 @@ class AugmentGenerator(VolumeIterator):
                                              cval=cval,
                                              flip=flip)
 
-        super(AugmentGenerator, self).__init__(inputs, labels, image_transformer,
-                                               batch_size=batch_size)
+        super().__init__(inputs, labels, image_transformer, batch_size=batch_size)
 
 
 class VolSliceGenerator(AugmentGenerator):
     def _get_batches_of_transformed_samples(self, index_array):
-        batch_x, batch_y = super(VolSliceGenerator)._get_batches_of_transformed_samples(index_array)
+        batch_x, batch_y = super()._get_batches_of_transformed_samples(index_array)
         print(batch_x.shape, batch_y.shape)
         for i, j in enumerate(batch_y):
             seed = np.zeros(batch_x[i].shape)
