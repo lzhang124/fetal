@@ -26,7 +26,7 @@ class AugmentGenerator(VolumeIterator):
             input_files = [label_file.replace(label_path[0], input_path[0])
                                      .replace(label_path[1], input_path[1])
                               for label_file in label_files]
-            
+
             inputs = np.array([preprocess(file) for file in input_files])
             labels = np.array([preprocess(file, funcs=['resize']) for file in label_files])
         else:
@@ -60,13 +60,14 @@ class VolSliceGenerator(AugmentGenerator):
 
 
 class VolumeGenerator(Sequence):
-    def __init__(self, files, batch_size, rescale=True):
+    def __init__(self, files, batch_size, rescale=True, empty_seed=False):
         self.files = glob.glob(files)
         self.shape = shape(self.files[0])
         self.batch_size = batch_size
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
         self.n = len(self.files)
         self.idx = 0
+        self.empty_seed = empty_seed
 
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
@@ -74,8 +75,12 @@ class VolumeGenerator(Sequence):
     def __getitem__(self, idx):
         batch = []
         for file in self.files[self.batch_size * idx:self.batch_size * (idx + 1)]:
-            batch.append(preprocess(file, self.funcs))
-        return np.array(batch)            
+            volume = preprocess(file, self.funcs)
+            if self.empty_seed:
+                zeros = np.zeros(volume.shape)
+                volume = np.concatenate((volume, zeros), axis=-1)
+            batch.append(volume)
+        return np.array(batch)
 
     def __iter__(self):
         self.idx = 0
@@ -85,11 +90,9 @@ class VolumeGenerator(Sequence):
         return self.next()
 
     def next(self):
-        if self.idx < self.n:
-            batch = []
-            for self.idx in range(self.idx, min(self.idx + self.batch_size, self.n)):
-                batch.append(preprocess(self.files[self.idx], self.funcs))
+        if self.idx < len(self):
+            batch = self[self.idx]
             self.idx += 1
-            return np.array(batch)
+            return batch
         else:
             raise StopIteration()
