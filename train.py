@@ -64,7 +64,7 @@ def main():
 
     if options.predict:
         logging.info('Making predictions.')
-        pred_gen = VolumeGenerator(options.predict[0], options.batch_size)
+        pred_gen = VolumeGenerator(options.predict[0], options.batch_size, seed=options.seed)
         model.predict(pred_gen, options.predict[1])
 
     end = time.time()
