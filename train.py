@@ -73,7 +73,7 @@ def main():
 
 def custom():
     import numpy as np
-    import nibable as nib
+    import nibabel as nib
     import process
     import util
     start = time.time()
