@@ -95,30 +95,30 @@ def custom():
 
     shape = constants.TARGET_SHAPE
     m = UNet(shape, 1e-4, filename='models/unet_1222_weights.94-0.4035.h5')
-    p = m.model.predict(x1222)
+    p = m.model.predict(x1222)[0]
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/base_24.nii.gz')
-    p = m.model.predict(x0430)
+    p = m.model.predict(x0430)[0]
     util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/base_24.nii.gz')
 
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     mseed_1 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.35.h5')
-    p = mseed_1.model.predict(x1222_0)
+    p = mseed_1.model.predict(x1222_0)[0]
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero_24-0.35.nii.gz')
-    p = mseed_1.model.predict(x1222_s)
+    p = mseed_1.model.predict(x1222_s)[0]
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/seed_24-0.35.nii.gz')
-    p = mseed_1.model.predict(x0430_0)
+    p = mseed_1.model.predict(x0430_0)[0]
     util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/zero_24-0.35.nii.gz')
-    p = mseed_1.model.predict(x0430_s)
+    p = mseed_1.model.predict(x0430_s)[0]
     util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/seed_24-0.35.nii.gz')
 
     mseed_2 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.40.h5')
-    p = mseed_2.model.predict(x1222_0)
+    p = mseed_2.model.predict(x1222_0)[0]
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero_24-0.40.nii.gz')
-    p = mseed_2.model.predict(x1222_s)
+    p = mseed_2.model.predict(x1222_s)[0]
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/seed_24-0.40.nii.gz')
-    p = mseed_2.model.predict(x0430_0)
+    p = mseed_2.model.predict(x0430_0)[0]
     util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/zero_24-0.40.nii.gz')
-    p = mseed_2.model.predict(x0430_s)
+    p = mseed_2.model.predict(x0430_s)[0]
     util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/seed_24-0.40.nii.gz')
 
     end = time.time()
