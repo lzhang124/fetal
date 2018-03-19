@@ -85,6 +85,7 @@ def custom():
     s0430 = process.preprocess('data/seeds/043015/043015_24.nii.gz', ['resize'])
     x1222_0 = np.concatenate((x1222, np.zeros(x1222.shape)), axis=-1)
     x0430_0 = np.concatenate((x0430, np.zeros(x0430.shape)), axis=-1)
+    print(x1222.shape, s1222.shape)
     x1222_s = np.concatenate((x1222, s1222[64]), axis=-1)
     x0430_s = np.concatenate((x0430, s0430[64]), axis=-1)
 
