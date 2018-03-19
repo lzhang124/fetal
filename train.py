@@ -80,7 +80,9 @@ def custom():
     o = util.shape('data/raw/122215/122215_1.nii.gz')
     x = process.preprocess('data/raw/122215/122215_1.nii.gz')
     y = process.preprocess('data/labels/122215/122215_1_placenta.nii.gz', ['resize'])
-    x = np.concatenate((x, y[64]), axis=-1)
+    z = np.zeros(x.shape)
+    z[64] = y[64]
+    x = np.concatenate((x, z), axis=-1)
     x = x[np.newaxis, :]
     y = y[np.newaxis, :]
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
