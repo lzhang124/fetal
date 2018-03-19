@@ -73,11 +73,13 @@ def main():
 
 def custom():
     import numpy as np
+    import nibable as nib
     import process
     import util
     start = time.time()
 
     o = util.shape('data/raw/122215/122215_1.nii.gz')
+    h = nib.load('data/raw/122215/122215_1.nii.gz').header
     x = process.preprocess('data/raw/122215/122215_1.nii.gz')
     y = process.preprocess('data/labels/122215/122215_1_placenta.nii.gz', ['resize'])
     z = np.zeros(x.shape)
@@ -90,9 +92,9 @@ def custom():
     mseed_1 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.35.h5')
     mseed_2 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.40.h5')
     p = mseed_1.model.predict(x)[0]
-    util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.35.nii.gz')
+    util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.35.nii.gz', header=h)
     p = mseed_2.model.predict(x)[0]
-    util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.40.nii.gz')
+    util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.40.nii.gz', header=h)
 
 
 
