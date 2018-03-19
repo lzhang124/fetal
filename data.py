@@ -60,14 +60,13 @@ class VolSliceGenerator(AugmentGenerator):
 
 
 class VolumeGenerator(Sequence):
-    def __init__(self, files, batch_size, rescale=True, seed=False):
+    def __init__(self, files, batch_size, rescale=True):
         self.files = glob.glob(files)
         self.shape = shape(self.files[0])
         self.batch_size = batch_size
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
         self.n = len(self.files)
         self.idx = 0
-        self.seed = seed
 
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
@@ -76,9 +75,6 @@ class VolumeGenerator(Sequence):
         batch = []
         for file in self.files[self.batch_size * idx:self.batch_size * (idx + 1)]:
             volume = preprocess(file, self.funcs)
-            if self.seed:
-                zeros = np.zeros(volume.shape)
-                volume = np.concatenate((volume, zeros), axis=-1)
             batch.append(volume)
         return np.array(batch)
 
