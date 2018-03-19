@@ -83,10 +83,10 @@ def custom():
     x0430 = process.preprocess('data/raw/043015/043015_24.nii.gz')
     s1222 = process.preprocess('data/seeds/122215/122215_24.nii.gz', ['resize'])
     s0430 = process.preprocess('data/seeds/043015/043015_24.nii.gz', ['resize'])
-    x1222_0 = np.concatenate(x1222, np.zeros(x1222.shape), axis=-1)
-    x0430_0 = np.concatenate(x0430, np.zeros(x0430.shape), axis=-1)
-    x1222_s = np.concatenate(x1222, s1222[64], axis=-1)
-    x0430_s = np.concatenate(x0430, s0430[64], axis=-1)
+    x1222_0 = np.concatenate((x1222, np.zeros(x1222.shape)), axis=-1)
+    x0430_0 = np.concatenate((x0430, np.zeros(x0430.shape)), axis=-1)
+    x1222_s = np.concatenate((x1222, s1222[64]), axis=-1)
+    x0430_s = np.concatenate((x0430, s0430[64]), axis=-1)
 
     shape = constants.TARGET_SHAPE
     m = UNet(shape, 1e-4, filename='models/unet_1222_weights.94-0.4035.h5')
