@@ -85,13 +85,10 @@ def custom():
     x = np.concatenate((x, z), axis=-1)
     x = x[np.newaxis, :]
     y = y[np.newaxis, :]
-    print(x.shape, y.shape)
-
+    
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-    m = UNet(shape, 1e-4, filename='models/unet_1222_weights.94-0.4035.h5')
     mseed_1 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.35.h5')
     mseed_2 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.40.h5')
-    print(m.model.evaluate(x, y))
     print(mseed_1.model.evaluate(x, y))
     print(mseed_2.model.evaluate(x, y))
 
