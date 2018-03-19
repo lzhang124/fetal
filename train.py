@@ -89,9 +89,9 @@ def custom():
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     mseed_1 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.35.h5')
     mseed_2 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.40.h5')
-    p = mseed_1.model.predict(x)
+    p = mseed_1.model.predict(x)[0]
     util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.35.nii.gz')
-    p = mseed_2.model.predict(x)
+    p = mseed_2.model.predict(x)[0]
     util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.40.nii.gz')
 
 
