@@ -71,30 +71,12 @@ def main():
     logging.info('total time: {}s'.format(end - start))
 
 
-def custom():
+def seed_test():
     import numpy as np
     import nibabel as nib
     import process
     import util
     start = time.time()
-
-    # o = util.shape('data/raw/122215/122215_1.nii.gz')
-    # h = nib.load('data/raw/122215/122215_1.nii.gz').header
-    # x = process.preprocess('data/raw/122215/122215_1.nii.gz')
-    # y = process.preprocess('data/labels/122215/122215_1_placenta.nii.gz', ['resize'])
-    # z = np.zeros(x.shape)
-    # z[64] = y[64]
-    # x = np.concatenate((x, z), axis=-1)
-    # x = x[np.newaxis, :]
-    # y = y[np.newaxis, :]
-
-    # shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-    # mseed_1 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.35.h5')
-    # mseed_2 = UNet(shape, 1e-4, filename='models/UNET_SEED-0.40.h5')
-    # p = mseed_1.model.predict(x)[0]
-    # util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.35.nii.gz', header=h)
-    # p = mseed_2.model.predict(x)[0]
-    # util.save_vol(process.uncrop(p, o), 'data/predict/122215/seed_1-0.40.nii.gz', header=h)
 
     o1222 = util.shape('data/raw/122215/122215_24.nii.gz')
     h1222 = nib.load('data/raw/122215/122215_24.nii.gz').header
@@ -146,5 +128,5 @@ def custom():
 
 
 if __name__ == '__main__':
-    # main()
-    custom()
+    main()
+    # seed_test()

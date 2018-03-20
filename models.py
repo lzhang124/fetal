@@ -41,7 +41,6 @@ class BaseModel:
                                            monitor='loss',
                                            save_best_only=True,
                                            save_weights_only=True)
-
         self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint], verbose=1)
 
     def predict(self, generator, path):
