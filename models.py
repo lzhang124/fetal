@@ -25,6 +25,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
     w = 1 if weight is None else weight
 
     def loss_fn(y_true, y_pred):
+        y_pred = K.clip(y_pred, K.epsilon(), 1)
         loss = (-y_true * K.log(y_pred) * w) - ((1 - y_true) * K.log(1 - y_pred))
 
         if boundary_weight is not None:
