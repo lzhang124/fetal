@@ -51,7 +51,7 @@ class BaseModel:
         raise NotImplementedError()
 
     def train(self, generator, epochs):
-        self._compile(util.get_weights(generator.labels))
+        self._compile(get_weights(generator.labels))
         fname = 'models/{}_weights'.format(self.name)
         model_checkpoint = ModelCheckpoint(fname + '.{epoch:02d}-{loss:.4f}.h5',
                                            monitor='loss',
