@@ -25,13 +25,13 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
     w = 1 if weight is None else weight
 
     def loss_fn(y_true, y_pred):
-        cross_entropy = (-y_true * K.log(y_pred) * w) - ((1 - y_true) * K.log(1 - y_pred))
+        loss = (-y_true * K.log(y_pred) * w) - ((1 - y_true) * K.log(1 - y_pred))
 
         if boundary_weight is not None:
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
             boundaries = K.cast(y_true_avg >= K.epsilon(), 'float32') \
                          * K.cast(y_true_avg <= 1 - K.epsilon(), 'float32')
-            cross_entropy += cross_entropy * (boundary_weight * boundaries)
+            loss += loss * (boundary_weight * boundaries)
 
         return K.mean(loss)
     return loss_fn
