@@ -42,7 +42,7 @@ class AugmentGenerator(VolumeIterator):
                                              cval=cval,
                                              flip=flip)
 
-        super().__init__(inputs, labels, image_transformer, batch_size=batch_size)
+        super().__init__(self.inputs, self.labels, image_transformer, batch_size=batch_size)
 
 
 class VolSliceGenerator(AugmentGenerator):
