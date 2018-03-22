@@ -22,3 +22,9 @@ def save_vol(vol, filename, header=None, scale=False):
 
 def shape(filename):
     return read_vol(filename).shape
+
+
+def get_weights(vols):
+    if vols is None:
+        return None
+    return vols.size / np.sum(vols) - 1

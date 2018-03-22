@@ -28,9 +28,6 @@ def build_parser():
     parser.add_argument('-e', '--epochs',
                         metavar='EPOCHS', help='Training epochs',
                         dest='epochs', type=int, default=100)
-    parser.add_argument('-lr', '--learning-rate',
-                        metavar='LEARNING_RATE', help='Training learning rate',
-                        dest='lr', type=float, default=1e-4)
     parser.add_argument('-n', '--name',
                         metavar='MODEL_NAME', help='Name of model',
                         dest='name', type=str)
@@ -51,7 +48,7 @@ def main():
         shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     else:
         shape = constants.TARGET_SHAPE
-    model = UNet(shape, options.lr, name=options.name, filename=options.model_file)
+    model = UNet(shape, name=options.name, filename=options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')
@@ -111,5 +108,5 @@ def seed_test():
 
 
 if __name__ == '__main__':
-    # main()
-    seed_test()
+    main()
+    # seed_test()
