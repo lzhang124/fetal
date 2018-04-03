@@ -23,7 +23,6 @@ def dice_loss(y_true, y_pred):
 
 def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
     w = (.5, .5) if weight is None else weight
-    print(w)
 
     def loss_fn(y_true, y_pred):
         y_pred = K.clip(y_pred, K.epsilon(), 1)
@@ -35,6 +34,8 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
             boundaries = K.cast(y_true_avg >= K.epsilon(), 'float32') \
                          * K.cast(y_true_avg <= 1 - K.epsilon(), 'float32')
             loss += cross_entropy * boundary_weight * boundaries
+
+        print(loss.shape)
 
         return K.mean(K.sum(loss, axis=-1))
     return loss_fn
