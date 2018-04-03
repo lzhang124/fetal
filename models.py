@@ -26,7 +26,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
 
     def loss_fn(y_true, y_pred):
         y_pred = K.clip(y_pred, K.epsilon(), 1)
-        cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))])
+        cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))], axis=-1)
         loss = cross_entropy * w
         print(cross_entropy.shape)
         print(loss.shape)
@@ -37,7 +37,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
                          * K.cast(y_true_avg <= 1 - K.epsilon(), 'float32')
             loss += cross_entropy * boundary_weight * boundaries
 
-        return K.mean(K.sum(loss, axis=0))
+        return K.mean(K.sum(loss, axis=-1))
     return loss_fn
 
 
