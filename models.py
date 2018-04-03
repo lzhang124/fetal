@@ -26,13 +26,14 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
 
     def loss_fn(y_true, y_pred):
         y_pred = K.clip(y_pred, K.epsilon(), 1)
-        loss = (-y_true * K.log(y_pred) * w) - ((1 - y_true) * K.log(1 - y_pred))
+        loss = -(y_true * K.log(y_pred) * w) - ((1 - y_true) * K.log(1 - y_pred))
 
         if boundary_weight is not None:
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
-            boundaries = K.cast(y_true_avg >= K.epsilon(), 'float32') \
-                         * K.cast(y_true_avg <= 1 - K.epsilon(), 'float32')
-            loss += loss * (boundary_weight * boundaries)
+            # boundaries = K.cast(y_true_avg >= K.epsilon(), 'float32') \
+                         # * K.cast(y_true_avg <= 1 - K.epsilon(), 'float32')
+            boundaries = (y_true_avg >= K.epsilon()) * (y_true_avg <= 1 - K.epsilon())
+            loss *= (boundary_weight * boundaries) + 1
 
         return K.mean(loss)
     return loss_fn
@@ -55,7 +56,7 @@ class BaseModel:
     def train(self, generator, epochs):
         self._compile(get_weights(generator.labels))
         fname = 'models/{}_weights'.format(self.name)
-        model_checkpoint = ModelCheckpoint(fname + '.{epoch:02d}-{loss:.4f}.h5',
+        model_checkpoint = ModelCheckpoint(fname + '.{epoch:03d}-{loss:.4f}-{dice_coef:.4f}.h5',
                                            monitor='loss',
                                            save_best_only=True,
                                            save_weights_only=True)
