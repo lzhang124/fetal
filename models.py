@@ -23,6 +23,7 @@ def dice_loss(y_true, y_pred):
 
 def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
     w = (.5, .5) if weight is None else weight
+    print(w)
 
     def loss_fn(y_true, y_pred):
         y_pred = K.clip(y_pred, K.epsilon(), 1)
@@ -119,6 +120,6 @@ class UNet(BaseModel):
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def _compile(self, weight):
-        self.model.compile(optimizer=Adam(lr=1e-5),
+        self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=weighted_crossentropy(weight=weight, boundary_weight=.2),
                            metrics=['accuracy', dice_coef])
