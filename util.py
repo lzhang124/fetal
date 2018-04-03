@@ -27,4 +27,5 @@ def shape(filename):
 def get_weights(vols):
     if vols is None:
         return None
-    return vols.size / np.sum(vols) - 1
+    w = np.sum(vols) / vols.size
+    return (w, 1 - w)
