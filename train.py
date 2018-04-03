@@ -1,5 +1,4 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -34,6 +33,9 @@ def build_parser():
     parser.add_argument('-f', '--model-file',
                         metavar='MODEL_FILE', help='Pretrained model file',
                         dest='model_file', type=str)
+    parser.add_argument('--gpu',
+                        metavar='GPU', help='GPU to use',
+                        dest='gpu', type=str, default='0')
     return parser
 
 
@@ -42,6 +44,8 @@ def main():
 
     parser = build_parser()
     options = parser.parse_args()
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
 
     logging.info('Compiling model.')
     if options.seed:
