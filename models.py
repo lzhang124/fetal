@@ -28,14 +28,13 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
         y_pred = K.clip(y_pred, K.epsilon(), 1)
         cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))])
         loss = cross_entropy * w
-        print(loss.shape)
+        print(cross_entropy.shape)
 
         if boundary_weight is not None:
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
             boundaries = K.cast(y_true_avg >= K.epsilon(), 'float32') \
                          * K.cast(y_true_avg <= 1 - K.epsilon(), 'float32')
             loss += cross_entropy * boundary_weight * boundaries
-        print(loss.shape)
 
         return K.mean(K.sum(loss, axis=-1))
     return loss_fn
