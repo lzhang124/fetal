@@ -93,7 +93,7 @@ def seed_test(options):
     x0430_s = np.concatenate((x0430, s0430), axis=-1)
 
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-    m = UNet(shape, 1e-4, filename='models/UNET_SEED_1222.906-0.0001-0.6816.h5')
+    m = UNet(shape, 1e-4, filename='models/UNET_SEED_1222-0.6854.h5')
     p = m.model.predict(x1222_0)[0]
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero-1222_24.nii.gz', header=h1222)
     p = m.model.predict(x1222_s)[0]
