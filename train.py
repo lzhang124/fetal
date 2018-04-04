@@ -36,16 +36,14 @@ def build_parser():
     parser.add_argument('--gpu',
                         metavar='GPU', help='GPU to use',
                         dest='gpu', type=str, default='0')
+    parser.add_argument('--test',
+                        metavar='TEST', help='TESTING USE ONLY',
+                        dest='test', action='store_true')
     return parser
 
 
-def main():
+def main(options):
     start = time.time()
-
-    parser = build_parser()
-    options = parser.parse_args()
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
 
     logging.info('Compiling model.')
     if options.seed:
@@ -72,9 +70,7 @@ def main():
     logging.info('total time: {}s'.format(end - start))
 
 
-def seed_test():
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-
+def seed_test(options):
     import numpy as np
     import nibabel as nib
     import process
@@ -114,5 +110,12 @@ def seed_test():
 
 
 if __name__ == '__main__':
-    # main()
-    seed_test()
+    parser = build_parser()
+    options = parser.parse_args()
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
+
+    if options.test:
+        seed_test(options)
+    else:
+        main(options)
