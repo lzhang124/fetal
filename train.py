@@ -73,6 +73,8 @@ def main():
 
 
 def seed_test():
+    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
     import numpy as np
     import nibabel as nib
     import process
