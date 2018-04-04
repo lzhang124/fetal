@@ -97,20 +97,20 @@ def seed_test():
     x0430_s = np.concatenate((x0430, s0430), axis=-1)
 
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-    m = UNet(shape, 1e-4, filename='models/UNET_SEED.760-0.1353.h5')
+    m = UNet(shape, 1e-4, filename='models/UNET_SEED_1222.906-0.0001-0.6816.h5')
     p = m.model.predict(x1222_0)[0]
-    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero_24-0.14.nii.gz', header=h1222)
+    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero-1222_24.nii.gz', header=h1222)
     p = m.model.predict(x1222_s)[0]
-    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/seed_24-0.14.nii.gz', header=h1222)
+    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/seed-1222_24.nii.gz', header=h1222)
     p = m.model.predict(x0430_0)[0]
-    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/zero_24-0.14.nii.gz', header=h0430)
+    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/zero-1222_24.nii.gz', header=h0430)
     p = m.model.predict(x0430_s)[0]
-    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/seed_24-0.14.nii.gz', header=h0430)
+    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/seed-1222_24.nii.gz', header=h0430)
 
     end = time.time()
     logging.info('total time: {}s'.format(end - start))
 
 
 if __name__ == '__main__':
-    main()
-    # seed_test()
+    # main()
+    seed_test()
