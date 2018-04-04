@@ -36,9 +36,7 @@ def build_parser():
     parser.add_argument('--gpu',
                         metavar='GPU', help='GPU to use',
                         dest='gpu', type=str, default='0')
-    parser.add_argument('--test',
-                        metavar='TEST', help='TESTING USE ONLY',
-                        dest='test', action='store_true')
+    parser.add_argument('--test', dest='test', action='store_true')
     return parser
 
 
