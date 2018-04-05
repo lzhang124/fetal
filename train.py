@@ -75,13 +75,13 @@ def seed_test(options):
     import util
     start = time.time()
 
-    o1222 = util.shape('data/raw/122215/122215_1.nii.gz')
-    h1222 = nib.load('data/raw/122215/122215_1.nii.gz').header
-    o0430 = util.shape('data/raw/043015/043015_1.nii.gz')
-    h0430 = nib.load('data/raw/043015/043015_1.nii.gz').header
-    x1222 = process.preprocess('data/raw/122215/122215_1.nii.gz')
+    o1222 = util.shape('data/raw/122215/122215_24.nii.gz')
+    h1222 = nib.load('data/raw/122215/122215_24.nii.gz').header
+    o0430 = util.shape('data/raw/043015/043015_24.nii.gz')
+    h0430 = nib.load('data/raw/043015/043015_24.nii.gz').header
+    x1222 = process.preprocess('data/raw/122215/122215_24.nii.gz')
     x1222 = x1222[np.newaxis, :]
-    x0430 = process.preprocess('data/raw/043015/043015_1.nii.gz')
+    x0430 = process.preprocess('data/raw/043015/043015_24.nii.gz')
     x0430 = x0430[np.newaxis, :]
     s1222 = process.preprocess('data/seeds/122215/122215_24.nii.gz', ['resize'])
     s1222 = s1222[np.newaxis, :]
@@ -95,13 +95,13 @@ def seed_test(options):
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     m = UNet(shape, 1e-4, filename='models/UNET_SEED_1222-0.6854.h5')
     p = m.model.predict(x1222_0)[0]
-    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero-1222_1.nii.gz', header=h1222)
+    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero-1222_24.nii.gz', header=h1222)
     p = m.model.predict(x1222_s)[0]
-    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/seed-1222_1.nii.gz', header=h1222)
+    util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/seed-1222_24.nii.gz', header=h1222)
     p = m.model.predict(x0430_0)[0]
-    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/zero-1222_1.nii.gz', header=h0430)
+    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/zero-1222_24.nii.gz', header=h0430)
     p = m.model.predict(x0430_s)[0]
-    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/seed-1222_1.nii.gz', header=h0430)
+    util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/seed-1222_24.nii.gz', header=h0430)
 
     end = time.time()
     logging.info('total time: {}s'.format(end - start))
