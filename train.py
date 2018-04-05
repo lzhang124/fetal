@@ -83,9 +83,9 @@ def seed_test(options):
     x1222 = x1222[np.newaxis, :]
     x0430 = process.preprocess('data/raw/043015/043015_1.nii.gz')
     x0430 = x0430[np.newaxis, :]
-    s1222 = process.preprocess('data/seeds/122215/122215_1.nii.gz', ['resize'])
+    s1222 = process.preprocess('data/seeds/122215/122215_24.nii.gz', ['resize'])
     s1222 = s1222[np.newaxis, :]
-    s0430 = process.preprocess('data/seeds/043015/043015_1.nii.gz', ['resize'])
+    s0430 = process.preprocess('data/seeds/043015/043015_24.nii.gz', ['resize'])
     s0430 = s0430[np.newaxis, :]
     x1222_0 = np.concatenate((x1222, np.zeros(x1222.shape)), axis=-1)
     x0430_0 = np.concatenate((x0430, np.zeros(x0430.shape)), axis=-1)
