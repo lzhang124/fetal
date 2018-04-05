@@ -95,16 +95,12 @@ def seed_test(options):
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     m = UNet(shape, 1e-4, filename='models/UNET_SEED_1222-0.6854.h5')
     p = m.model.predict(x1222_0)[0]
-    print(np.min(p), np.max(p))
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/zero-1222_24.nii.gz', header=h1222)
     p = m.model.predict(x1222_s)[0]
-    print(np.min(p), np.max(p))
     util.save_vol(process.uncrop(p, o1222), 'data/predict/122215/seed-1222_24.nii.gz', header=h1222)
     p = m.model.predict(x0430_0)[0]
-    print(np.min(p), np.max(p))
     util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/zero-1222_24.nii.gz', header=h0430)
     p = m.model.predict(x0430_s)[0]
-    print(np.min(p), np.max(p))
     util.save_vol(process.uncrop(p, o0430), 'data/predict/043015/seed-1222_24.nii.gz', header=h0430)
 
     end = time.time()
