@@ -90,4 +90,4 @@ class VolSliceGenerator(VolumeGenerator):
             while not np.any(seed[r]):
                 r = np.random.choice(seed.shape[0])
             seeds.append(seed)
-        return np.stack([batch, seeds], axis=-1)
+        return np.concatenate([batch, seeds], axis=-1)
