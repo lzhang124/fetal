@@ -146,7 +146,7 @@ def seed_test(options):
 
     logging.info('Making predictions.')
     seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(number, number))
-    predict_files = [file.replace('labels', 'raw') for file in seed_files]
+    predict_files = [file.replace('labels', 'raw').replace('__placenta', '') for file in seed_files]
     pred_gen = VolSliceGenerator(predict_files, seed_files, options.batch_size)
     model.predict(pred_gen, 'data/predict/{}/')
 
