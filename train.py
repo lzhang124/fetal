@@ -136,13 +136,13 @@ def seed_test(options):
 
     number = options.sample_test
 
-    logging.info('Creating data generator.')
-    input_files = ['data/raw/{}/{}_1.nii.gz'.format(number, number)]
-    label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(number, number)]
-    aug_gen = VolSliceAugmentGenerator(input_files, label_files, options.batch_size)
+    # logging.info('Creating data generator.')
+    # input_files = ['data/raw/{}/{}_1.nii.gz'.format(number, number)]
+    # label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(number, number)]
+    # aug_gen = VolSliceAugmentGenerator(input_files, label_files, options.batch_size)
 
-    logging.info('Training model.')
-    model.train(aug_gen, options.epochs)
+    # logging.info('Training model.')
+    # model.train(aug_gen, options.epochs)
 
     logging.info('Making predictions.')
     seed_files = glob.glob('data/labels/{}/{}_*.nii.gz'.format(number, number))
