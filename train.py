@@ -145,15 +145,13 @@ def seed_test(options):
     # model.train(aug_gen, options.epochs)
 
     logging.info('Making predictions.')
-    seed_files = glob.glob('data/labels/{}/{}_*.nii.gz'.format(number, number))
+    seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(number, number))
     predict_files = [file.replace('labels', 'raw') for file in seed_files]
     pred_gen = VolSliceGenerator(predict_files, seed_files, options.batch_size)
     model.predict(pred_gen, 'data/predict/{}/')
 
     logging.info('Testing model.')
-    test_files = [file.replace('labels', 'labels').replace('.nii.gz', '_placenta.nii.gz')
-                  for file in seed_files]
-    test_gen = zip(pred_gen, VolumeGenerator(test_files, None, options.batch_size, False))
+    test_gen = zip(pred_gen, VolumeGenerator(seed_files, None, options.batch_size, False))
     performance = model.test(test_gen)
     logging.info(performance)
 
