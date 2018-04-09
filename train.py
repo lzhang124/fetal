@@ -30,7 +30,7 @@ def build_parser():
     parser.add_argument('-e', '--epochs',
                         metavar='EPOCHS',
                         help='Training epochs',
-                        dest='epochs', type=int, default=100)
+                        dest='epochs', type=int, default=1000)
     parser.add_argument('-n', '--name',
                         metavar='MODEL_NAME',
                         help='Name of model',
