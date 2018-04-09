@@ -128,6 +128,7 @@ def seed_predict(options):
 
 
 def seed_test(options):
+    import util
     start = time.time()
 
     logging.info('Compiling model.')
@@ -136,10 +137,10 @@ def seed_test(options):
 
     number = options.sample_test
 
-    # logging.info('Creating data generator.')
-    # input_files = ['data/raw/{}/{}_1.nii.gz'.format(number, number)]
-    # label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(number, number)]
-    # aug_gen = VolSliceAugmentGenerator(input_files, label_files, options.batch_size)
+    logging.info('Creating data generator.')
+    input_files = ['data/raw/{}/{}_1.nii.gz'.format(number, number)]
+    label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(number, number)]
+    aug_gen = VolSliceAugmentGenerator(input_files, label_files, options.batch_size)
 
     # logging.info('Training model.')
     # model.train(aug_gen, options.epochs)
@@ -152,6 +153,7 @@ def seed_test(options):
 
     logging.info('Testing model.')
     test_gen = zip(pred_gen, VolumeGenerator(seed_files, None, options.batch_size, False))
+    model._compile(util.get_weights(aug_gen.labels))
     metrics = model.test(test_gen)
     logging.info(metrics)
 

@@ -73,6 +73,7 @@ class BaseModel:
             save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
 
     def test(self, generator):
+        self._compile(get_weights(generator.labels))
         return self.model.evaluate_generator(generator)
 
 
