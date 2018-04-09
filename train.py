@@ -6,7 +6,7 @@ import constants
 import glob
 import time
 from argparse import ArgumentParser
-from data import AugmentGenerator, VolSliceAugmentGenerator, VolSliceGenerator VolumeGenerator
+from data import AugmentGenerator, VolSliceAugmentGenerator, VolSliceGenerator, VolumeGenerator
 from models import UNet
 
 
