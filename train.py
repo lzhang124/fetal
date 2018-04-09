@@ -69,7 +69,7 @@ def main(options):
         input_files = [label_file.replace(label_path, input_path) for label_file in label_files]
 
         generator = VolSliceAugmentGenerator if options.seed else AugmentGenerator
-        aug_gen = generator(input_files, label_files, options.batch_size)
+        aug_gen = generator(input_files, label_files=label_files, batch_size=options.batch_size)
 
         logging.info('Compiling model.')
         model.compile(get_weights(aug_gen.labels))
@@ -84,8 +84,9 @@ def main(options):
         seed_files = glob.glob(options.predict[1]) if options.seed else None
         save_path = options.predict[2] if options.seed else options.predict[1]
 
-        generator = VolSliceGenerator if options.seed else VolumeGenerator
-        pred_gen = generator(input_files, seed_files, options.batch_size)
+        pred_gen = VolumeGenerator(input_files,
+                                   seed_files=seed_files,
+                                   batch_size=options.batch_size)
         model.predict(pred_gen, save_path)
 
     end = time.time()
@@ -139,12 +140,14 @@ def seed_test(options):
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     model = UNet(shape, name=options.name, filename=options.model_file)
 
-    number = options.sample_test
+    sample = options.sample_test
 
     logging.info('Creating data generator.')
-    input_files = ['data/raw/{}/{}_1.nii.gz'.format(number, number)]
-    label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(number, number)]
-    aug_gen = VolSliceAugmentGenerator(input_files, label_files, options.batch_size)
+    input_files = ['data/raw/{}/{}_1.nii.gz'.format(sample, sample)]
+    label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample)]
+    aug_gen = VolSliceAugmentGenerator(input_files,
+                                       label_files=label_files,
+                                       batch_size=options.batch_size)
 
     logging.info('Compiling model.')
     model.compile(get_weights(aug_gen.labels))
@@ -153,13 +156,18 @@ def seed_test(options):
     # model.train(aug_gen, options.epochs)
 
     logging.info('Making predictions.')
-    seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(number, number))
+    seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[1:]
     predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in seed_files]
-    pred_gen = VolSliceGenerator(predict_files, seed_files, options.batch_size)
-    model.predict(pred_gen, 'data/predict/{}/'.format(number))
+    pred_gen = VolSliceGenerator(predict_files,
+                                 label_files=seed_files,
+                                 batch_size=options.batch_size,
+                                 include_labels=False)
+    model.predict(pred_gen, 'data/predict/{}/'.format(sample))
 
     logging.info('Testing model.')
-    test_gen = zip(pred_gen, VolumeGenerator(seed_files, None, options.batch_size, False))
+    test_gen = VolSliceGenerator(predict_files,
+                                 label_files=seed_files,
+                                 batch_size=options.batch_size)
     metrics = model.test(test_gen)
     logging.info(metrics)
 
