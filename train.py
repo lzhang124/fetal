@@ -156,7 +156,8 @@ def seed_test(options):
     # model.train(aug_gen, options.epochs)
 
     logging.info('Making predictions.')
-    seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[1:]
+    seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
+    seed_files.remove('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample))
     predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in seed_files]
     pred_gen = VolSliceGenerator(predict_files,
                                  label_files=seed_files,
