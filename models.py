@@ -73,7 +73,7 @@ class BaseModel:
             save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
 
     def test(self, generator):
-        return self.model.evaluate_generator(generator, verbose=1)
+        return self.model.evaluate_generator(generator)
 
 
 class UNet(BaseModel):

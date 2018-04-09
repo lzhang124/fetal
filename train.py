@@ -152,8 +152,8 @@ def seed_test(options):
 
     logging.info('Testing model.')
     test_gen = zip(pred_gen, VolumeGenerator(seed_files, None, options.batch_size, False))
-    performance = model.test(test_gen)
-    logging.info(performance)
+    metrics = model.test(test_gen)
+    logging.info(metrics)
 
     end = time.time()
     logging.info('total time: {}s'.format(end - start))
