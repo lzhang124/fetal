@@ -13,11 +13,11 @@ from models import UNet
 def build_parser():
     parser = ArgumentParser()
     parser.add_argument('-t', '--train',
-                        metavar=('INPUT_FILES', 'LABEL_FILES'),
+                        metavar='INPUT_FILES, LABEL_FILES',
                         help='Train model',
                         dest='train', type=str, nargs=2)
     parser.add_argument('-p', '--predict',
-                        metavar=('INPUT_FILES', 'SEED_FILES', 'SAVE_PATH'),
+                        metavar='INPUT_FILES, [SEED_FILES,] SAVE_PATH',
                         help='Predict segmentations',
                         dest='predict', type=str, nargs='+')
     parser.add_argument('-s', '--seed',
