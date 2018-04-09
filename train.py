@@ -43,8 +43,8 @@ def build_parser():
                         metavar='GPU',
                         help='GPU to use',
                         dest='gpu', type=str, default='0')
-    parser.add_argument('--sample_predict', dest='sample_predict', action='store_true')
-    parser.add_argument('--sample_test', dest='sample_test', type=str)
+    parser.add_argument('--sample-predict', dest='sample_predict', action='store_true')
+    parser.add_argument('--sample-test', dest='sample_test', type=str)
     return parser
 
 
@@ -141,7 +141,7 @@ def seed_test(options):
 
     logging.info('Creating data generator.')
     input_files = ['data/raw/{}/{}_1.nii.gz'.format(number, number)]
-    label_files = ['data/raw/{}/{}_1_placenta.nii.gz'.format(number, number)]
+    label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(number, number)]
     aug_gen = VolSliceAugmentGenerator(input_files, label_files, options.batch_size)
 
     logging.info('Training model.')
