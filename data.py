@@ -82,7 +82,7 @@ class VolumeGenerator(Sequence):
 
 class VolSliceGenerator(VolumeGenerator):
     def __getitem__(self, idx):
-        batch = super()[idx]
+        batch = super().__getitem__(idx)
         seeds = []
         for file in self.seed_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
             seed = preprocess(file, ['resize'])
