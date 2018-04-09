@@ -148,7 +148,7 @@ def seed_test(options):
     seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(number, number))
     predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in seed_files]
     pred_gen = VolSliceGenerator(predict_files, seed_files, options.batch_size)
-    model.predict(pred_gen, 'data/predict/{}/')
+    model.predict(pred_gen, 'data/predict/{}/'.format(number))
 
     logging.info('Testing model.')
     test_gen = zip(pred_gen, VolumeGenerator(seed_files, None, options.batch_size, False))
