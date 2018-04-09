@@ -43,8 +43,8 @@ def build_parser():
                         metavar='GPU',
                         help='GPU to use',
                         dest='gpu', type=str, default='0')
-    parser.add_argument('--predict', dest='predict', action='store_true')
-    parser.add_argument('--test', dest='test', type=str)
+    parser.add_argument('--sample_predict', dest='sample_predict', action='store_true')
+    parser.add_argument('--sample_test', dest='sample_test', type=str)
     return parser
 
 
@@ -137,7 +137,7 @@ def seed_test(options):
         shape = constants.TARGET_SHAPE
     model = UNet(shape, name=options.name, filename=options.model_file)
 
-    number = options.test
+    number = options.sample_test
 
     logging.info('Creating data generator.')
     input_files = ['data/raw/{}/{}_1.nii.gz'.format(number, number)]
@@ -170,9 +170,9 @@ if __name__ == '__main__':
 
     os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
 
-    if options.predict:
+    if options.sample_predict:
         seed_predict(options)
-    elif options.test:
+    elif options.sample_test:
         seed_test(options)
     else:
         main(options)
