@@ -19,7 +19,7 @@ def build_parser():
     parser.add_argument('-p', '--predict',
                         metavar=('INPUT_FILES', 'SEED_FILES', 'SAVE_PATH'),
                         help='Predict segmentations',
-                        dest='predict', type=str, nargs=+)
+                        dest='predict', type=str, nargs='+')
     parser.add_argument('-s', '--seed',
                         help='Seed slices',
                         dest='seed', action='store_true')
