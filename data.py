@@ -1,4 +1,3 @@
-import glob
 import numpy as np
 from image3d import ImageTransformer, VolumeIterator
 from keras.utils.data_utils import Sequence
@@ -18,21 +17,8 @@ class AugmentGenerator(VolumeIterator):
                  fill_mode='nearest',
                  cval=0.,
                  flip=True):
-        if label_files:
-            input_path = input_files.split('*/*')
-            label_path = label_files.split('*/*')
-
-            label_files = glob.glob(label_files)
-            input_files = [label_file.replace(label_path[0], input_path[0])
-                                     .replace(label_path[1], input_path[1])
-                              for label_file in label_files]
-
-            self.inputs = np.array([preprocess(file) for file in input_files])
-            self.labels = np.array([preprocess(file, funcs=['resize']) for file in label_files])
-        else:
-            self.inputs = np.array([preprocess(file, funcs=['resize'])
-                                    for file in glob.glob(input_files)])
-            self.labels = None
+        self.inputs = np.array([preprocess(file) for file in input_files])
+        self.labels = np.array([preprocess(file, funcs=['resize']) for file in label_files])
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -45,7 +31,7 @@ class AugmentGenerator(VolumeIterator):
         super().__init__(self.inputs, self.labels, image_transformer, batch_size=batch_size)
 
 
-class VolSliceGenerator(AugmentGenerator):
+class VolSliceAugmentGenerator(AugmentGenerator):
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x, batch_y = super()._get_batches_of_transformed_samples(index_array)
         new_batch_x = np.zeros(tuple(list(batch_x.shape[:-1]) + [batch_x.shape[-1] + 1]))
@@ -60,12 +46,13 @@ class VolSliceGenerator(AugmentGenerator):
 
 
 class VolumeGenerator(Sequence):
-    def __init__(self, files, batch_size, rescale=True):
-        self.files = glob.glob(files)
-        self.shape = shape(self.files[0])
+    def __init__(self, input_files, seed_files, batch_size, rescale=True):
+        self.input_files = input_files
+        self.seed_files = seed_files
+        self.shape = shape(self.input_files[0])
         self.batch_size = batch_size
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
-        self.n = len(self.files)
+        self.n = len(self.input_files)
         self.idx = 0
 
     def __len__(self):
@@ -73,7 +60,7 @@ class VolumeGenerator(Sequence):
 
     def __getitem__(self, idx):
         batch = []
-        for file in self.files[self.batch_size * idx:self.batch_size * (idx + 1)]:
+        for file in self.input_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
             volume = preprocess(file, self.funcs)
             batch.append(volume)
         return np.array(batch)
@@ -92,3 +79,15 @@ class VolumeGenerator(Sequence):
             return batch
         else:
             raise StopIteration()
+
+class VolSliceGenerator(VolumeGenerator):
+    def __getitem__(self, idx):
+        batch = super()[idx]
+        seeds = []
+        for file in self.seed_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
+            seed = preprocess(file, ['resize'])
+            r = np.random.choice(seed.shape[0])
+            while not np.any(seed[r]):
+                r = np.random.choice(seed.shape[0])
+            seeds.append(seed)
+        np.stack([batch, seeds], axis=-1)
