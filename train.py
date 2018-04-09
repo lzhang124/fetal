@@ -8,6 +8,7 @@ import time
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolSliceAugmentGenerator, VolSliceGenerator, VolumeGenerator
 from models import UNet
+from util import get_weights
 
 
 def build_parser():
@@ -69,6 +70,9 @@ def main(options):
 
         generator = VolSliceAugmentGenerator if options.seed else AugmentGenerator
         aug_gen = generator(input_files, label_files, options.batch_size)
+
+        logging.info('Compiling model.')
+        model.compile(get_weights(aug_gen.labels))
 
         logging.info('Training model.')
         model.train(aug_gen, options.epochs)
@@ -142,6 +146,9 @@ def seed_test(options):
     label_files = ['data/labels/{}/{}_1_placenta.nii.gz'.format(number, number)]
     aug_gen = VolSliceAugmentGenerator(input_files, label_files, options.batch_size)
 
+    logging.info('Compiling model.')
+    model.compile(get_weights(aug_gen.labels))
+
     # logging.info('Training model.')
     # model.train(aug_gen, options.epochs)
 
@@ -153,7 +160,6 @@ def seed_test(options):
 
     logging.info('Testing model.')
     test_gen = zip(pred_gen, VolumeGenerator(seed_files, None, options.batch_size, False))
-    model._compile(util.get_weights(aug_gen.labels))
     metrics = model.test(test_gen)
     logging.info(metrics)
 

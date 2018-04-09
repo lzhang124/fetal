@@ -7,7 +7,7 @@ from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 from keras import layers
 from process import uncrop
-from util import get_weights, save_vol
+from util import save_vol
 
 
 def dice_coef(y_true, y_pred):
@@ -52,11 +52,10 @@ class BaseModel:
     def _new_model(self):
         raise NotImplementedError()
 
-    def _compile(self, weight):
+    def compile(self, weight):
         raise NotImplementedError()
 
     def train(self, generator, epochs):
-        self._compile(get_weights(generator.labels))
         fname = 'models/{}_weights'.format(self.name)
         model_checkpoint = ModelCheckpoint(fname + '.{epoch:03d}-{loss:.4f}-{dice_coef:.4f}.h5',
                                            monitor='loss',
@@ -73,7 +72,6 @@ class BaseModel:
             save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
 
     def test(self, generator):
-        self._compile(get_weights(generator.labels))
         return self.model.evaluate_generator(generator)
 
 
@@ -124,7 +122,7 @@ class UNet(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def _compile(self, weight):
+    def compile(self, weight):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=weighted_crossentropy(weight=weight, boundary_weight=0.2),
                            metrics=['accuracy', dice_coef])
