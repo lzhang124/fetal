@@ -131,10 +131,7 @@ def seed_test(options):
     start = time.time()
 
     logging.info('Compiling model.')
-    if options.seed:
-        shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-    else:
-        shape = constants.TARGET_SHAPE
+    shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     model = UNet(shape, name=options.name, filename=options.model_file)
 
     number = options.sample_test
