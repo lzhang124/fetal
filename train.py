@@ -49,7 +49,7 @@ def build_parser():
                         help='GPU to use',
                         dest='gpu', type=str, default='0')
     parser.add_argument('--size',
-                        metabar='SIZE',
+                        metavar='SIZE',
                         help='Size of UNet',
                         dest='size', type=str)
     parser.add_argument('--run', dest='run', action='store_true')
