@@ -7,7 +7,7 @@ import glob
 import time
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolSliceAugmentGenerator, VolSliceGenerator, VolumeGenerator
-from models import UNet
+from models import UNet, UNetSmall
 from util import get_weights
 
 
@@ -44,6 +44,7 @@ def build_parser():
                         metavar='GPU',
                         help='GPU to use',
                         dest='gpu', type=str, default='0')
+    parser.add_argument('--small', dest='small', action='store_true')
     parser.add_argument('--sample-predict', dest='sample_predict', action='store_true')
     parser.add_argument('--sample-test', dest='sample_test', type=str)
     return parser
@@ -57,7 +58,8 @@ def main(options):
         shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     else:
         shape = constants.TARGET_SHAPE
-    model = UNet(shape, name=options.name, filename=options.model_file)
+    m = UNetSmall if options.small else UNet
+    model = m(shape, name=options.name, filename=options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')
@@ -138,7 +140,8 @@ def seed_test(options):
 
     logging.info('Creating model.')
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-    model = UNet(shape, name=options.name, filename=options.model_file)
+    m = UNetSmall if options.small else UNet
+    model = m(shape, name=options.name, filename=options.model_file)
 
     sample = options.sample_test
 
