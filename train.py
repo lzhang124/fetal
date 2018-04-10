@@ -13,34 +13,34 @@ from util import get_weights
 
 def build_parser():
     parser = ArgumentParser()
-    parser.add_argument('-t', '--train',
+    parser.add_argument('--train',
                         metavar='INPUT_FILES, LABEL_FILES',
                         help='Train model',
                         dest='train', type=str, nargs=2)
-    parser.add_argument('-p', '--predict',
+    parser.add_argument('--predict',
                         metavar='INPUT_FILES, SEED_FILES/LABEL_FILES, SAVE_PATH',
                         help='Predict segmentations',
                         dest='predict', type=str, nargs=3)
-    parser.add_argument('-t', '--test',
+    parser.add_argument('--test',
                         metavar='INPUT_FILES, [SEED_FILES,] LABEL_FILES',
                         help='Test model.',
                         dest='test', type=str, nargs='+')
-    parser.add_argument('-s', '--seed',
+    parser.add_argument('--seed',
                         help='Seed slices',
                         dest='seed', type=str, default='generate')
-    parser.add_argument('-b', '--batch-size',
+    parser.add_argument('--batch-size',
                         metavar='BATCH_SIZE',
                         help='Training batch size',
                         dest='batch_size', type=int, default=1)
-    parser.add_argument('-e', '--epochs',
+    parser.add_argument('--epochs',
                         metavar='EPOCHS',
                         help='Training epochs',
                         dest='epochs', type=int, default=1000)
-    parser.add_argument('-n', '--name',
+    parser.add_argument('--name',
                         metavar='MODEL_NAME',
                         help='Name of model',
                         dest='name', type=str)
-    parser.add_argument('-f', '--model-file',
+    parser.add_argument('--model-file',
                         metavar='MODEL_FILE',
                         help='Pretrained model file',
                         dest='model_file', type=str)
