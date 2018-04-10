@@ -68,8 +68,10 @@ class VolumeGenerator(Sequence):
                  load_files=False,
                  include_labels=False,
                  rescale=True):
+        
         self.load_files = load_files
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
+        self.shape = shape(input_files[0])
 
         self.input_files = input_files
         self.seed_files = seed_files
@@ -81,11 +83,10 @@ class VolumeGenerator(Sequence):
             if label_files is not None:
                 self.label_files = np.array([preprocess(file, ['resize']) for file in label_files])
 
-        self.shape = shape(self.input_files[0])
         self.batch_size = batch_size
         self.gen_seed = gen_seed
         self.include_labels = include_labels
-        self.n = len(self.input_files)
+        self.n = len(input_files)
         self.idx = 0
 
     def __len__(self):
