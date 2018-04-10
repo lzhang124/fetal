@@ -136,7 +136,7 @@ class UNet(BaseModel):
                            metrics=['accuracy', dice_coef])
 
 
-class UnetSmall(UNet):
+class UNetSmall(UNet):
     def _new_model(self):
         inputs = layers.Input(shape=self.input_size)
 
@@ -175,7 +175,7 @@ class UnetSmall(UNet):
         self.model = Model(inputs=inputs, outputs=outputs)
 
 
-class UnetBig(UNet):
+class UNetBig(UNet):
     def _new_model(self):
         inputs = layers.Input(shape=self.input_size)
 
