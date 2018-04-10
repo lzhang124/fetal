@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras import backend as K
 from keras import layers
 from process import uncrop
@@ -52,16 +52,24 @@ class BaseModel:
     def _new_model(self):
         raise NotImplementedError()
 
+    def save(self):
+        self.model.save('models/{}_weights.latest.h5'.format(self.name))
+
     def compile(self, weight):
         raise NotImplementedError()
 
-    def train(self, generator, epochs):
+    def train(self, generator, val_gen, epochs):
         fname = 'models/{}_weights'.format(self.name)
         model_checkpoint = ModelCheckpoint(fname + '.{epoch:03d}-{loss:.4f}-{dice_coef:.4f}.h5',
                                            monitor='loss',
                                            save_best_only=True,
                                            save_weights_only=True)
-        self.model.fit_generator(generator, epochs=epochs, callbacks=[model_checkpoint], verbose=1)
+        early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=100)
+        self.model.fit_generator(generator,
+                                 epochs=epochs,
+                                 validation_data=val_gen,
+                                 callbacks=[model_checkpoint, early_stopping],
+                                 verbose=1)
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator, verbose=1)

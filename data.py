@@ -65,16 +65,25 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  gen_seed=False,
+                 load_files=False,
                  include_labels=False,
                  rescale=True):
-        self.input_files = input_files
-        self.seed_files = seed_files
-        self.label_files = label_files
+        self.load_files = load_files
+        self.funcs = ['rescale', 'resize'] if rescale else ['resize']
+
+        if load_files:
+            self.input_files = np.array([preprocess(file, self.funcs) for file in input_files])
+            self.seed_files = np.array([preprocess(file, ['resize']) for file in seed_files])
+            self.label_files = np.array([preprocess(file, ['resize']) for file in label_files])
+        else:
+            self.input_files = input_files
+            self.seed_files = seed_files
+            self.label_files = label_files
+
         self.shape = shape(self.input_files[0])
         self.batch_size = batch_size
         self.gen_seed = gen_seed
         self.include_labels = include_labels
-        self.funcs = ['rescale', 'resize'] if rescale else ['resize']
         self.n = len(self.input_files)
         self.idx = 0
 
@@ -84,14 +93,14 @@ class VolumeGenerator(Sequence):
     def __getitem__(self, idx):
         batch = []
         for file in self.input_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
-            volume = preprocess(file, self.funcs)
+            volume = file if self.load_files else preprocess(file, self.funcs)
             batch.append(volume)
         batch = np.array(batch)
 
         if self.seed_files is not None:
             seeds = []
             for file in self.seed_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
-                seed = preprocess(file, ['resize'])
+                seed = file if self.load_files else preprocess(file, ['resize'])
                 seeds.append(seed)
             batch = np.concatenate((batch, np.array(seeds)), axis=-1)
 
@@ -102,7 +111,8 @@ class VolumeGenerator(Sequence):
                 raise ValueError('Seeds already exist.')
 
             new_batch = np.zeros(tuple(list(batch.shape[:-1]) + [batch.shape[-1] + 1]))
-            for i, label in enumerate(batch_y):
+            for i, file in enumerate(self.label_files[self.batch_size * idx:self.batch_size * (idx + 1)]):
+                label = file if self.load_files else preprocess(file, ['resize'])
                 seed = np.zeros(batch[i].shape)
                 r = np.random.choice(label.shape[0])
                 while not np.any(label[r]):
@@ -117,7 +127,7 @@ class VolumeGenerator(Sequence):
 
             labels = []
             for file in self.label_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
-                label = preprocess(file, ['resize'])
+                label = file if self.load_files else preprocess(file, ['resize'])
                 labels.append(label)
             labels = np.array(labels)
             batch = (batch, labels)

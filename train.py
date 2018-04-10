@@ -87,12 +87,19 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
+        val_gen = VolumeGenerator(input_files,
+                                  label_files=label_files,
+                                  batch_size=options.batch_size,
+                                  gen_seed=gen_seed,
+                                  load_files=True,
+                                  include_labels=True)
 
         logging.info('Compiling model.')
         model.compile(get_weights(aug_gen.labels))
 
         logging.info('Training model.')
-        model.train(aug_gen, options.epochs)
+        model.train(aug_gen, val_gen, options.epochs)
+        model.save()
 
     if options.predict:
         logging.info('Making predictions.')
@@ -162,13 +169,19 @@ def run(options):
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   gen_seed=options.seed)
+                                   gen_seed=gen_seed)
+        val_gen = VolumeGenerator(input_files,
+                                  label_files=label_files,
+                                  batch_size=options.batch_size,
+                                  gen_seed=gen_seed,
+                                  load_files=True,
+                                  include_labels=True)
 
         logging.info('Compiling model.')
         model.compile(get_weights(aug_gen.labels))
 
         logging.info('Training model.')
-        model.train(aug_gen, options.epochs)
+        model.train(aug_gen, val_gen, options.epochs)
 
         logging.info('Making predictions.')
         label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
