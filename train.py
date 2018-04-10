@@ -52,7 +52,7 @@ def build_parser():
 def main(options):
     start = time.time()
 
-    logging.info('Compiling model.')
+    logging.info('Creating model.')
     if options.seed:
         shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     else:
@@ -136,7 +136,7 @@ def seed_test(options):
     import util
     start = time.time()
 
-    logging.info('Compiling model.')
+    logging.info('Creating model.')
     shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
     model = UNet(shape, name=options.name, filename=options.model_file)
 
