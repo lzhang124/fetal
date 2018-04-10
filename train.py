@@ -164,7 +164,7 @@ def run(options):
 
         logging.info('Creating data generator.')
 
-        label_files = [file if not os.path.basename(file).startswith(sample) for file in all_labels]
+        label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
         input_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
