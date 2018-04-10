@@ -152,8 +152,8 @@ def seed_test(options):
     logging.info('Compiling model.')
     model.compile(get_weights(aug_gen.labels))
 
-    # logging.info('Training model.')
-    # model.train(aug_gen, options.epochs)
+    logging.info('Training model.')
+    model.train(aug_gen, options.epochs)
 
     logging.info('Making predictions.')
     seed_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
