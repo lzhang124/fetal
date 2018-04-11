@@ -185,7 +185,7 @@ def run(options):
 
         logging.info('Making predictions.')
         label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
-        predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in seed_files]
+        predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         pred_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
