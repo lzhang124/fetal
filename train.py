@@ -52,7 +52,10 @@ def build_parser():
                         metavar='SIZE',
                         help='Size of UNet',
                         dest='size', type=str)
-    parser.add_argument('--run', dest='run', action='store_true')
+    parser.add_argument('--run',
+                        metavar='GPU',
+                        help='Which preset program to run',
+                        dest='run', type=str)
     return parser
 
 
@@ -144,8 +147,7 @@ def run(options):
 
     all_labels = glob.glob('data/labels/*/*_placenta.nii.gz')
 
-    # for sample in ['043015', '051215', '061715', '062515', '081315', '083115', '110214', '112614', '122115', '122215']:
-    for sample in ['043015']:
+    for sample in ['043015', '051215', '061715', '062515', '081315', '083115', '110214', '112614', '122115', '122215']:
         logging.info(sample)
 
         logging.info('Creating model.')
@@ -165,7 +167,13 @@ def run(options):
 
         logging.info('Creating data generator.')
 
-        label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
+        if options.run == 'one-out':
+            label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
+        elif options.run == 'single':
+            label_files = glob.glob('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample))
+        else:
+            raise ValueError('Preset program not defined.')
+            
         input_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
@@ -185,7 +193,14 @@ def run(options):
         model.train(aug_gen, val_gen, options.epochs)
 
         logging.info('Making predictions.')
-        label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
+        if options.run == 'one-out':
+            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
+        elif options.run == 'single':
+            label_files = [f for f in glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
+                           if not os.path.basename(f).endswith('_1_placenta.nii.gz')]
+        else:
+            raise ValueError('Preset program not defined.')
+            
         predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         pred_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
