@@ -64,11 +64,10 @@ class BaseModel:
                                            monitor='loss',
                                            save_best_only=True,
                                            save_weights_only=True)
-        early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=100)
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
-                                 callbacks=[model_checkpoint, early_stopping],
+                                 callbacks=[model_checkpoint],
                                  verbose=1)
 
     def predict(self, generator, path):
