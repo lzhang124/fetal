@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 from keras import layers
 from process import uncrop
