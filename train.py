@@ -179,6 +179,8 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
+        print(aug_gen.next().shape)
+        raise Error
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
