@@ -181,7 +181,7 @@ def run(options):
                                    gen_seed=gen_seed)
         a = aug_gen.next()
         print(a[0].shape)
-        savevol(a, 'test_vol.nii.gz')
+        save_vol(a, 'test_vol.nii.gz')
         raise ValueError
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
