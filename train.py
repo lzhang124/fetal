@@ -8,7 +8,7 @@ import time
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolumeGenerator
 from models import UNet, UNetSmall, UNetBig
-from util import get_weights
+from util import get_weights, save_vol
 
 
 def build_parser():
@@ -27,7 +27,7 @@ def build_parser():
                         dest='test', type=str, nargs='+')
     parser.add_argument('--seed',
                         help='Seed slices',
-                        dest='seed', type=str, default='generate')
+                        dest='seed', type=str)
     parser.add_argument('--batch-size',
                         metavar='BATCH_SIZE',
                         help='Training batch size',
@@ -179,8 +179,10 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
-        print(aug_gen.next()[0].shape)
-        raise Error
+        a = aug_gen.next()
+        print(a[0].shape)
+        savevol(a, 'test_vol.nii.gz')
+        raise ValueError
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
