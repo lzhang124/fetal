@@ -182,8 +182,8 @@ def run(options):
         import process
         shape = aug_gen.inputs[0].shape
         a = aug_gen.next()
-        b = process.uncrop(a[0], shape)
-        c = process.uncrop(a[1], shape)
+        b = process.uncrop(a[0][0], shape)
+        c = process.uncrop(a[1][0], shape)
         print(b.shape)
         util.save_vol(b, 'test_vol.nii.gz', scale=True)
         util.save_vol(c, 'test_label.nii.gz')
