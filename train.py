@@ -8,7 +8,7 @@ import time
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolumeGenerator
 from models import UNet, UNetSmall, UNetBig
-from util import get_weights, save_vol
+from util
 
 
 def build_parser():
@@ -98,7 +98,7 @@ def main(options):
                                   include_labels=True)
 
         logging.info('Compiling model.')
-        model.compile(get_weights(aug_gen.labels))
+        model.compile(util.get_weights(aug_gen.labels))
 
         logging.info('Training model.')
         model.train(aug_gen, val_gen, options.epochs)
@@ -179,10 +179,13 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
+        import process
+        shape = aug_gen.inputs[0].shape
         a = aug_gen.next()
+        a = process.uncrop(a, shape)
         print(a[0].shape)
-        save_vol(a[0], 'test_vol.nii.gz', scale=True)
-        save_vol(a[1], 'test_label.nii.gz')
+        util.save_vol(a[0], 'test_vol.nii.gz', scale=True)
+        util.save_vol(a[1], 'test_label.nii.gz')
         raise ValueError
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
@@ -192,7 +195,7 @@ def run(options):
                                   include_labels=True)
 
         logging.info('Compiling model.')
-        model.compile(get_weights(aug_gen.labels))
+        model.compile(util.get_weights(aug_gen.labels))
 
         logging.info('Training model.')
         model.train(aug_gen, val_gen, options.epochs)
