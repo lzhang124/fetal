@@ -179,7 +179,7 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
-        a = aug_gen.next()
+        a = aug_gen.inputs[0]
         print(a[0].shape)
         print(a[1].shape)
         save_vol(a[0], 'test_vol.nii.gz', scale=True)
