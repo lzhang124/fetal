@@ -5,10 +5,10 @@ logging.basicConfig(level=logging.INFO)
 import constants
 import glob
 import time
+import util
 from argparse import ArgumentParser
 from data import AugmentGenerator, VolumeGenerator
 from models import UNet, UNetSmall, UNetBig
-from util
 
 
 def build_parser():
