@@ -182,10 +182,11 @@ def run(options):
         import process
         shape = aug_gen.inputs[0].shape
         a = aug_gen.next()
-        a = process.uncrop(a, shape)
-        print(a[0].shape)
-        util.save_vol(a[0], 'test_vol.nii.gz', scale=True)
-        util.save_vol(a[1], 'test_label.nii.gz')
+        b = process.uncrop(a[0], shape)
+        c = process.uncrop(a[1], shape)
+        print(b.shape)
+        util.save_vol(b, 'test_vol.nii.gz', scale=True)
+        util.save_vol(c, 'test_label.nii.gz')
         raise ValueError
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
