@@ -180,7 +180,7 @@ def run(options):
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
         import process
-        shape = util.shape('data/043015/043015_1.nii.gz')
+        shape = util.shape('data/raw/043015/043015_1.nii.gz')
         a = aug_gen.next()
         b = process.uncrop(a[0][0], shape)
         c = process.uncrop(a[1][0], shape)
