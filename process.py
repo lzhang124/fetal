@@ -54,7 +54,7 @@ def uncrop(vol, shape):
     dy = abs(shape[1] - constants.TARGET_SHAPE[1]) // 2
     dz = abs(shape[2] - constants.TARGET_SHAPE[2]) // 2
 
-    resized = np.pad(vol, ((dx, dx), (dy, dy), (dz, dz)), 'constant')
+    resized = np.pad(vol, ((dx, dx), (dy, dy), (dz, dz), (0, 0)), 'constant')
     if resized.shape != shape:
         raise ValueError('The resized shape {shape} '
                          'does not match the target '
