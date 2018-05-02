@@ -179,9 +179,10 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
-        a = aug_gen.inputs[0]
-        print(a.shape)
-        save_vol(a, 'test_vol.nii.gz', scale=True)
+        a = aug_gen.next()
+        print(a[0].shape)
+        save_vol(a[0], 'test_vol.nii.gz', scale=True)
+        save_vol(a[1], 'test_label.nii.gz')
         raise ValueError
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
