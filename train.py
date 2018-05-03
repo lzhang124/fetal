@@ -53,7 +53,7 @@ def build_parser():
                         help='Size of UNet',
                         dest='size', type=str)
     parser.add_argument('--run',
-                        metavar='GPU',
+                        metavar='RUN',
                         help='Which preset program to run',
                         dest='run', type=str)
     return parser
