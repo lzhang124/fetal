@@ -180,15 +180,6 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
-        import process
-        shape = util.shape('data/raw/043015/043015_1.nii.gz')
-        a = aug_gen.next()
-        b = process.uncrop(a[0][0], shape)
-        c = process.uncrop(a[1][0], shape)
-        print(b.shape)
-        util.save_vol(b, 'test_vol.nii.gz', scale=True)
-        util.save_vol(c, 'test_label.nii.gz')
-        raise ValueError
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
