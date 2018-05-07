@@ -186,7 +186,9 @@ def run(options):
                                   gen_seed=gen_seed,
                                   load_files=True,
                                   include_labels=True)
-        print(val_gen.next().shape)
+        a = val_gen.next()
+        print(a[0].shape)
+        print(a[1].shape)
 
         logging.info('Compiling model.')
         model.compile(util.get_weights(aug_gen.labels))
