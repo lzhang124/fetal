@@ -106,7 +106,7 @@ def main(options):
 
     if options.predict:
         logging.info('Making predictions.')
-        
+
         input_files = glob.glob(options.predict[0])
         seed_files = None if gen_seed else glob.glob(options.predict[1])
         label_files = glob.glob(options.predict[1]) if gen_seed else None
@@ -174,15 +174,15 @@ def run(options):
             label_files = glob.glob('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample))
         else:
             raise ValueError('Preset program not defined.')
-            
+
         input_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
         a = aug_gen.next()
-        util.save_vol(a[0], 'test.nii.gz', scale=True)
-        util.save_vol(a[1], 'test_label.nii.gz',)
+        util.save_vol(a[0][0], 'test.nii.gz', scale=True)
+        util.save_vol(a[1][0], 'test_label.nii.gz',)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
@@ -204,7 +204,7 @@ def run(options):
                            if not os.path.basename(f).endswith('_1_placenta.nii.gz')]
         else:
             raise ValueError('Preset program not defined.')
-            
+
         predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         pred_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
