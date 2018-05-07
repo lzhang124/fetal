@@ -12,9 +12,9 @@ class AugmentGenerator(VolumeIterator):
                  batch_size=1,
                  gen_seed=False,
                  rotation_range=0.,
-                 shift_range=0.1,
+                 shift_range=0.,
                  shear_range=0.,
-                 zoom_range=0.,
+                 zoom_range=0.1,
                  fill_mode='nearest',
                  cval=0.,
                  flip=True):
