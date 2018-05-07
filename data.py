@@ -11,10 +11,10 @@ class AugmentGenerator(VolumeIterator):
                  label_files=None,
                  batch_size=1,
                  gen_seed=False,
-                 rotation_range=0.,
+                 rotation_range=90.,
                  shift_range=0.,
                  shear_range=0.,
-                 zoom_range=0.1,
+                 zoom_range=0.2,
                  fill_mode='nearest',
                  cval=0.,
                  flip=True):
