@@ -26,6 +26,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
     epsilon = K.epsilon()
 
     def loss_fn(y_true, y_pred):
+        print(y_true.shape, y_pred.shape)
         y_pred = K.clip(y_pred, epsilon, 1 - epsilon)
         cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))],
                                 axis=-1)

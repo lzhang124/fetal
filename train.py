@@ -180,7 +180,6 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
-        print(model.input_size)
         a = aug_gen.next()
         util.save_vol(a[0][0], 'test.nii.gz', scale=True)
         util.save_vol(a[1][0], 'test_label.nii.gz')
