@@ -176,7 +176,6 @@ def run(options):
             raise ValueError('Preset program not defined.')
 
         input_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
-        print(gen_seed)
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
@@ -187,6 +186,7 @@ def run(options):
                                   gen_seed=gen_seed,
                                   load_files=True,
                                   include_labels=True)
+        print(val_gen.next().shape)
 
         logging.info('Compiling model.')
         model.compile(util.get_weights(aug_gen.labels))
