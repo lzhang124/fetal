@@ -181,8 +181,8 @@ def run(options):
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
         a = aug_gen.next()
-        print(a[0].shape)
-        print(a[1].shape)
+        util.save_vol(a[0], 'test.nii.gz', scale=True)
+        util.save_vol(a[1], 'test_label.nii.gz',)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
