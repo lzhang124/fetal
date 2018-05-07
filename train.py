@@ -152,12 +152,10 @@ def run(options):
         logging.info(sample)
 
         logging.info('Creating model.')
-        print(options.seed)
         if options.seed:
             shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
         else:
             shape = constants.TARGET_SHAPE
-        print(shape)
         if options.size == 'small':
             m = UNetSmall
         elif options.size == 'big':
@@ -182,6 +180,9 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    gen_seed=gen_seed)
+        a = aug_gen.next()
+        print(a[0].shape)
+        print(a[1].shape)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
