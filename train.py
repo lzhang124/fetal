@@ -75,7 +75,7 @@ def main(options):
         m = UNet
     model = m(shape, name=options.name, filename=options.model_file)
 
-    gen_seed = options.seed == 'generate'
+    gen_seed = (options.seed == 'slice' || options.seed == 'volume')
 
     if options.train:
         logging.info('Creating data generator.')
@@ -89,11 +89,11 @@ def main(options):
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   gen_seed=gen_seed)
+                                   seed=options.seed)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
-                                  gen_seed=gen_seed,
+                                  seed=options.seed,
                                   load_files=True,
                                   include_labels=True)
 
@@ -116,7 +116,7 @@ def main(options):
                                    seed_files=seed_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   gen_seed=gen_seed,
+                                   seed=options.seed,
                                    include_labels=False)
         model.predict(pred_gen, save_path)
 
@@ -131,7 +131,7 @@ def main(options):
                                    seed_files=seed_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   gen_seed=gen_seed,
+                                   seed=options.seed,
                                    include_labels=True)
         metrics = model.test(test_gen)
         logging.info(metrics)
@@ -164,8 +164,6 @@ def run(options):
             m = UNet
         model = m(shape, name='unet_test_{}'.format(sample), filename=options.model_file)
 
-        gen_seed = options.seed == 'generate'
-
         logging.info('Creating data generator.')
 
         if options.run == 'one-out':
@@ -179,11 +177,11 @@ def run(options):
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   gen_seed=gen_seed)
+                                   seed=options.seed)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
-                                  gen_seed=gen_seed,
+                                  seed=options.seed,
                                   load_files=True,
                                   include_labels=True)
 
@@ -206,7 +204,7 @@ def run(options):
         pred_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   gen_seed=gen_seed,
+                                   seed=options.seed,
                                    include_labels=False)
         model.predict(pred_gen, 'data/predict/{}/'.format(sample))
 
@@ -214,7 +212,7 @@ def run(options):
         test_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   gen_seed=gen_seed,
+                                   seed=options.seed,
                                    include_labels=True)
         metrics[sample] = model.test(test_gen)
 

@@ -10,7 +10,7 @@ class AugmentGenerator(VolumeIterator):
                  input_files,
                  label_files=None,
                  batch_size=1,
-                 gen_seed=False,
+                 seed=None,
                  rotation_range=90.,
                  shift_range=0.1,
                  shear_range=0.1,
@@ -25,7 +25,7 @@ class AugmentGenerator(VolumeIterator):
         else:
             self.labels = None
 
-        self.gen_seed = gen_seed
+        self.seed = seed
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -40,18 +40,21 @@ class AugmentGenerator(VolumeIterator):
     def _get_batches_of_transformed_samples(self, index_array):
         batch = super()._get_batches_of_transformed_samples(index_array)
         
-        if self.gen_seed:
+        if self.seed is not None:
             if self.labels is None:
                 raise ValueError('No labels to generate slices.')
             batch_x, batch_y = batch
             
             new_batch_x = np.zeros(tuple(list(batch_x.shape[:-1]) + [batch_x.shape[-1] + 1]))
             for i, label in enumerate(batch_y):
-                seed = np.zeros(batch_x[i].shape)
-                r = np.random.choice(label.shape[0])
-                while not np.any(label[r]):
+                if self.seed == 'slice':
+                    seed = np.zeros(batch_x[i].shape)
                     r = np.random.choice(label.shape[0])
-                seed[r] = label[r]
+                    while not np.any(label[r]):
+                        r = np.random.choice(label.shape[0])
+                    seed[r] = label[r]
+                elif self.seed == 'volume':
+                    seed = label.copy()
                 new_batch_x[i] = np.concatenate((batch_x[i], seed), axis=-1)
             batch = (new_batch_x, batch_y)
 
@@ -64,7 +67,7 @@ class VolumeGenerator(Sequence):
                  seed_files=None,
                  label_files=None,
                  batch_size=1,
-                 gen_seed=False,
+                 seed=None,
                  load_files=False,
                  include_labels=False,
                  rescale=True):
@@ -84,7 +87,7 @@ class VolumeGenerator(Sequence):
                 self.label_files = np.array([preprocess(file, ['resize']) for file in label_files])
 
         self.batch_size = batch_size
-        self.gen_seed = gen_seed
+        self.seed = seed
         self.include_labels = include_labels
         self.n = len(input_files)
         self.idx = 0
@@ -106,7 +109,7 @@ class VolumeGenerator(Sequence):
                 seeds.append(seed)
             batch = np.concatenate((batch, np.array(seeds)), axis=-1)
 
-        if self.gen_seed:
+        if self.seed is not None:
             if self.label_files is None:
                 raise ValueError('No labels to generate slices.')
             if self.seed_files is not None:
@@ -115,11 +118,14 @@ class VolumeGenerator(Sequence):
             new_batch = np.zeros(tuple(list(batch.shape[:-1]) + [batch.shape[-1] + 1]))
             for i, file in enumerate(self.label_files[self.batch_size * idx:self.batch_size * (idx + 1)]):
                 label = file if self.load_files else preprocess(file, ['resize'])
-                seed = np.zeros(batch[i].shape)
-                r = np.random.choice(label.shape[0])
-                while not np.any(label[r]):
+                if self.seed == 'slice':
+                    seed = np.zeros(batch[i].shape)
                     r = np.random.choice(label.shape[0])
-                seed[r] = label[r]
+                    while not np.any(label[r]):
+                        r = np.random.choice(label.shape[0])
+                    seed[r] = label[r]
+                elif self.seed == 'volume':
+                    seed = label.copy()
                 new_batch[i] = np.concatenate((batch[i], seed), axis=-1)
             batch = new_batch
 
