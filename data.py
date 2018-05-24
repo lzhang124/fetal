@@ -11,7 +11,7 @@ class AugmentGenerator(VolumeIterator):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
-                 concat_first=False,
+                 concat=None,
                  rotation_range=90.,
                  shift_range=0.1,
                  shear_range=0.1,
@@ -28,18 +28,11 @@ class AugmentGenerator(VolumeIterator):
 
         self.seed_type = seed_type
 
-        if concat_first:
+        if concat is not None:
             new_inputs = []
-            for i in range(1, len(self.inputs)):
-                if label_files is not None:
-                    new_inputs.append(np.concatenate((self.inputs[i],
-                                                      self.inputs[0],
-                                                      self.labels[0]), axis=-1))
-                else:
-                    new_inputs.append(np.concatenate((self.inputs[i],
-                                                      self.inputs[0]), axis=-1))
+            for vol in self.inputs:
+                new_inputs.append(np.concatenate((vol, concat), axis=-1))
             self.inputs = np.array(new_inputs)
-            self.labels = self.labels[1:]
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -82,61 +75,63 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
-                 concat_first=False,
+                 concat=None,
                  load_files=False,
                  include_labels=False,
                  rescale=True):
-        self.input_files = input_files
-        self.seed_files = seed_files
-        self.label_files = label_files
-        
-        self.concat_first = concat_first
-        self.first = preprocess(input_files[0])
-        if label_files is not None:
-            self.first = np.concatenate((self.first, preprocess(label_files[0], ['resize'])), axis=-1)
-
-        self.load_files = load_files
-        self.funcs = ['rescale', 'resize'] if rescale else ['resize']
-        self.shape = shape(input_files[0])
-        
-        if load_files:
-            self.input_files = np.array([preprocess(file, self.funcs) for file in input_files])
-            if seed_files is not None:
-                self.seed_files = np.array([preprocess(file, ['resize']) for file in seed_files])
-            if label_files is not None:
-                self.label_files = np.array([preprocess(file, ['resize']) for file in label_files])
-
+        self.inputs = input_files
+        self.seeds = seed_files
+        self.labels = label_files
         self.batch_size = batch_size
         self.seed_type = seed_type
+        self.concat = concat
+        self.load_files = load_files
         self.include_labels = include_labels
+        self.funcs = ['rescale', 'resize'] if rescale else ['resize']
+        self.shape = shape(input_files[0])
         self.n = len(input_files)
         self.idx = 0
+        
+        if load_files:
+            self.inputs = np.array([preprocess(file, self.funcs) for file in input_files])
+            if concat is not None:
+                new_inputs = []
+                for vol in self.inputs:
+                    new_inputs.append(np.concatenate((vol, concat), axis=-1))
+                self.inputs = np.array(new_inputs)
+            if seed_files is not None:
+                self.seeds = np.array([preprocess(file, ['resize']) for file in seed_files])
+            if label_files is not None:
+                self.labels = np.array([preprocess(file, ['resize']) for file in label_files])
+
 
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
 
     def __getitem__(self, idx):
         batch = []
-        for file in self.input_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
+        for file in self.inputs[self.batch_size * idx:self.batch_size * (idx + 1)]:
             volume = file if self.load_files else preprocess(file, self.funcs)
+            if self.concat is not None:
+                volume = np.concatenate((volume, self.concat), axis=-1) 
             batch.append(volume)
         batch = np.array(batch)
 
-        if self.seed_files is not None:
+        if self.seeds is not None:
             seeds = []
-            for file in self.seed_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
+            for file in self.seeds[self.batch_size * idx:self.batch_size * (idx + 1)]:
                 seed = file if self.load_files else preprocess(file, ['resize'])
                 seeds.append(seed)
             batch = np.concatenate((batch, np.array(seeds)), axis=-1)
 
         if self.seed_type is not None:
-            if self.label_files is None:
+            if self.labels is None:
                 raise ValueError('No labels to generate slices.')
-            if self.seed_files is not None:
+            if self.seeds is not None:
                 raise ValueError('Seeds already exist.')
 
             new_batch = np.zeros(tuple(list(batch.shape[:-1]) + [batch.shape[-1] + 1]))
-            for i, file in enumerate(self.label_files[self.batch_size * idx:self.batch_size * (idx + 1)]):
+            for i, file in enumerate(self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]):
                 label = file if self.load_files else preprocess(file, ['resize'])
                 if self.seed_type == 'slice':
                     seed = np.zeros(batch[i].shape)
@@ -150,11 +145,11 @@ class VolumeGenerator(Sequence):
             batch = new_batch
 
         if self.include_labels:
-            if self.label_files is None:
+            if self.labels is None:
                 raise ValueError('No labels provided.')
 
             labels = []
-            for file in self.label_files[self.batch_size * idx:self.batch_size * (idx + 1)]:
+            for file in self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]:
                 label = file if self.load_files else preprocess(file, ['resize'])
                 labels.append(label)
             labels = np.array(labels)

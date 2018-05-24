@@ -26,11 +26,13 @@ def build_parser():
                         help='Test model.',
                         dest='test', type=str, nargs='+')
     parser.add_argument('--seed',
+                        metavar='SEED_TYPE',
                         help='Seed slices',
                         dest='seed', type=str)
     parser.add_argument('--concat',
+                        metavar='INPUT_FILE, LABEL_FILE',
                         help='Concatenate first volume',
-                        dest='concat', action='store_true')
+                        dest='concat', nargs=2)
     parser.add_argument('--batch-size',
                         metavar='BATCH_SIZE',
                         help='Training batch size',
@@ -80,6 +82,12 @@ def main(options):
 
     gen_seed = (options.seed == 'slice' or options.seed == 'volume')
 
+    if options.concat:
+        concat = np.concatenate((preprocess(options.concat[0]),
+                                 preprocess(options.concat[1], funcs=['resize'])), axis=-1)
+    else:
+        concat = None
+
     if options.train:
         logging.info('Creating data generator.')
 
@@ -93,12 +101,12 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat_first=options.concat)
+                                   concat=concat)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
                                   seed_type=options.seed,
-                                  concat_first=options.concat,
+                                  concat=concat,
                                   load_files=True,
                                   include_labels=True)
 
@@ -122,7 +130,7 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat_first=options.concat,
+                                   concat=concat,
                                    include_labels=False)
         model.predict(pred_gen, save_path)
 
@@ -138,7 +146,7 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat_first=options.concat,
+                                   concat=concat,
                                    include_labels=True)
         metrics = model.test(test_gen)
         logging.info(metrics)
@@ -173,12 +181,18 @@ def run(options):
 
         logging.info('Creating data generator.')
 
+        if options.run == 'concat':
+            concat = np.concatenate((preprocess('data/raw/{}/{}_1.nii.gz'.format(sample, sample)),
+                                     preprocess('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample), funcs=['resize'])), axis=-1)
+        else:
+            concat = None
+
         if options.run == 'one-out':
             label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
         elif options.run == 'single':
             label_files = glob.glob('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample))
-        elif options.run == 'sample':
-            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[:4]
+        elif options.run == 'concat':
+            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[1:4]
         else:
             raise ValueError('Preset program not defined.')
 
@@ -187,12 +201,12 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat_first=options.concat)
+                                   concat=concat)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
                                   seed_type=options.seed,
-                                  concat_first=options.concat,
+                                  concat=concat,
                                   load_files=True,
                                   include_labels=True)
         a = aug_gen.next()
@@ -215,9 +229,8 @@ def run(options):
         elif options.run == 'single':
             label_files = [f for f in glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
                            if not os.path.basename(f).endswith('_1_placenta.nii.gz')]
-        elif options.run == 'sample':
-            files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
-            label_files = files[0] + files[4:]
+        elif options.run == 'concat':
+            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[4:]
         else:
             raise ValueError('Preset program not defined.')
 
@@ -226,7 +239,7 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat_first=options.concat,
+                                   concat=concat,
                                    include_labels=False)
         model.predict(pred_gen, 'data/predict/{}/'.format(sample))
 
@@ -235,7 +248,7 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat_first=options.concat,
+                                   concat=concat,
                                    include_labels=True)
         metrics[sample] = model.test(test_gen)
 
