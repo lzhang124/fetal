@@ -173,14 +173,12 @@ def run(options):
 
         logging.info('Creating data generator.')
 
-        if options.concat:
-            label_files = glob.glob('data/labels/{}/{}_placenta.nii.gz'.format(sample, sample))
-        elif options.run == 'one-out':
+        if options.run == 'one-out':
             label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
         elif options.run == 'single':
             label_files = glob.glob('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample))
         else:
-            raise ValueError('Preset program not defined.')
+            label_files = glob.glob('data/labels/{}/{}_placenta.nii.gz'.format(sample, sample))
 
         input_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         aug_gen = AugmentGenerator(input_files,
