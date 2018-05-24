@@ -86,12 +86,13 @@ class VolumeGenerator(Sequence):
                  load_files=False,
                  include_labels=False,
                  rescale=True):
-        
+        self.concat_first = concat_first
+        self.first_input = preprocess(input_files[0])
+        self.first_label = preprocess(label_files[0]) if label_files is not None else None
+
         self.load_files = load_files
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
         self.shape = shape(input_files[0])
-
-        self.concat_first = concat_first
         
         self.input_files = input_files
         self.seed_files = seed_files
