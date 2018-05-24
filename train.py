@@ -177,8 +177,10 @@ def run(options):
             label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
         elif options.run == 'single':
             label_files = glob.glob('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample))
+        elif options.run == 'sample':
+            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[:4]
         else:
-            label_files = glob.glob('data/labels/{}/{}_placenta.nii.gz'.format(sample, sample))
+            raise ValueError('Preset program not defined.')
 
         input_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
         aug_gen = AugmentGenerator(input_files,
@@ -210,6 +212,8 @@ def run(options):
         elif options.run == 'single':
             label_files = [f for f in glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
                            if not os.path.basename(f).endswith('_1_placenta.nii.gz')]
+        elif options.run == 'sample':
+            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[4:]
         else:
             raise ValueError('Preset program not defined.')
 
