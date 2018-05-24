@@ -3,4 +3,4 @@ scipy
 nibabel
 keras
 tensorflow
-tensorflow-gpu >= 1.0  # installs tensorflow with GPU support, should still work even without GPU
+tensorflow-gpu
