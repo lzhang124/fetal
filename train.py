@@ -92,12 +92,12 @@ def main(options):
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed,
+                                   seed_type=options.seed,
                                    concat_first=options.concat)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
-                                  seed=options.seed,
+                                  seed_type=options.seed,
                                   concat_first=options.concat,
                                   load_files=True,
                                   include_labels=True)
@@ -121,7 +121,7 @@ def main(options):
                                    seed_files=seed_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed,
+                                   seed_type=options.seed,
                                    concat_first=options.concat,
                                    include_labels=False)
         model.predict(pred_gen, save_path)
@@ -137,7 +137,7 @@ def main(options):
                                    seed_files=seed_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed,
+                                   seed_type=options.seed,
                                    concat_first=options.concat,
                                    include_labels=True)
         metrics = model.test(test_gen)
@@ -186,12 +186,12 @@ def run(options):
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed,
+                                   seed_type=options.seed,
                                    concat_first=options.concat)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
-                                  seed=options.seed,
+                                  seed_type=options.seed,
                                   concat_first=options.concat,
                                   load_files=True,
                                   include_labels=True)
@@ -223,7 +223,7 @@ def run(options):
         pred_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed,
+                                   seed_type=options.seed,
                                    concat_first=options.concat,
                                    include_labels=False)
         model.predict(pred_gen, 'data/predict/{}/'.format(sample))
@@ -232,7 +232,7 @@ def run(options):
         test_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed,
+                                   seed_type=options.seed,
                                    concat_first=options.concat,
                                    include_labels=True)
         metrics[sample] = model.test(test_gen)

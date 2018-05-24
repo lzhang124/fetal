@@ -1,4 +1,4 @@
-"""Fairly basic set of tools for real-time data augmentation on 3D image data.
+ """Fairly basic set of tools for real-time data augmentation on 3D image data.
 
 Can easily be extended to include new transformations,
 new preprocessing methods, etc...
