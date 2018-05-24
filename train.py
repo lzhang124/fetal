@@ -165,9 +165,8 @@ def run(options):
         shape = constants.TARGET_SHAPE
         if options.seed:
             shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
-        if options.concat:
+        if options.run == 'concat':
             shape = tuple(list(shape[:-1]) + [shape[-1] + 2])
-        print(shape)
         if options.size == 'small':
             m = UNetSmall
         elif options.size == 'big':
