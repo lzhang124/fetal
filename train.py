@@ -28,6 +28,9 @@ def build_parser():
     parser.add_argument('--seed',
                         help='Seed slices',
                         dest='seed', type=str)
+    parser.add_argument('--concat',
+                        help='Concatenate first volume',
+                        dest='concat', action='store_true')
     parser.add_argument('--batch-size',
                         metavar='BATCH_SIZE',
                         help='Training batch size',
@@ -89,11 +92,13 @@ def main(options):
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed)
+                                   seed=options.seed,
+                                   concat_first=options.concat)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
                                   seed=options.seed,
+                                  concat_first=options.concat,
                                   load_files=True,
                                   include_labels=True)
 
@@ -117,6 +122,7 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed=options.seed,
+                                   concat_first=options.concat,
                                    include_labels=False)
         model.predict(pred_gen, save_path)
 
@@ -132,6 +138,7 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed=options.seed,
+                                   concat_first=options.concat,
                                    include_labels=True)
         metrics = model.test(test_gen)
         logging.info(metrics)
@@ -177,13 +184,19 @@ def run(options):
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
-                                   seed=options.seed)
+                                   seed=options.seed,
+                                   concat_first=options.concat)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
                                   seed=options.seed,
+                                  concat_first=options.concat,
                                   load_files=True,
                                   include_labels=True)
+        a = aug_gen.next()
+        print(a[0].shape)
+        print(a[1].shape)
+        assert False
 
         logging.info('Compiling model.')
         model.compile(util.get_weights(aug_gen.labels))
@@ -205,6 +218,7 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed=options.seed,
+                                   concat_first=options.concat,
                                    include_labels=False)
         model.predict(pred_gen, 'data/predict/{}/'.format(sample))
 
@@ -213,6 +227,7 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed=options.seed,
+                                   concat_first=options.concat,
                                    include_labels=True)
         metrics[sample] = model.test(test_gen)
 
