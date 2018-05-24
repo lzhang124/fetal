@@ -26,6 +26,7 @@ class AugmentGenerator(VolumeIterator):
         else:
             self.labels = None
 
+        print(seed)
         self.seed = seed
 
         if concat_first:
