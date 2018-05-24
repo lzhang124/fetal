@@ -342,12 +342,6 @@ class VolumeIterator(Iterator):
         else:
             self.y = None
 
-        if y is not None and self.x.shape != self.y.shape:
-            raise ValueError('x (images tensor) and y (labels) '
-                             'should have the same shape. '
-                             'Found: x.shape = %s, y.shape = %s' %
-                             (self.x.shape, self.y.shape))
-
         self.image_transformer = image_transformer
         self.generate_labels = generate_labels
         super().__init__(x.shape[0], batch_size, shuffle, seed)
