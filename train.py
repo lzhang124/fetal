@@ -78,7 +78,7 @@ def main(options):
         m = UNet
     model = m(shape, name=options.name, filename=options.model_file)
 
-    gen_seed = (options.seed == 'slice' || options.seed == 'volume')
+    gen_seed = (options.seed == 'slice' or options.seed == 'volume')
 
     if options.train:
         logging.info('Creating data generator.')
