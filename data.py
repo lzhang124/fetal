@@ -38,7 +38,7 @@ class AugmentGenerator(VolumeIterator):
                 else:
                     new_inputs.append(np.concatenate((self.inputs[i],
                                                       self.inputs[0]), axis=-1))
-            self.inputs = new_inputs
+            self.inputs = np.array(new_inputs)
             self.labels = self.labels[1:]
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
