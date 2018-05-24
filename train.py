@@ -198,6 +198,7 @@ def run(options):
         a = aug_gen.next()
         print(a[0].shape)
         print(a[1].shape)
+        print(aug_gen.seed)
         assert False
 
         logging.info('Compiling model.')
