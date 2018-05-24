@@ -26,7 +26,6 @@ class AugmentGenerator(VolumeIterator):
         else:
             self.labels = None
 
-        print(seed)
         self.seed = seed
 
         if concat_first:
@@ -55,6 +54,7 @@ class AugmentGenerator(VolumeIterator):
     def _get_batches_of_transformed_samples(self, index_array):
         batch = super()._get_batches_of_transformed_samples(index_array)
         
+        print(self.seed)
         if self.seed is not None:
             if self.labels is None:
                 raise ValueError('No labels to generate slices.')
