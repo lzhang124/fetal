@@ -11,7 +11,7 @@ class AugmentGenerator(VolumeIterator):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
-                 concat_first=False,
+                 concat=None,
                  rotation_range=90.,
                  shift_range=0.1,
                  shear_range=0.1,
@@ -27,19 +27,13 @@ class AugmentGenerator(VolumeIterator):
             self.labels = None
 
         self.seed_type = seed_type
+        self.concat = concat
 
-        if concat_first:
+        if concat is not None:
             new_inputs = []
-            for i in range(1, len(self.inputs)):
-                if label_files is not None:
-                    new_inputs.append(np.concatenate((self.inputs[i],
-                                                      self.inputs[0],
-                                                      self.labels[0]), axis=-1))
-                else:
-                    new_inputs.append(np.concatenate((self.inputs[i],
-                                                      self.inputs[0]), axis=-1))
+            for vol in self.inputs:
+                new_inputs.append(np.concatenate((vol, concat), axis=-1))
             self.inputs = np.array(new_inputs)
-            self.labels = self.labels[1:]
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,

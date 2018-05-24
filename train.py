@@ -198,8 +198,9 @@ def run(options):
         a = aug_gen.next()
         print(a[0].shape)
         print(a[1].shape)
-        print(options.seed)
-        print(aug_gen.seed)
+        b = val_gen.next()
+        print(b[0].shape)
+        print(b[1].shape)
         assert False
 
         logging.info('Compiling model.')
@@ -215,7 +216,8 @@ def run(options):
             label_files = [f for f in glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
                            if not os.path.basename(f).endswith('_1_placenta.nii.gz')]
         elif options.run == 'sample':
-            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[4:]
+            files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
+            label_files = files[0] + files[4:]
         else:
             raise ValueError('Preset program not defined.')
 
