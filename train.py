@@ -203,13 +203,6 @@ def run(options):
                                   concat_files=concat_files,
                                   load_files=True,
                                   include_labels=True)
-        a = aug_gen.next()
-        print(a[0].shape)
-        print(a[1].shape)
-        b = val_gen.next()
-        print(b[0].shape)
-        print(b[1].shape)
-        assert False
 
         logging.info('Compiling model.')
         model.compile(util.get_weights(aug_gen.labels))
