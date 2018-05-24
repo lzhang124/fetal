@@ -68,10 +68,11 @@ def main(options):
     start = time.time()
 
     logging.info('Creating model.')
+    shape = constants.TARGET_SHAPE
     if options.seed:
-        shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-    else:
-        shape = constants.TARGET_SHAPE
+        shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
+    if options.concat:
+        shape = tuple(list(shape[:-1]) + [shape[-1] + 2])
     if options.size == 'small':
         m = UNetSmall
     elif options.size == 'big':
@@ -161,10 +162,11 @@ def run(options):
         logging.info(sample)
 
         logging.info('Creating model.')
+        shape = constants.TARGET_SHAPE
         if options.seed:
-            shape = tuple(list(constants.TARGET_SHAPE[:-1]) + [constants.TARGET_SHAPE[-1] + 1])
-        else:
-            shape = constants.TARGET_SHAPE
+            shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
+        if options.concat:
+            shape = tuple(list(shape[:-1]) + [shape[-1] + 2])
         if options.size == 'small':
             m = UNetSmall
         elif options.size == 'big':
