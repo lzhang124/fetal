@@ -11,7 +11,7 @@ class AugmentGenerator(VolumeIterator):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
-                 concat=None,
+                 concat_files=None,
                  rotation_range=90.,
                  shift_range=0.1,
                  shear_range=0.1,
@@ -28,7 +28,9 @@ class AugmentGenerator(VolumeIterator):
 
         self.seed_type = seed_type
 
-        if concat is not None:
+        if concat_files is not None:
+            concat = np.concatenate((preprocess(concat_files[0]),
+                                     preprocess(concat_files[1], funcs=['resize'])), axis=-1)
             new_inputs = []
             for vol in self.inputs:
                 new_inputs.append(np.concatenate((vol, concat), axis=-1))
@@ -75,7 +77,7 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
-                 concat=None,
+                 concat_files=None,
                  load_files=False,
                  include_labels=False,
                  rescale=True):
@@ -84,7 +86,7 @@ class VolumeGenerator(Sequence):
         self.labels = label_files
         self.batch_size = batch_size
         self.seed_type = seed_type
-        self.concat = concat
+        self.concat = None
         self.load_files = load_files
         self.include_labels = include_labels
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
@@ -92,12 +94,16 @@ class VolumeGenerator(Sequence):
         self.n = len(input_files)
         self.idx = 0
         
+        if concat_files is not None:
+            self.concat = np.concatenate((preprocess(concat_files[0]),
+                                          preprocess(concat_files[1], funcs=['resize'])), axis=-1)
+
         if load_files:
             self.inputs = np.array([preprocess(file, self.funcs) for file in input_files])
-            if concat is not None:
+            if self.concat is not None:
                 new_inputs = []
                 for vol in self.inputs:
-                    new_inputs.append(np.concatenate((vol, concat), axis=-1))
+                    new_inputs.append(np.concatenate((vol, self.concat), axis=-1))
                 self.inputs = np.array(new_inputs)
             if seed_files is not None:
                 self.seeds = np.array([preprocess(file, ['resize']) for file in seed_files])
@@ -113,7 +119,7 @@ class VolumeGenerator(Sequence):
         for file in self.inputs[self.batch_size * idx:self.batch_size * (idx + 1)]:
             volume = file if self.load_files else preprocess(file, self.funcs)
             if self.concat is not None:
-                volume = np.concatenate((volume, self.concat), axis=-1) 
+                volume = np.concatenate((volume, self.concat), axis=-1)
             batch.append(volume)
         batch = np.array(batch)
 

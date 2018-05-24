@@ -4,7 +4,6 @@ logging.basicConfig(level=logging.INFO)
 
 import constants
 import glob
-import numpy as np
 import time
 import util
 from argparse import ArgumentParser
@@ -83,12 +82,6 @@ def main(options):
 
     gen_seed = (options.seed == 'slice' or options.seed == 'volume')
 
-    if options.concat:
-        concat = np.concatenate((preprocess(options.concat[0]),
-                                 preprocess(options.concat[1], funcs=['resize'])), axis=-1)
-    else:
-        concat = None
-
     if options.train:
         logging.info('Creating data generator.')
 
@@ -102,12 +95,12 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat=concat)
+                                   concat_files=options.concat)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
                                   seed_type=options.seed,
-                                  concat=concat,
+                                  concat_files=options.concat,
                                   load_files=True,
                                   include_labels=True)
 
@@ -131,7 +124,7 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat=concat,
+                                   concat_files=options.concat,
                                    include_labels=False)
         model.predict(pred_gen, save_path)
 
@@ -147,7 +140,7 @@ def main(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat=concat,
+                                   concat_files=options.concat,
                                    include_labels=True)
         metrics = model.test(test_gen)
         logging.info(metrics)
@@ -183,10 +176,10 @@ def run(options):
         logging.info('Creating data generator.')
 
         if options.run == 'concat':
-            concat = np.concatenate((preprocess('data/raw/{}/{}_1.nii.gz'.format(sample, sample)),
-                                     preprocess('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample), funcs=['resize'])), axis=-1)
+            concat_files = ['data/raw/{}/{}_1.nii.gz'.format(sample, sample),
+                            'data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample)]
         else:
-            concat = None
+            concat_files = None
 
         if options.run == 'one-out':
             label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
@@ -202,12 +195,12 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat=concat)
+                                   concat_files=concat_files)
         val_gen = VolumeGenerator(input_files,
                                   label_files=label_files,
                                   batch_size=options.batch_size,
                                   seed_type=options.seed,
-                                  concat=concat,
+                                  concat_files=concat_files,
                                   load_files=True,
                                   include_labels=True)
         a = aug_gen.next()
@@ -240,7 +233,7 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat=concat,
+                                   concat_files=concat_files,
                                    include_labels=False)
         model.predict(pred_gen, 'data/predict/{}/'.format(sample))
 
@@ -249,7 +242,7 @@ def run(options):
                                    label_files=label_files,
                                    batch_size=options.batch_size,
                                    seed_type=options.seed,
-                                   concat=concat,
+                                   concat_files=concat_files,
                                    include_labels=True)
         metrics[sample] = model.test(test_gen)
 
