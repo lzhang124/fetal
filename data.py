@@ -29,15 +29,16 @@ class AugmentGenerator(VolumeIterator):
         self.seed = seed
 
         if concat_first:
+            new_inputs = []
             for i in range(1, len(self.inputs)):
                 if label_files is not None:
-                    self.inputs[i] = np.concatenate((self.inputs[i],
-                                                     self.inputs[0],
-                                                     self.labels[0]), axis=-1)
+                    new_inputs.append(np.concatenate((self.inputs[i],
+                                                      self.inputs[0],
+                                                      self.labels[0]), axis=-1))
                 else:
-                    self.inputs[i] = np.concatenate((self.inputs[i],
-                                                     self.inputs[0]), axis=-1)
-            self.inputs = self.inputs[1:]
+                    new_inputs.append(np.concatenate((self.inputs[i],
+                                                      self.inputs[0]), axis=-1))
+            self.inputs = new_inputs
             self.labels = self.labels[1:]
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
