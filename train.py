@@ -4,6 +4,7 @@ logging.basicConfig(level=logging.INFO)
 
 import constants
 import glob
+import numpy as np
 import time
 import util
 from argparse import ArgumentParser
