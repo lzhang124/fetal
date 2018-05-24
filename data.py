@@ -11,7 +11,7 @@ class AugmentGenerator(VolumeIterator):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
-                 concat=None,
+                 concat_first=False,
                  rotation_range=90.,
                  shift_range=0.1,
                  shear_range=0.1,
@@ -27,13 +27,19 @@ class AugmentGenerator(VolumeIterator):
             self.labels = None
 
         self.seed_type = seed_type
-        self.concat = concat
 
-        if concat is not None:
+        if concat_first:
             new_inputs = []
-            for vol in self.inputs:
-                new_inputs.append(np.concatenate((vol, concat), axis=-1))
+            for i in range(1, len(self.inputs)):
+                if label_files is not None:
+                    new_inputs.append(np.concatenate((self.inputs[i],
+                                                      self.inputs[0],
+                                                      self.labels[0]), axis=-1))
+                else:
+                    new_inputs.append(np.concatenate((self.inputs[i],
+                                                      self.inputs[0]), axis=-1))
             self.inputs = np.array(new_inputs)
+            self.labels = self.labels[1:]
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -80,17 +86,19 @@ class VolumeGenerator(Sequence):
                  load_files=False,
                  include_labels=False,
                  rescale=True):
+        self.input_files = input_files
+        self.seed_files = seed_files
+        self.label_files = label_files
+        
         self.concat_first = concat_first
-        self.first_input = preprocess(input_files[0])
-        self.first_label = preprocess(label_files[0]) if label_files is not None else None
+        self.first = preprocess(input_files[0])
+        if label_files is not None:
+            self.first = np.concatenate((self.first, preprocess(label_files[0], ['resize'])), axis=-1)
 
         self.load_files = load_files
         self.funcs = ['rescale', 'resize'] if rescale else ['resize']
         self.shape = shape(input_files[0])
         
-        self.input_files = input_files
-        self.seed_files = seed_files
-        self.label_files = label_files
         if load_files:
             self.input_files = np.array([preprocess(file, self.funcs) for file in input_files])
             if seed_files is not None:
