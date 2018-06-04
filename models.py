@@ -74,8 +74,8 @@ class BaseModel:
         preds = self.model.predict_generator(generator, verbose=1)
         # FIXME
         for i in range(preds.shape[0]):
-            fname = generator.input_files[i].split('/')[-1]
-            header = nib.load(generator.input_files[i]).header
+            fname = generator.inputs[i].split('/')[-1]
+            header = nib.load(generator.inputs[i]).header
             save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
 
     def test(self, generator):

@@ -46,7 +46,7 @@ single long  loss        acc        dice
 
 ------------------------------
 
-big
+big borderless
 
 left out     loss        acc        dice
 043015   : [  0.015817 , 0.948823 , 0.4536 ]
