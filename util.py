@@ -25,6 +25,10 @@ def shape(filename):
     return read_vol(filename).shape
 
 
+def header(filename):
+    return nib.load(filename).header
+
+
 def get_weights(vols):
     if vols is None:
         return None

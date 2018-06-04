@@ -23,8 +23,12 @@ def build_parser():
                         dest='predict', type=str, nargs=3)
     parser.add_argument('--test',
                         metavar='INPUT_FILES, [SEED_FILES,] LABEL_FILES',
-                        help='Test model.',
+                        help='Test model',
                         dest='test', type=str, nargs='+')
+    parser.add_argument('--organ',
+                        metavar='ORGAN',
+                        help='Organ to segment',
+                        dest='organ', type=str)
     parser.add_argument('--seed',
                         metavar='SEED_TYPE',
                         help='Seed slices',
@@ -155,7 +159,8 @@ def run(options):
 
     metrics = {}
 
-    all_labels = glob.glob('data/labels/*/*_placenta.nii.gz')
+    all_labels = glob.glob('data/labels/*/*_{}.nii.gz'
+                           .format('all_brains' if options.organ == 'brains' else options.organ))
 
     # for sample in ['043015', '051215', '061715', '062515', '081315', '083115', '110214', '112614', '122115', '122215']:
     for sample in ['043015', '061715']:
