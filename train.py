@@ -28,7 +28,7 @@ def build_parser():
     parser.add_argument('--organ',
                         metavar='ORGAN',
                         help='Organ to segment',
-                        dest='organ', type=str)
+                        dest='organ', type=str, nargs=1)
     parser.add_argument('--seed',
                         metavar='SEED_TYPE',
                         help='Seed slices',
