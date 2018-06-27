@@ -191,6 +191,7 @@ def run(options):
         if options.run == 'one-out':
             label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
         elif options.run == 'single':
+            print('data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ))
             label_files = glob.glob('data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ))
         elif options.run == 'concat':
             label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))[1:4]
