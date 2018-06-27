@@ -191,7 +191,6 @@ def run(options):
         if options.run == 'one-out':
             label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
         elif options.run == 'single':
-            print('data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ))
             label_files = glob.glob('data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ))
         elif options.run == 'concat':
             label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))[1:4]
@@ -199,7 +198,6 @@ def run(options):
             raise ValueError('Preset program not defined.')
 
         input_files = [file.replace('labels', 'raw').replace('_{}'.format(organ), '') for file in label_files]
-        print(len(input_files), len(label_files))
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
