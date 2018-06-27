@@ -1,12 +1,12 @@
 import os
 import tensorflow as tf
+import util
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 from keras import layers
 from process import uncrop
-from util import header, save_vol
 
 
 def dice_coef(y_true, y_pred):
@@ -75,7 +75,7 @@ class BaseModel:
         for i in range(preds.shape[0]):
             fname = generator.inputs[i].split('/')[-1]
             header = util.header(generator.inputs[i])
-            save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
+            util.save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
 
     def test(self, generator):
         return self.model.evaluate_generator(generator)

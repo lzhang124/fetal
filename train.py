@@ -159,8 +159,8 @@ def run(options):
 
     metrics = {}
 
-    all_labels = glob.glob('data/labels/*/*_{}.nii.gz'
-                           .format('all_brains' if options.organ == 'brains' else options.organ))
+    organ = 'all_brains' if options.organ == 'brains' else options.organ
+    all_labels = glob.glob('data/labels/*/*_{}.nii.gz'.format(organ))
 
     # for sample in ['043015', '051215', '061715', '062515', '081315', '083115', '110214', '112614', '122115', '122215']:
     for sample in ['043015', '061715']:
@@ -184,20 +184,20 @@ def run(options):
 
         if options.run == 'concat':
             concat_files = ['data/raw/{}/{}_1.nii.gz'.format(sample, sample),
-                            'data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample)]
+                            'data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ)]
         else:
             concat_files = None
 
         if options.run == 'one-out':
             label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
         elif options.run == 'single':
-            label_files = glob.glob('data/labels/{}/{}_1_placenta.nii.gz'.format(sample, sample))
+            label_files = glob.glob('data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ))
         elif options.run == 'concat':
-            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[1:4]
+            label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))[1:4]
         else:
             raise ValueError('Preset program not defined.')
 
-        input_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
+        input_files = [file.replace('labels', 'raw').replace('_{}'.format(organ), '') for file in label_files]
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
@@ -219,16 +219,16 @@ def run(options):
 
         logging.info('Making predictions.')
         if options.run == 'one-out':
-            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
+            label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))
         elif options.run == 'single':
-            label_files = [f for f in glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))
-                           if not os.path.basename(f).endswith('_1_placenta.nii.gz')]
+            label_files = [f for f in glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))
+                           if not os.path.basename(f).endswith('_1_{}.nii.gz')]
         elif options.run == 'concat':
-            label_files = glob.glob('data/labels/{}/{}_*_placenta.nii.gz'.format(sample, sample))[4:]
+            label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))[4:]
         else:
             raise ValueError('Preset program not defined.')
 
-        predict_files = [file.replace('labels', 'raw').replace('_placenta', '') for file in label_files]
+        predict_files = [file.replace('labels', 'raw').replace('_{}'.format(organ), '') for file in label_files]
         pred_gen = VolumeGenerator(predict_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
