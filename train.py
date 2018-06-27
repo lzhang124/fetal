@@ -198,6 +198,7 @@ def run(options):
             raise ValueError('Preset program not defined.')
 
         input_files = [file.replace('labels', 'raw').replace('_{}'.format(organ), '') for file in label_files]
+        print(input_files.shape, label_files.shape, concat_files.shape)
         aug_gen = AugmentGenerator(input_files,
                                    label_files=label_files,
                                    batch_size=options.batch_size,
