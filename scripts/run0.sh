@@ -7,4 +7,4 @@ python_exe=/data/vision/polina/shared_software/anaconda3-4.3.1/envs/keras/bin/py
 
 cd ${placenta_dir}
 
-nohup ${python_exe} train.py "$@" --gpu 0 > nohup0.out 2> nohup0.err < /dev/null &
+nohup ${python_exe} train.py "$@ --gpu 0" > nohup0.out 2> nohup0.err < /dev/null &
