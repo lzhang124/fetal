@@ -257,6 +257,7 @@ if __name__ == '__main__':
     options = parser.parse_args()
 
     os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
+    logging.info('Using GPU {}'.format(options.gpu))
 
     if options.run:
         run(options)
