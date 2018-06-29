@@ -53,10 +53,6 @@ def build_parser():
                         metavar='MODEL_FILE',
                         help='Pretrained model file',
                         dest='model_file', type=str)
-    parser.add_argument('--gpu',
-                        metavar='GPU',
-                        help='GPU to use',
-                        dest='gpu', type=str, default='0')
     parser.add_argument('--size',
                         metavar='SIZE',
                         help='Size of UNet',
@@ -255,9 +251,6 @@ def run(options):
 if __name__ == '__main__':
     parser = build_parser()
     options = parser.parse_args()
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
-    logging.info('Using GPU {}'.format(options.gpu))
 
     if options.run:
         run(options)

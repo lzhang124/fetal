@@ -7,5 +7,5 @@ python_exe=/data/vision/polina/shared_software/anaconda3-4.3.1/envs/keras/bin/py
 
 cd ${placenta_dir}
 
-args="--gpu 1"
-nohup ${python_exe} train.py ${args} "$@" > nohup1.out 2> nohup1.err < /dev/null &
+export CUDA_VISIBLE_DEVICES=1
+nohup ${python_exe} train.py "$@" > nohup1.out 2> nohup1.err < /dev/null &
