@@ -45,18 +45,11 @@ parser.add_argument('--size',
                     metavar='SIZE',
                     help='Size of UNet',
                     dest='size', type=str)
-parser.add_argument('--gpu',
-                    metavar='GPU',
-                    help='Which GPU to run on',
-                    dest='gpu', type=str, nargs=1)
 parser.add_argument('--run',
                     metavar='RUN',
                     help='Which preset program to run',
                     dest='run', type=str)
 options = parser.parse_args()
-
-os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu[0]
-print(os.environ)
 
 import logging
 logging.basicConfig(level=logging.INFO)
