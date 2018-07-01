@@ -162,8 +162,8 @@ def run(options):
     organ = 'all_brains' if options.organ[0] == 'brains' else options.organ[0]
     all_labels = glob.glob('data/labels/*/*_{}.nii.gz'.format(organ))
 
-    # for sample in ['043015', '051215', '061715', '062515', '081315', '083115', '110214', '112614', '122115', '122215']:
-    for sample in ['043015', '061715']:
+    for sample in ['043015', '051215', '061715', '062515', '081315', '083115', '110214', '112614', '122115', '122215']:
+    # for sample in ['043015', '061715']:
         logging.info(sample)
 
         logging.info('Creating model.')
