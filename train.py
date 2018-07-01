@@ -59,7 +59,6 @@ parser.add_argument('--run',
 options = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu[0]
-print(os.environ)
 
 import constants
 import glob
