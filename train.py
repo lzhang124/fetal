@@ -1,7 +1,4 @@
 import os
-import logging
-logging.basicConfig(level=logging.INFO)
-
 from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.add_argument('--train',
@@ -58,7 +55,11 @@ parser.add_argument('--run',
                     dest='run', type=str)
 options = parser.parse_args()
 
-os.environ["CUDA_VISIBLE_DEVICES"] = options.gpu[0]
+os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu[0]
+print(os.environ)
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 import constants
 import glob
