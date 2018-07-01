@@ -51,7 +51,7 @@ parser.add_argument('--size',
 parser.add_argument('--gpu',
                     metavar='GPU',
                     help='Which GPU to run on',
-                    dest='gpu', type=int, nargs=1)
+                    dest='gpu', type=str, nargs=1)
 parser.add_argument('--run',
                     metavar='RUN',
                     help='Which preset program to run',
