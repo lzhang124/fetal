@@ -2,66 +2,66 @@ import os
 import logging
 logging.basicConfig(level=logging.INFO)
 
+from argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument('--train',
+                    metavar='INPUT_FILES, LABEL_FILES',
+                    help='Train model',
+                    dest='train', type=str, nargs=2)
+parser.add_argument('--predict',
+                    metavar='INPUT_FILES, SEED_FILES/LABEL_FILES, SAVE_PATH',
+                    help='Predict segmentations',
+                    dest='predict', type=str, nargs=3)
+parser.add_argument('--test',
+                    metavar='INPUT_FILES, [SEED_FILES,] LABEL_FILES',
+                    help='Test model',
+                    dest='test', type=str, nargs='+')
+parser.add_argument('--organ',
+                    metavar='ORGAN',
+                    help='Organ to segment',
+                    dest='organ', type=str, nargs=1)
+parser.add_argument('--seed',
+                    metavar='SEED_TYPE',
+                    help='Seed slices',
+                    dest='seed', type=str)
+parser.add_argument('--concat',
+                    metavar='INPUT_FILE, LABEL_FILE',
+                    help='Concatenate first volume',
+                    dest='concat', nargs=2)
+parser.add_argument('--batch-size',
+                    metavar='BATCH_SIZE',
+                    help='Training batch size',
+                    dest='batch_size', type=int, default=1)
+parser.add_argument('--epochs',
+                    metavar='EPOCHS',
+                    help='Training epochs',
+                    dest='epochs', type=int, default=1000)
+parser.add_argument('--name',
+                    metavar='MODEL_NAME',
+                    help='Name of model',
+                    dest='name', type=str)
+parser.add_argument('--model-file',
+                    metavar='MODEL_FILE',
+                    help='Pretrained model file',
+                    dest='model_file', type=str)
+parser.add_argument('--size',
+                    metavar='SIZE',
+                    help='Size of UNet',
+                    dest='size', type=str)
+parser.add_argument('--run',
+                    metavar='RUN',
+                    help='Which preset program to run',
+                    dest='run', type=str)
+options = parser.parse_args()
+
+os.environ["CUDA_VISIBLE_DEVICES"] = options.gpu
+
 import constants
 import glob
 import time
 import util
-from argparse import ArgumentParser
 from data import AugmentGenerator, VolumeGenerator
 from models import UNet, UNetSmall, UNetBig
-
-
-def build_parser():
-    parser = ArgumentParser()
-    parser.add_argument('--train',
-                        metavar='INPUT_FILES, LABEL_FILES',
-                        help='Train model',
-                        dest='train', type=str, nargs=2)
-    parser.add_argument('--predict',
-                        metavar='INPUT_FILES, SEED_FILES/LABEL_FILES, SAVE_PATH',
-                        help='Predict segmentations',
-                        dest='predict', type=str, nargs=3)
-    parser.add_argument('--test',
-                        metavar='INPUT_FILES, [SEED_FILES,] LABEL_FILES',
-                        help='Test model',
-                        dest='test', type=str, nargs='+')
-    parser.add_argument('--organ',
-                        metavar='ORGAN',
-                        help='Organ to segment',
-                        dest='organ', type=str, nargs=1)
-    parser.add_argument('--seed',
-                        metavar='SEED_TYPE',
-                        help='Seed slices',
-                        dest='seed', type=str)
-    parser.add_argument('--concat',
-                        metavar='INPUT_FILE, LABEL_FILE',
-                        help='Concatenate first volume',
-                        dest='concat', nargs=2)
-    parser.add_argument('--batch-size',
-                        metavar='BATCH_SIZE',
-                        help='Training batch size',
-                        dest='batch_size', type=int, default=1)
-    parser.add_argument('--epochs',
-                        metavar='EPOCHS',
-                        help='Training epochs',
-                        dest='epochs', type=int, default=1000)
-    parser.add_argument('--name',
-                        metavar='MODEL_NAME',
-                        help='Name of model',
-                        dest='name', type=str)
-    parser.add_argument('--model-file',
-                        metavar='MODEL_FILE',
-                        help='Pretrained model file',
-                        dest='model_file', type=str)
-    parser.add_argument('--size',
-                        metavar='SIZE',
-                        help='Size of UNet',
-                        dest='size', type=str)
-    parser.add_argument('--run',
-                        metavar='RUN',
-                        help='Which preset program to run',
-                        dest='run', type=str)
-    return parser
 
 
 def main(options):
@@ -249,9 +249,6 @@ def run(options):
 
 
 if __name__ == '__main__':
-    parser = build_parser()
-    options = parser.parse_args()
-
     if options.run:
         run(options)
     else:
