@@ -116,7 +116,12 @@ class VolumeGenerator(Sequence):
     def __getitem__(self, idx):
         batch = []
         for file in self.inputs[self.batch_size * idx:self.batch_size * (idx + 1)]:
-            volume = file if self.load_files else np.concatenate((preprocess(file, self.funcs), self.concat), axis=-1)
+            if self.load_files:
+                volume = file
+            elif self.concat is None:
+                volume = preprocess(file, self.funcs)
+            else:
+                volume = np.concatenate((preprocess(file, self.funcs), self.concat), axis=-1)
             batch.append(volume)
         batch = np.array(batch)
 
