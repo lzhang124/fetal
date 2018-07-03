@@ -1,9 +1,9 @@
 import os
 import tensorflow as tf
 import util
+from datetime import datetime
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 from keras import layers
 from process import uncrop
@@ -52,17 +52,12 @@ class BaseModel:
         raise NotImplementedError()
 
     def save(self):
-        self.model.save('models/{}_weights.latest.h5'.format(self.name))
+        self.model.save('models/{}_weights.{}.h5'.format(self.name, datetime.now().strftime('%m.%d.%y')))
 
     def compile(self, weight):
         raise NotImplementedError()
 
     def train(self, generator, val_gen, epochs):
-        fname = 'models/{}_weights'.format(self.name)
-        model_checkpoint = ModelCheckpoint(fname + '.{epoch:03d}-{loss:.4f}-{dice_coef:.4f}.h5',
-                                           monitor='loss',
-                                           save_best_only=True,
-                                           save_weights_only=True)
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,

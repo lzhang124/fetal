@@ -216,6 +216,7 @@ def run(options):
 
         logging.info('Training model.')
         model.train(aug_gen, val_gen, options.epochs)
+        model.save()
 
         logging.info('Making predictions.')
         if options.run == 'one-out':
