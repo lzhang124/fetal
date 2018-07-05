@@ -61,7 +61,6 @@ class BaseModel:
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
-                                 callbacks=[model_checkpoint],
                                  verbose=1)
 
     def predict(self, generator, path):
