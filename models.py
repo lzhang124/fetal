@@ -52,7 +52,7 @@ class BaseModel:
         raise NotImplementedError()
 
     def save(self):
-        self.model.save('models/{}_weights.{}.h5'.format(self.name, datetime.now().strftime('%m.%d.%y')))
+        self.model.save('models/{}_weights.{}.h5'.format(self.name, datetime.now().strftime('%m.%d.%y-%H:%M:%S')))
 
     def compile(self, weight):
         raise NotImplementedError()

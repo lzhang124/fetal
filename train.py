@@ -180,43 +180,45 @@ def run(options):
             m = UNet
         model = m(shape, name='unet_test_{}'.format(sample), filename=options.model_file)
 
-        # logging.info('Creating data generator.')
+        logging.info('Creating data generator.')
 
-        # if options.run == 'concat':
-        #     concat_files = ['data/raw/{}/{}_1.nii.gz'.format(sample, sample),
-        #                     'data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ)]
-        # else:
-        #     concat_files = None
+        if options.run == 'concat':
+            concat_files = ['data/raw/{}/{}_1.nii.gz'.format(sample, sample),
+                            'data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ)]
+        else:
+            concat_files = None
 
-        # if options.run == 'one-out':
-        #     label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
-        # elif options.run == 'single':
-        #     label_files = glob.glob('data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ))
-        # elif options.run == 'concat':
-        #     label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))[1:4]
-        # else:
-        #     raise ValueError('Preset program not defined.')
+        if options.run == 'one-out':
+            label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
+        elif options.run == 'single':
+            label_files = glob.glob('data/labels/{}/{}_1_{}.nii.gz'.format(sample, sample, organ))
+        elif options.run == 'concat':
+            label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))[1:4]
+        else:
+            raise ValueError('Preset program not defined.')
 
-        # input_files = [file.replace('labels', 'raw').replace('_{}'.format(organ), '') for file in label_files]
-        # aug_gen = AugmentGenerator(input_files,
-        #                            label_files=label_files,
-        #                            batch_size=options.batch_size,
-        #                            seed_type=options.seed,
-        #                            concat_files=concat_files)
-        # val_gen = VolumeGenerator(input_files,
-        #                           label_files=label_files,
-        #                           batch_size=options.batch_size,
-        #                           seed_type=options.seed,
-        #                           concat_files=concat_files,
-        #                           load_files=True,
-        #                           include_labels=True)
+        input_files = [file.replace('labels', 'raw').replace('_{}'.format(organ), '') for file in label_files]
+        aug_gen = AugmentGenerator(input_files,
+                                   label_files=label_files,
+                                   batch_size=options.batch_size,
+                                   seed_type=options.seed,
+                                   concat_files=concat_files)
+        val_gen = VolumeGenerator(input_files,
+                                  label_files=label_files,
+                                  batch_size=options.batch_size,
+                                  seed_type=options.seed,
+                                  concat_files=concat_files,
+                                  load_files=True,
+                                  include_labels=True)
 
-        # logging.info('Compiling model.')
-        # model.compile(util.get_weights(aug_gen.labels))
+        logging.info('Compiling model.')
+        model.compile(util.get_weights(aug_gen.labels))
 
-        # logging.info('Training model.')
-        # model.train(aug_gen, val_gen, options.epochs)
-        # model.save()
+        logging.info('Training model.')
+        model.train(aug_gen, val_gen, options.epochs)
+
+        logging.info('Saving model.')
+        model.save()
 
         logging.info('Making predictions.')
         if options.run == 'one-out':
