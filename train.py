@@ -178,7 +178,7 @@ def run(options):
             m = UNetBig
         else:
             m = UNet
-        model = m(shape, name='unet_test_{}'.format(sample), filename=options.model_file)
+        model = m(shape, name='unet_brains_{}_{}'.format(options.run, sample), filename=options.model_file)
 
         logging.info('Creating data generator.')
 
