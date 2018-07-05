@@ -238,7 +238,10 @@ def run(options):
                                    seed_type=options.seed,
                                    concat_files=concat_files,
                                    include_labels=False)
-        model.predict(pred_gen, 'data/predict/{}/'.format(sample))
+        save_path = 'data/predict/{}/{}-{}/'.format(sample, options.organ, options.run)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        model.predict(pred_gen, save_path)
 
         logging.info('Testing model.')
         test_gen = VolumeGenerator(predict_files,
