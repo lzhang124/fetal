@@ -225,7 +225,7 @@ def run(options):
             label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))
         elif options.run == 'single':
             label_files = [f for f in glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))
-                           if not os.path.basename(f).endswith('_1_{}.nii.gz')]
+                           if not os.path.basename(f).endswith('_1_{}.nii.gz'.format(organ))]
         elif options.run == 'concat':
             label_files = glob.glob('data/labels/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))[4:]
         else:
@@ -238,7 +238,7 @@ def run(options):
                                    seed_type=options.seed,
                                    concat_files=concat_files,
                                    include_labels=False)
-        save_path = 'data/predict/{}/{}-{}/'.format(sample, options.organ, options.run)
+        save_path = 'data/predict/{}/{}-{}/'.format(sample, options.organ[0], options.run)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         model.predict(pred_gen, save_path)
