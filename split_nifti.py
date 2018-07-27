@@ -56,17 +56,28 @@ def main(folder):
     plt.axis('off')
     plt.show(block=False)
 
-    order = input('which slice first?\n  1. odd\n  2. even\n> ')
+    order = input('1. odd\n2. even\n> ')
     plt.close()
+    new_shape = list(shape)
+    new_shape[-1] *= 2
+    series = np.zeros(new_shape)
 
     if order == '1':
-        print('odd')
+        series[...,::2] = odds
+        series[...,1::2] = evens
     elif order == '2':
-        print('even')
+        series[...,::2] = evens
+        series[...,1::2] = odds
     else:
         raise ValueError('Must be even or odd slice.')
 
     series = np.moveaxis(series, 0, axis)
+
+    sample = folder.split('/')[2]
+    new_folder = 'data/originals/{}/'.format(folder.split('/')[2])
+    os.makedirs(new_folder, exist_ok=True)
+    for i in range(new_shape[-1]):
+        util.save_vol(series[...,i], new_folder + sample + '_{}.nii.gz'.format(i))
 
 
 if __name__ == '__main__':
