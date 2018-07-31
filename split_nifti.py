@@ -16,7 +16,16 @@ options = parser.parse_args()
 def main(folder):
     files = glob.glob(folder + '*.nii.gz')
     vols = np.concatenate([util.read_vol(file) for file in files], axis=-1)
-    axis = int(input('shape: {}\n> '.format(vols.shape)))
+    if vols.shape[0] == vols.shape[1] == vols.shape[2]:
+        axis = int(input('shape: {}\n> '.format(vols.shape)))
+    elif vols.shape[0] == vols.shape[1]:
+        axis = 2
+    elif vols.shape[0] == vols.shape[2]:
+        axis = 1
+    elif vols.shape[1] == vols.shape[2]:
+        axis = 0
+    else:
+        axis = int(input('shape: {}\n> '.format(vols.shape)))
     vols = np.moveaxis(vols, axis, 0)
     shape = vols.shape
 
@@ -38,22 +47,40 @@ def main(folder):
 
     odds = np.concatenate((np.zeros([1,] + list(shape[1:])), odds))
 
-    even = evens[shape[0]//2,shape[1]//2,...]
-    odd = odds[shape[0]//2,shape[1]//2,...]
-    even_img = np.zeros((shape[2], shape[3] * 2))
-    even_img[:,::2] = even
-    even_img[:,1::2] = odd
-    odd_img = np.zeros((shape[2], shape[3] * 2))
-    odd_img[:,::2] = odd
-    odd_img[:,1::2] = even
+    even_1 = evens[shape[0]//3,shape[1]//2,...]
+    even_2 = evens[shape[0]*2//3,shape[1]//2,...]
+    odd_1 = odds[shape[0]//3,shape[1]//2,...]
+    odd_2 = odds[shape[0]*2//3,shape[1]//2,...]
+    even_img_1 = np.zeros((shape[2], shape[3] * 2))
+    even_img_1[:,::2] = even_1
+    even_img_1[:,1::2] = odd_1
+    odd_img_1 = np.zeros((shape[2], shape[3] * 2))
+    odd_img_1[:,::2] = odd_1
+    odd_img_1[:,1::2] = even_1
+    even_img_2 = np.zeros((shape[2], shape[3] * 2))
+    even_img_2[:,::2] = even_2
+    even_img_2[:,1::2] = odd_2
+    odd_img_2 = np.zeros((shape[2], shape[3] * 2))
+    odd_img_2[:,::2] = odd_2
+    odd_img_2[:,1::2] = even_2
 
-    fig = plt.figure(figsize=(8, 8))
-    fig.add_subplot(2, 1, 1)
-    plt.imshow(odd_img)
+    fig = plt.figure(figsize=(16, 8))
+    fig.add_subplot(2, 2, 1)
+    plt.imshow(odd_img_1)
     plt.axis('off')
-    fig.add_subplot(2, 1, 2)
-    plt.imshow(even_img)
+    plt.title('odd')
+    fig.add_subplot(2, 2, 2)
+    plt.imshow(even_img_1)
     plt.axis('off')
+    plt.title('even')
+    fig.add_subplot(2, 2, 3)
+    plt.imshow(odd_img_2)
+    plt.axis('off')
+    plt.title('odd')
+    fig.add_subplot(2, 2, 4)
+    plt.imshow(even_img_2)
+    plt.axis('off')
+    plt.title('even')
     plt.show(block=False)
 
     order = input('1. odd\n2. even\n> ')
