@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
-parser.add_argument('--folder', type=str, required=True)
+parser.add_argument('folder', type=str, nargs=1)
 options = parser.parse_args()
 
 
@@ -108,4 +108,4 @@ def main(folder):
 
 
 if __name__ == '__main__':
-    main(options.folder)
+    main(options.folder[0])
