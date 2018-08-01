@@ -10,10 +10,11 @@ from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
 parser.add_argument('folder', type=str, nargs=1)
+parser.add_argument('--volume', action='store_true')
 options = parser.parse_args()
 
 
-def main(folder):
+def main(folder, volume):
     files = glob.glob(folder + '*.nii.gz')
     vols = np.concatenate([util.read_vol(file) for file in files], axis=-1)
     if vols.shape[0] == vols.shape[1] == vols.shape[2]:
@@ -46,42 +47,67 @@ def main(folder):
         odds = np.concatenate((odds, odds[np.newaxis,-1,...]))
 
     odds = np.concatenate((np.zeros([1,] + list(shape[1:])), odds))
+    
+    if volume:
+        even_1 = evens[shape[0]//3,...]
+        even_2 = evens[shape[0]*2//3,...]
+        odd_1 = odds[shape[0]//3,...]
+        odd_2 = odds[shape[0]*2//3,...]
+        even_img_1 = np.zeros((shape[1], shape[2], shape[3] * 2))
+        even_img_1[...,::2] = even_1
+        even_img_1[...,1::2] = odd_1
+        even_img_2 = np.zeros((shape[1], shape[2], shape[3] * 2))
+        even_img_2[...,::2] = even_2
+        even_img_2[...,1::2] = odd_2
+        odd_img_1 = np.zeros((shape[1], shape[2], shape[3] * 2))
+        odd_img_1[...,::2] = odd_1
+        odd_img_1[...,1::2] = even_1
+        odd_img_2 = np.zeros((shape[1], shape[2], shape[3] * 2))
+        odd_img_2[...,::2] = odd_2
+        odd_img_2[...,1::2] = even_2
 
-    even_1 = evens[shape[0]//3,shape[1]//2,...]
-    even_2 = evens[shape[0]*2//3,shape[1]//2,...]
-    odd_1 = odds[shape[0]//3,shape[1]//2,...]
-    odd_2 = odds[shape[0]*2//3,shape[1]//2,...]
-    even_img_1 = np.zeros((shape[2], shape[3] * 2))
-    even_img_1[:,::2] = even_1
-    even_img_1[:,1::2] = odd_1
-    odd_img_1 = np.zeros((shape[2], shape[3] * 2))
-    odd_img_1[:,::2] = odd_1
-    odd_img_1[:,1::2] = even_1
-    even_img_2 = np.zeros((shape[2], shape[3] * 2))
-    even_img_2[:,::2] = even_2
-    even_img_2[:,1::2] = odd_2
-    odd_img_2 = np.zeros((shape[2], shape[3] * 2))
-    odd_img_2[:,::2] = odd_2
-    odd_img_2[:,1::2] = even_2
+        temp_folder = 'data/temp/'
+        os.makedirs(temp_folder, exist_ok=True)
+        util.save_vol(even_img_1, temp_folder + 'even_1.nii.gz')
+        util.save_vol(even_img_2, temp_folder + 'even_2.nii.gz')
+        util.save_vol(odd_img_1, temp_folder + 'odd_1.nii.gz')
+        util.save_vol(odd_img_2, temp_folder + 'odd_2.nii.gz')
+    else:
+        even_1 = evens[shape[0]//3,shape[1]//2,...]
+        even_2 = evens[shape[0]*2//3,shape[1]//2,...]
+        odd_1 = odds[shape[0]//3,shape[1]//2,...]
+        odd_2 = odds[shape[0]*2//3,shape[1]//2,...]
+        even_img_1 = np.zeros((shape[2], shape[3] * 2))
+        even_img_1[:,::2] = even_1
+        even_img_1[:,1::2] = odd_1
+        even_img_2 = np.zeros((shape[2], shape[3] * 2))
+        even_img_2[:,::2] = even_2
+        even_img_2[:,1::2] = odd_2
+        odd_img_1 = np.zeros((shape[2], shape[3] * 2))
+        odd_img_1[:,::2] = odd_1
+        odd_img_1[:,1::2] = even_1
+        odd_img_2 = np.zeros((shape[2], shape[3] * 2))
+        odd_img_2[:,::2] = odd_2
+        odd_img_2[:,1::2] = even_2
 
-    fig = plt.figure(figsize=(16, 8))
-    fig.add_subplot(2, 2, 1)
-    plt.imshow(odd_img_1)
-    plt.axis('off')
-    plt.title('odd')
-    fig.add_subplot(2, 2, 2)
-    plt.imshow(even_img_1)
-    plt.axis('off')
-    plt.title('even')
-    fig.add_subplot(2, 2, 3)
-    plt.imshow(odd_img_2)
-    plt.axis('off')
-    plt.title('odd')
-    fig.add_subplot(2, 2, 4)
-    plt.imshow(even_img_2)
-    plt.axis('off')
-    plt.title('even')
-    plt.show(block=False)
+        fig = plt.figure(figsize=(16, 8))
+        fig.add_subplot(2, 2, 1)
+        plt.imshow(odd_img_1)
+        plt.axis('off')
+        plt.title('odd')
+        fig.add_subplot(2, 2, 2)
+        plt.imshow(even_img_1)
+        plt.axis('off')
+        plt.title('even')
+        fig.add_subplot(2, 2, 3)
+        plt.imshow(odd_img_2)
+        plt.axis('off')
+        plt.title('odd')
+        fig.add_subplot(2, 2, 4)
+        plt.imshow(even_img_2)
+        plt.axis('off')
+        plt.title('even')
+        plt.show(block=False)
 
     order = input('1. odd\n2. even\n> ')
     plt.close()
@@ -108,4 +134,4 @@ def main(folder):
 
 
 if __name__ == '__main__':
-    main(options.folder[0])
+    main(options.folder[0], options.volume)

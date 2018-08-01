@@ -3,7 +3,7 @@
 username=larryzhang
 remote_machine=aniseed
 
-placenta_dir=/data/vision/polina/projects/placenta_segmentation/
+placenta_dir=/data/vision/polina/projects/placenta_segmentation
 
 ###################
 
