@@ -1,2 +1,1 @@
-TARGET_SHAPE = (96, 96, 64, 1)
-MAX_VALUE = 1500.
+SHAPE = (96, 96, 64, 1)

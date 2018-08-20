@@ -108,6 +108,7 @@ class ImageTransformer(object):
                  shift_range=0.,
                  shear_range=0.,
                  zoom_range=0.,
+                 crop_size=None,
                  fill_mode='nearest',
                  cval=0.,
                  flip=False):
@@ -115,6 +116,7 @@ class ImageTransformer(object):
         self.shift_range = shift_range
         self.shear_range = shear_range
         self.zoom_range = zoom_range
+        self.crop_size = crop_size
         self.fill_mode = fill_mode
         self.cval = cval
         self.flip = flip
@@ -197,8 +199,8 @@ class ImageTransformer(object):
             else:
                 transform_matrix = np.dot(transform_matrix, shear_matrix)
 
-        if self.zoom_range[0] == 1 and self.zoom_range[1] == 1:
-            zx, zy, zz = 1, 1, 1
+        if self.zoom_range[0] != 1 and self.zoom_range[1] != 1:
+            zx, zy, zz = np.random.uniform(self.zoom_range[0], self.zoom_range[1], 3)
             zoom_matrix = np.array([[zx, 0, 0, 0],
                                     [0, zy, 0, 0],
                                     [0, 0, zz, 0],
@@ -207,6 +209,12 @@ class ImageTransformer(object):
                 transform_matrix = zoom_matrix
             else:
                 transform_matrix = np.dot(transform_matrix, zoom_matrix)
+
+        if self.crop_size:
+            cx = np.random.randint(0, self.crop_size[0])
+            cy = np.random.randint(0, self.crop_size[1])
+            cz = np.random.randint(0, self.crop_size[2])
+            x = x[cx:cx+self.crop_size[0], cy:cy+self.crop_size[1], cz:cz+self.crop_size[2], :]
 
         if transform_matrix is not None:
             transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)

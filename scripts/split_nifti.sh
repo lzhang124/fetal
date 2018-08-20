@@ -7,4 +7,6 @@ placenta_dir=/data/vision/polina/projects/placenta_segmentation
 
 ###################
 
-rsync -avP ${username}@${remote_machine}.csail.mit.edu:${placenta_dir}/data/$1/* ./data/$1/
+scripts/download_data.sh nifti/$1/
+python -B split_nifti.py data/nifti/$1/
+scripts/upload_data.sh originals/$1/

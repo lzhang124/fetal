@@ -1,9 +1,9 @@
 import numpy as np
+import constants
 from image3d import ImageTransformer, VolumeIterator
 from keras.utils.data_utils import Sequence
 from process import preprocess
 from util import shape
-
 
 class AugmentGenerator(VolumeIterator):
     def __init__(self,
@@ -16,13 +16,14 @@ class AugmentGenerator(VolumeIterator):
                  shift_range=0.1,
                  shear_range=0.1,
                  zoom_range=0.1,
+                 crop_size=constants.SHAPE,
                  fill_mode='nearest',
                  cval=0.,
                  flip=True):
-        self.inputs = np.array([preprocess(file) for file in input_files])
+        self.inputs = np.array([preprocess(file, rescale=True) for file in input_files])
 
         if label_files is not None:
-            self.labels = np.array([preprocess(file, funcs=['resize']) for file in label_files])
+            self.labels = np.array([preprocess(file) for file in label_files])
         else:
             self.labels = None
 
@@ -30,7 +31,7 @@ class AugmentGenerator(VolumeIterator):
 
         if concat_files is not None:
             concat = np.concatenate((preprocess(concat_files[0]),
-                                     preprocess(concat_files[1], funcs=['resize'])), axis=-1)
+                                     preprocess(concat_files[1])), axis=-1)
             new_inputs = []
             for vol in self.inputs:
                 new_inputs.append(np.concatenate((vol, concat), axis=-1))
@@ -40,6 +41,7 @@ class AugmentGenerator(VolumeIterator):
                                              shift_range=shift_range,
                                              shear_range=shear_range,
                                              zoom_range=zoom_range,
+                                             crop_size=crop_size,
                                              fill_mode=fill_mode,
                                              cval=cval,
                                              flip=flip)
@@ -77,6 +79,7 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
+                 crop_size=constants.SHAPE,
                  concat_files=None,
                  load_files=False,
                  include_labels=False,
@@ -86,29 +89,31 @@ class VolumeGenerator(Sequence):
         self.labels = label_files
         self.batch_size = batch_size
         self.seed_type = seed_type
+        self.crop_size = crop_size
         self.concat = None
         self.load_files = load_files
         self.include_labels = include_labels
-        self.funcs = ['rescale', 'resize'] if rescale else ['resize']
+        self.rescale = rescale
         self.shape = shape(input_files[0])
         self.n = len(input_files)
         self.idx = 0
         
         if concat_files is not None:
-            self.concat = np.concatenate((preprocess(concat_files[0]),
-                                          preprocess(concat_files[1], funcs=['resize'])), axis=-1)
+            self.concat = np.concatenate((preprocess(concat_files[0], resize=True, rescale=True),
+                                          preprocess(concat_files[1], resize=True)), axis=-1)
 
         if load_files:
-            self.inputs = np.array([preprocess(file, self.funcs) for file in input_files])
+            self.inputs = np.array([preprocess(file, resize=True, rescale=self.rescale)
+                                    for file in input_files])
             if self.concat is not None:
                 new_inputs = []
                 for vol in self.inputs:
                     new_inputs.append(np.concatenate((vol, self.concat), axis=-1))
                 self.inputs = np.array(new_inputs)
             if seed_files is not None:
-                self.seeds = np.array([preprocess(file, ['resize']) for file in seed_files])
+                self.seeds = np.array([preprocess(file, resize=True) for file in seed_files])
             if label_files is not None:
-                self.labels = np.array([preprocess(file, ['resize']) for file in label_files])
+                self.labels = np.array([preprocess(file, resize=True) for file in label_files])
 
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
@@ -119,16 +124,16 @@ class VolumeGenerator(Sequence):
             if self.load_files:
                 volume = file
             elif self.concat is None:
-                volume = preprocess(file, self.funcs)
+                volume = preprocess(file, resize=True, rescale=self.rescale)
             else:
-                volume = np.concatenate((preprocess(file, self.funcs), self.concat), axis=-1)
+                volume = np.concatenate((preprocess(file, resize=True, rescale=self.rescale), self.concat), axis=-1)
             batch.append(volume)
         batch = np.array(batch)
 
         if self.seeds is not None:
             seeds = []
             for file in self.seeds[self.batch_size * idx:self.batch_size * (idx + 1)]:
-                seed = file if self.load_files else preprocess(file, ['resize'])
+                seed = file if self.load_files else preprocess(file, resize=True)
                 seeds.append(seed)
             batch = np.concatenate((batch, np.array(seeds)), axis=-1)
 
@@ -140,7 +145,7 @@ class VolumeGenerator(Sequence):
 
             new_batch = np.zeros(tuple(list(batch.shape[:-1]) + [batch.shape[-1] + 1]))
             for i, file in enumerate(self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]):
-                label = file if self.load_files else preprocess(file, ['resize'])
+                label = file if self.load_files else preprocess(file, resize=True)
                 if self.seed_type == 'slice':
                     seed = np.zeros(batch[i].shape)
                     r = np.random.choice(label.shape[0])
@@ -158,7 +163,7 @@ class VolumeGenerator(Sequence):
 
             labels = []
             for file in self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]:
-                label = file if self.load_files else preprocess(file, ['resize'])
+                label = file if self.load_files else preprocess(file, resize=True)
                 labels.append(label)
             labels = np.array(labels)
             batch = (batch, labels)
