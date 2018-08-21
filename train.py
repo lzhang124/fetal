@@ -173,6 +173,7 @@ def run(options):
             shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
         if options.run == 'concat':
             #TODO
+            pass
         if options.size == 'small':
             m = UNetSmall
         elif options.size == 'big':
@@ -185,6 +186,7 @@ def run(options):
 
         if options.run == 'concat':
             #TODO
+            pass
         else:
             concat_files = None
 
@@ -195,6 +197,7 @@ def run(options):
             label_files = glob.glob('data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ))
         elif options.run == 'concat':
             #TODO
+            pass
         else:
             raise ValueError('Preset program not defined.')
 
@@ -230,6 +233,7 @@ def run(options):
                            if not os.path.basename(f).endswith('_0_{}.nii.gz'.format(organ))]
         elif options.run == 'concat':
             #TODO
+            pass
         else:
             raise ValueError('Preset program not defined.')
 
