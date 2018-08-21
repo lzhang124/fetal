@@ -158,11 +158,7 @@ def main(options):
 def run(options):
     start = time.time()
 
-    metrics = {}
-
     organ = 'all_brains' if options.organ[0] == 'brains' else options.organ[0]
-    all_labels = glob.glob('data/labels/*/*_{}.nii.gz'.format(organ))
-
     for sample in ['010918L', '010918S', '012115', '013018L', '013018S',
                    '013118L', '013118S', '021015', '021218L', '021218S',
                    '022318L', '022318S', '022415', '022618', '030217',
@@ -193,7 +189,8 @@ def run(options):
             concat_files = None
 
         if options.run == 'one-out':
-            label_files = [file for file in all_labels if not os.path.basename(file).startswith(sample)]
+            label_files = [file for file in glob.glob('data/labels/*/*_{}.nii.gz'.format(organ))
+                           if not os.path.basename(file).startswith(sample)]
         elif options.run == 'single':
             label_files = glob.glob('data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ))
         elif options.run == 'concat':
