@@ -1,6 +1,6 @@
-numpy
-scipy
-nibabel
-keras
-tensorflow
-tensorflow-gpu
+numpy==1.14.5
+scipy==1.1.0
+nibabel==2.3.0
+keras==2.2.2
+tensorflow==1.10.0
+tensorflow-gpu==1.10.0
