@@ -10,6 +10,7 @@ for sample in ['010918L', '010918S', '012115', '013018L', '013018S',
                '031616', '031716', '032217', '032318a', '032318b',
                '032318c', '032318d', '032818', '040218', '040417']:
         files = glob.glob('data/labels/{}/{}_0_*_brains.nii.gz'.format(sample, sample))
+        print(files)
 
         volume = np.zeros(util.shape(files[0]))
         header = util.header(files[0])
