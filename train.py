@@ -157,6 +157,7 @@ def main(options):
 
 def run(options):
     start = time.time()
+    metrics = {}
 
     organ = 'all_brains' if options.organ[0] == 'brains' else options.organ[0]
     for sample in ['010918L', '010918S', '012115', '013018L', '013018S',
@@ -227,10 +228,10 @@ def run(options):
 
         logging.info('Making predictions.')
         if options.run == 'one-out':
-            predict_files = glob.glob('data/raw/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))
+            predict_files = glob.glob('data/raw/{}/{}_*.nii.gz'.format(sample, sample))
         elif options.run == 'single':
-            label_files = [f for f in glob.glob('data/raw/{}/{}_*_{}.nii.gz'.format(sample, sample, organ))
-                           if not os.path.basename(f).endswith('_0_{}.nii.gz'.format(organ))]
+            predict_files = [f for f in glob.glob('data/raw/{}/{}_*.nii.gz'.format(sample, sample))
+                           if not os.path.basename(f).endswith('_0.nii.gz')]
         elif options.run == 'concat':
             #TODO
             pass
@@ -246,8 +247,21 @@ def run(options):
         os.makedirs(save_path, exist_ok=True)
         model.predict(pred_gen, save_path)
 
-        logging.info('Testing model.')
-        #TODO
+        if options.run == 'one-out':
+            logging.info('Testing model.')
+            test_files = glob.glob('data/raw/{}/{}_0_{}.nii.gz'.format(sample, sample, organ))
+            label_files = glob.glob('data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ))
+
+            test_gen = VolumeGenerator(test_files,
+                                       label_files=label_files,
+                                       batch_size=options.batch_size,
+                                       seed_type=options.seed,
+                                       concat_files=concat_files,
+                                       include_labels=False)
+            metrics[sample] = model.test(test_gen)
+
+    if len(metrics) > 0:
+        logging.info(metrics)
 
     end = time.time()
     logging.info('total time: {}s'.format(end - start))
