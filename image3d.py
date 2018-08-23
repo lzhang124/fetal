@@ -338,15 +338,14 @@ class VolumeIterator(Iterator):
     """
 
     def __init__(self, x, y, image_transformer,
-                 batch_size=32, shuffle=True, seed=None, generate_labels=True):
-        self.x = np.asarray(x, dtype=K.floatx())
-
-        if self.x.ndim != 5:
-            raise ValueError('Input data in `VolumeIterator` '
-                             'should have rank 5. You passed an array '
-                             'with shape', self.x.shape)
+                 batch_size=32, shuffle=True, seed=None, generate_labels=False):
+        for i in range(x.length):
+            x[i] = np.asarray(x[i], dtype=K.floatx())
+            if x[i].ndim != 4:
+                raise ValueError('Each volume of the input data for '
+                                 '`VolumeIterator` should have rank 4.')
         if y is not None:
-            self.y = np.asarray(y, dtype=K.floatx())
+            self.y = [np.asarray(y[i], dtype=K.floatx()) for i in range(y.length)]
         else:
             self.y = None
 
@@ -355,24 +354,23 @@ class VolumeIterator(Iterator):
         super().__init__(x.shape[0], batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array):
-        batch_x = np.zeros(tuple([len(index_array)] + list(self.x.shape)[1:]),
-                           dtype=K.floatx())
+        batch_x = []
         if self.y is None:
             for i, j in enumerate(index_array):
                 x = self.x[j]
                 x = self.image_transformer.random_transform(x.astype(K.floatx()))
-                batch_x[i] = x
+                batch_x.append(x)
+            batch_x = np.asarray(batch_x, dtype=K.floatx())
             return (batch_x, batch_x) if self.generate_labels else batch_x
         
-        batch_y = np.zeros(tuple([len(index_array)] + list(self.y.shape)[1:]),
-                           dtype=K.floatx())      
+        batch_y = []
         for i, j in enumerate(index_array):
             x, y = self.x[j], self.y[j]
             x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
                                                            y.astype(K.floatx()))
-            batch_x[i] = x
-            batch_y[i] = y
-        return (batch_x, batch_y)
+            batch_x.append(x)
+            batch_y.append(y)
+        return (np.asarray(batch_x, dtype=K.floatx()), np.asarray(batch_y, dtype=K.floatx()))
 
     def next(self):
         """For python 2.x.

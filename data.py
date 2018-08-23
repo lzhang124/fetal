@@ -20,10 +20,10 @@ class AugmentGenerator(VolumeIterator):
                  fill_mode='nearest',
                  cval=0.,
                  flip=True):
-        self.inputs = np.array([preprocess(file, rescale=True) for file in input_files])
+        self.inputs = [preprocess(file, rescale=True) for file in input_files]
 
         if label_files is not None:
-            self.labels = np.array([preprocess(file) for file in label_files])
+            self.labels = [preprocess(file) for file in label_files]
         else:
             self.labels = None
 
@@ -35,7 +35,7 @@ class AugmentGenerator(VolumeIterator):
             new_inputs = []
             for vol in self.inputs:
                 new_inputs.append(np.concatenate((vol, concat), axis=-1))
-            self.inputs = np.array(new_inputs)
+            self.inputs = new_inputs
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -79,7 +79,6 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  seed_type=None,
-                 crop_size=constants.SHAPE,
                  concat_files=None,
                  load_files=False,
                  include_labels=False,
@@ -89,7 +88,6 @@ class VolumeGenerator(Sequence):
         self.labels = label_files
         self.batch_size = batch_size
         self.seed_type = seed_type
-        self.crop_size = crop_size
         self.concat = None
         self.load_files = load_files
         self.include_labels = include_labels
