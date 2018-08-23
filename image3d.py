@@ -41,6 +41,7 @@ def transform_matrix_offset_center(matrix, shape):
 def apply_transform(x,
                     transform_matrix,
                     channel_axis=3,
+                    crop_size=None,
                     fill_mode='nearest',
                     cval=0.):
     """Apply the image transformation specified by a matrix.
@@ -49,6 +50,7 @@ def apply_transform(x,
         x: 4D numpy array, single image.
         transform_matrix: Numpy array specifying the geometric transformation.
         channel_axis: Index of axis for channels in the input tensor.
+        crop_size: Size to crop the image
         fill_mode: Points outside the boundaries of the input
             are filled according to the given mode
             (one of `{'constant', 'nearest', 'reflect', 'wrap'}`).
@@ -70,6 +72,12 @@ def apply_transform(x,
                       cval=cval) for channel in x]
     x = np.stack(channel_images, axis=0)
     x = np.rollaxis(x, 0, channel_axis + 1)
+
+    if crop_size:
+        cx = np.random.randint(0, x.shape[0]-crop_size[0])
+        cy = np.random.randint(0, x.shape[1]-crop_size[1])
+        cz = np.random.randint(0, x.shape[2]-crop_size[2])
+        x = x[cx:cx+crop_size[0], cy:cy+crop_size[1], cz:cz+crop_size[2], :]
     return x
 
 
@@ -210,17 +218,19 @@ class ImageTransformer(object):
             else:
                 transform_matrix = np.dot(transform_matrix, zoom_matrix)
 
-        if self.crop_size:
-            cx = np.random.randint(0, x.shape[0]-self.crop_size[0])
-            cy = np.random.randint(0, x.shape[1]-self.crop_size[1])
-            cz = np.random.randint(0, x.shape[2]-self.crop_size[2])
-            x = x[cx:cx+self.crop_size[0], cy:cy+self.crop_size[1], cz:cz+self.crop_size[2], :]
-
         if transform_matrix is not None:
             transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)
-            x = apply_transform(x, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
+            x = apply_transform(x,
+                                transform_matrix,
+                                crop_size=crop_size,
+                                fill_mode=self.fill_mode,
+                                cval=self.cval)
             if y is not None:
-                y = apply_transform(y, transform_matrix, fill_mode=self.fill_mode, cval=self.cval)
+                y = apply_transform(y,
+                                    transform_matrix,
+                                    crop_size=crop_size,
+                                    fill_mode=self.fill_mode,
+                                    cval=self.cval)
 
         if self.flip:
             for axis in range(3):
