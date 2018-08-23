@@ -217,7 +217,7 @@ def run(options):
                                   load_files=True,
                                   include_labels=True)
 
-        util.save_vol(aug_gen.next(), 'test.nii.gz')
+        util.save_vol(aug_gen.next()[0], 'test.nii.gz')
 
         logging.info('Compiling model.')
         model.compile(util.get_weights(aug_gen.labels))
