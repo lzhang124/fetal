@@ -11,9 +11,9 @@ def crop(vol):
         raise ValueError('The input shape {} is not supported.'.format(vol.shape))
 
     # convert to target shape
-    dx = (constants.SHAPE[0] - vol.shape[0]) // 2
-    dy = (constants.SHAPE[1] - vol.shape[1]) // 2
-    dz = (constants.SHAPE[2] - vol.shape[2]) // 2
+    dx = (vol.shape[0] - constants.SHAPE[0]) // 2
+    dy = (vol.shape[1] - constants.SHAPE[1]) // 2
+    dz = (vol.shape[2] - constants.SHAPE[2]) // 2
     
     resized = vol[dx:(dx+constants.SHAPE[0]),
                   dy:(dy+constants.SHAPE[1]),
@@ -48,9 +48,9 @@ def uncrop(vol, shape):
         raise ValueError('The target shape {} is not supported.'.format(shape))
 
     # convert to original shape
-    dx = (vol.shape[0] - shape[0]) // 2
-    dy = (vol.shape[1] - shape[1]) // 2
-    dz = (vol.shape[2] - shape[2]) // 2
+    dx = (shape[0] - vol.shape[0]) // 2
+    dy = (shape[1] - vol.shape[1]) // 2
+    dz = (shape[2] - vol.shape[2]) // 2
 
     resized = np.pad(vol, ((dx, vol.shape[0]-dx),
                            (dy, vol.shape[1]-dy),
