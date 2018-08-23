@@ -258,7 +258,7 @@ def run(options):
                                        seed_type=options.seed,
                                        concat_files=concat_files,
                                        include_labels=False)
-            print(model.text(test_gen))
+            print(model.test(test_gen))
             metrics[sample] = model.test(test_gen)
 
     if len(metrics) > 0:
