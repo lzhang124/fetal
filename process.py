@@ -31,7 +31,7 @@ def scale(vol):
 def preprocess(file, resize=False, rescale=False):
     vol = read_vol(file)
     if resize:
-        vol = crop(vol, resize)
+        vol = crop(vol)
     if rescale:
         vol = scale(vol)
     return vol
