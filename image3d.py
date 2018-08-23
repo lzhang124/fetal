@@ -211,9 +211,9 @@ class ImageTransformer(object):
                 transform_matrix = np.dot(transform_matrix, zoom_matrix)
 
         if self.crop_size:
-            cx = np.random.randint(0, self.crop_size[0])
-            cy = np.random.randint(0, self.crop_size[1])
-            cz = np.random.randint(0, self.crop_size[2])
+            cx = np.random.randint(0, x.shape[0]-self.crop_size[0])
+            cy = np.random.randint(0, x.shape[1]-self.crop_size[1])
+            cz = np.random.randint(0, x.shape[2]-self.crop_size[2])
             x = x[cx:cx+self.crop_size[0], cy:cy+self.crop_size[1], cz:cz+self.crop_size[2], :]
 
         if transform_matrix is not None:
