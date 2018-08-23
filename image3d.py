@@ -222,13 +222,13 @@ class ImageTransformer(object):
             transform_matrix = transform_matrix_offset_center(transform_matrix, x.shape)
             x = apply_transform(x,
                                 transform_matrix,
-                                crop_size=crop_size,
+                                crop_size=self.crop_size,
                                 fill_mode=self.fill_mode,
                                 cval=self.cval)
             if y is not None:
                 y = apply_transform(y,
                                     transform_matrix,
-                                    crop_size=crop_size,
+                                    crop_size=self.crop_size,
                                     fill_mode=self.fill_mode,
                                     cval=self.cval)
 
