@@ -379,8 +379,6 @@ class VolumeIterator(Iterator):
                                                            y.astype(K.floatx()))
             batch_x.append(x)
             batch_y.append(y)
-        print(np.asarray(batch_x, dtype=K.floatx()).shape)
-        print(np.asarray(batch_y, dtype=K.floatx()).shape)
         return (np.asarray(batch_x, dtype=K.floatx()), np.asarray(batch_y, dtype=K.floatx()))
 
     def next(self):
