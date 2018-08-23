@@ -257,7 +257,7 @@ def run(options):
                                        batch_size=options.batch_size,
                                        seed_type=options.seed,
                                        concat_files=concat_files,
-                                       include_labels=False)
+                                       include_labels=True)
             print(test_gen.next())
             metrics[sample] = model.test(test_gen)
 
