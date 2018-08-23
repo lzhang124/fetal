@@ -15,7 +15,7 @@ def crop(vol):
     dy = (constants.SHAPE[1] - vol.shape[1]) // 2
     dz = (constants.SHAPE[2] - vol.shape[2]) // 2
     
-    resized = vol[dx:dx+constants.SHAPE[0], dy:dy+constants.SHAPE[0], dz:dz+constants.SHAPE[0]]
+    resized = vol[dx:dx+constants.SHAPE[0], dy:dy+constants.SHAPE[1], dz:dz+constants.SHAPE[2]]
     if resized.shape != constants.SHAPE:
         raise ValueError('The resized shape {shape} '
                          'does not match the target '
