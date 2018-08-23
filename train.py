@@ -72,7 +72,7 @@ def main(options):
     start = time.time()
 
     logging.info('Creating model.')
-    shape = constants.TARGET_SHAPE
+    shape = constants.SHAPE
     if options.seed:
         shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
     if options.concat:
@@ -169,7 +169,7 @@ def run(options):
         logging.info(sample)
 
         logging.info('Creating model.')
-        shape = constants.TARGET_SHAPE
+        shape = constants.SHAPE
         if options.seed:
             shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
         if options.run == 'concat':
