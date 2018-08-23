@@ -249,7 +249,7 @@ def run(options):
 
         if options.run == 'one-out':
             logging.info('Testing model.')
-            test_files = glob.glob('data/raw/{}/{}_0_{}.nii.gz'.format(sample, sample, organ))
+            test_files = glob.glob('data/raw/{}/{}_0.nii.gz'.format(sample, sample))
             label_files = glob.glob('data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ))
 
             test_gen = VolumeGenerator(test_files,
