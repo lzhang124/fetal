@@ -32,5 +32,10 @@ def header(filename):
 def get_weights(vols):
     if vols is None:
         return None
-    w = np.sum(vols) / vols.size
+    weight = 0
+    total = 0
+    for vol in vols:
+        weight += np.sum(vol)
+        total += vol.size
+    w = weight/total
     return (1 - w, w)
