@@ -339,11 +339,10 @@ class VolumeIterator(Iterator):
 
     def __init__(self, x, y, image_transformer,
                  batch_size=32, shuffle=True, seed=None, generate_labels=False):
-        for i in range(len(x)):
-            x[i] = np.asarray(x[i], dtype=K.floatx())
-            if x[i].ndim != 4:
-                raise ValueError('Each volume of the input data for '
-                                 '`VolumeIterator` should have rank 4.')
+        self.x = [np.asarray(x[i], dtype=K.floatx()) for i in range(len(x))]
+        if any(x[i].ndim != 4 for i in range(len(x))):
+            raise ValueError('Each volume of the input data for '
+                             '`VolumeIterator` should have rank 4.')
         if y is not None:
             self.y = [np.asarray(y[i], dtype=K.floatx()) for i in range(len(y))]
         else:
