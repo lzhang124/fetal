@@ -54,8 +54,10 @@ parser.add_argument('--gpu',
                     dest='gpu', type=str, nargs=1)
 parser.add_argument('--run',
                     metavar='RUN',
-                    help='Which preset program to run',
                     dest='run', type=str)
+parser.add_argument('--part',
+                    metavar='PART',
+                    dest='part', type=int)
 options = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu[0]
@@ -160,12 +162,15 @@ def run(options):
     metrics = {}
 
     organ = 'all_brains' if options.organ[0] == 'brains' else options.organ[0]
-    for sample in ['010918L', '010918S', '012115', '013018L', '013018S',
+    if options.part == 1:
+        samples = ['010918L', '010918S', '012115', '013018L', '013018S',
                    '013118L', '013118S', '021015', '021218L', '021218S',
-                   '022318L', '022318S', '022415', '022618', '030217',
-                   '030315', '031317L', '031317T', '031516', '031615',
+                   '022318L', '022318S', '022415', '022618', '030217']
+    else:
+        samples = ['030315', '031317L', '031317T', '031516', '031615',
                    '031616', '031716', '032217', '032318a', '032318b',
-                   '032318c', '032318d', '032818', '040218', '040417']:
+                   '032318c', '032318d', '032818', '040218', '040417']
+    for sample in samples:
         logging.info(sample)
 
         logging.info('Creating model.')
