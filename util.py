@@ -13,7 +13,7 @@ def read_vol(filename):
 
 def save_vol(vol, filename, header=None):
     if type(vol) is np.ndarray:
-        if vol.ndims > 4:
+        if vol.ndim > 4:
             vol = vol[0]
         vol = np.rint(vol)
         vol = nib.Nifti1Image(vol.astype('int16'), np.diag([3, 3, 3, 1]), header=header)
