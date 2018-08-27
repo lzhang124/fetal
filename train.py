@@ -221,10 +221,6 @@ def run(options):
                                   concat_files=concat_files,
                                   load_files=True,
                                   include_labels=True)
-        a, b = aug_gen.next()
-        util.save_vol(a * 1500., 'test.nii.gz')
-        util.save_vol(b, 'label.nii.gz')
-        assert 0
 
         logging.info('Compiling model.')
         model.compile(util.get_weights(aug_gen.labels))
