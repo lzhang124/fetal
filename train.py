@@ -223,7 +223,7 @@ def run(options):
                                   include_labels=True)
         a, b = aug_gen.next()
         util.save_vol(a, 'test.nii.gz')
-        util.save_vol(b, 'label.nii.gz')
+        util.save_vol(b * 1500., 'label.nii.gz')
         assert 0
 
         logging.info('Compiling model.')
