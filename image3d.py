@@ -223,12 +223,12 @@ class ImageTransformer(object):
                                     cval=self.cval)
 
         if self.crop_size:
-            cx = np.random.randint(0, x.shape[0]-crop_size[0])
-            cy = np.random.randint(0, x.shape[1]-crop_size[1])
-            cz = np.random.randint(0, x.shape[2]-crop_size[2])
-            x = x[cx:cx+crop_size[0], cy:cy+crop_size[1], cz:cz+crop_size[2], :]
+            cx = np.random.randint(0, x.shape[0]-self.crop_size[0])
+            cy = np.random.randint(0, x.shape[1]-self.crop_size[1])
+            cz = np.random.randint(0, x.shape[2]-self.crop_size[2])
+            x = x[cx:cx+self.crop_size[0], cy:cy+self.crop_size[1], cz:cz+self.crop_size[2], :]
             if y is not None:
-                y = y[cx:cx+crop_size[0], cy:cy+crop_size[1], cz:cz+crop_size[2], :]
+                y = y[cx:cx+self.crop_size[0], cy:cy+self.crop_size[1], cz:cz+self.crop_size[2], :]
 
         if self.flip:
             for axis in range(3):
