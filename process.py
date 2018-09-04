@@ -2,6 +2,7 @@ import constants
 import glob
 import numpy as np
 from util import read_vol
+from scipy.ndimage.measurements import label
 
 
 def crop(vol):
@@ -14,7 +15,7 @@ def crop(vol):
     dx = (vol.shape[0] - constants.SHAPE[0]) // 2
     dy = (vol.shape[1] - constants.SHAPE[1]) // 2
     dz = (vol.shape[2] - constants.SHAPE[2]) // 2
-    
+
     resized = vol[dx:(dx+constants.SHAPE[0]),
                   dy:(dy+constants.SHAPE[1]),
                   dz:(dz+constants.SHAPE[2])]
@@ -62,3 +63,14 @@ def uncrop(vol, shape):
                          'shape {target}'.format(shape=resized.shape,
                                                  target=shape))
     return resized
+
+
+def remove_artifacts(vol, n):
+    assert n > 0
+    cleaned = np.zeros(vol.shape)
+    artifacts, _ = label(vol)
+    for i in range(n):
+        largest = artifacts == np.argmax(np.bincount(artifacts.flat))
+        cleaned += largest
+        artifacts[largest] = 0
+    return cleaned
