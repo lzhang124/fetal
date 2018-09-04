@@ -60,7 +60,8 @@ parser.add_argument('--part',
                     dest='part', type=int)
 options = parser.parse_args()
 
-os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu[0]
+if options.gpu:
+  os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu[0]
 
 import constants
 import glob
