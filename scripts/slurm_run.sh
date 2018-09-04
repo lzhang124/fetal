@@ -9,4 +9,4 @@ python_exe=/data/vision/polina/shared_software/anaconda3-4.3.1/envs/keras/bin/py
 ###################
 
 cd ${placenta_dir}
-${python_exe} train.py ${args} "$@"
+${python_exe} train.py "$@"
