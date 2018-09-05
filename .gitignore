@@ -105,6 +105,7 @@ venv.bak/
 
 .DS_Store
 .keras/
+cuda/
 
 # data and models
 data/
