@@ -1,7 +1,7 @@
 #!/bin/bash
 
 placenta_dir=/data/vision/polina/projects/placenta_segmentation/
-python_exe=/data/vision/polina/shared_software/anaconda3-4.3.1/envs/larry/bin/python
+python_exe=${placenta_dir}/venv/bin/python
 
 ###################
 
