@@ -1,13 +1,11 @@
 #!/bin/bash
 
-export HOME=/data/vision/polina/projects/placenta_segmentation/
-export CUDA_HOME=$HOME/cuda
-export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64"
-
-placenta_dir=$HOME
-python_exe=${placenta_dir}/venv/bin/python
+placenta_dir=/data/vision/polina/projects/placenta_segmentation/
 
 ###################
 
 cd ${placenta_dir}
-${python_exe} train.py "$@"
+for i in {1..4}:
+do
+    srun -p gpu -t 10:00:00 --mem-per-cpu 1 --gres=gpu:1 -J part$i -o run$i.out -e run$i.err scripts/slurm_run.sh --part $i "$@"
+done

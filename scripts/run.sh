@@ -1,13 +1,13 @@
 #!/bin/bash
 
-placenta_dir=/data/vision/polina/projects/placenta_segmentation/
+export HOME=/data/vision/polina/projects/placenta_segmentation/
+export CUDA_HOME=$HOME/cuda
+export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64"
+
+placenta_dir=$HOME
 python_exe=${placenta_dir}/venv/bin/python
 
 ###################
 
 cd ${placenta_dir}
-
-gpu=$1
-args="--gpu $1"
-shift
-nohup ${python_exe} train.py ${args} "$@" > nohup${gpu}.out 2> nohup${gpu}.err < /dev/null &
+${python_exe} train.py "$@"
