@@ -104,7 +104,10 @@ venv.bak/
 .mypy_cache/
 
 .DS_Store
+
+# gpu
 .keras/
+.nv/
 cuda
 
 # data and models
