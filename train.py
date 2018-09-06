@@ -161,19 +161,8 @@ def main(options):
 def run(options):
     start = time.time()
     metrics = {}
-
     organ = 'all_brains' if options.organ[0] == 'brains' else options.organ[0]
-    if options.part == 1:
-        samples = ['010918L', '010918S', '012115', '013018L', '013018S',
-                   '013118L', '013118S', '021015', '021218L', '021218S']
-    elif options.part == 2:
-        samples = ['022318L', '022318S', '022415', '022618', '030217',
-                   '030315', '031317L', '031317T', '031516', '031615']
-    elif options.part == 3:
-        samples = ['031616', '031716', '032217', '032318a', '032318b',
-                   '032318c', '032318d', '032818', '040218', '040417']
-    else:
-        raise ValueError('Data does not have part {}'.format(options.part))
+    samples = constants.SAMPLES[(options.part-1)*10:options.part*10]
 
     for sample in samples:
         logging.info(sample)
@@ -253,7 +242,7 @@ def run(options):
                                    seed_type=options.seed,
                                    concat_files=concat_files,
                                    include_labels=False)
-        save_path = 'data/predict/{}/{}-{}/'.format(sample, options.organ[0], options.run)
+        save_path = 'data/predict/{}/'.format(sample)
         os.makedirs(save_path, exist_ok=True)
         model.predict(pred_gen, save_path)
 
