@@ -69,8 +69,8 @@ def remove_artifacts(vol, n):
     assert n > 0
     cleaned = np.zeros(vol.shape)
     artifacts, _ = label(vol)
-    for i in range(n):
-        largest = artifacts == np.argmax(np.bincount(artifacts.flat))
-        cleaned += largest
-        artifacts[largest] = 0
+    indices = np.argsort(np.bincount(artifacts.flat))[-n-1::-1]
+    for i in indices:
+        if i != 0:
+            cleaned += artifacts == i
     return cleaned
