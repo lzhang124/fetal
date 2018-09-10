@@ -58,6 +58,9 @@ parser.add_argument('--run',
 parser.add_argument('--part',
                     metavar='PART',
                     dest='part', type=int)
+parser.add_argument('--tensorboard',
+                    metavar='TENSORBOARD',
+                    dest='tensorboard', action='store_true')
 options = parser.parse_args()
 
 if options.gpu:
@@ -117,7 +120,7 @@ def main(options):
         model.compile(util.get_weights(aug_gen.labels))
 
         logging.info('Training model.')
-        model.train(aug_gen, val_gen, options.epochs)
+        model.train(aug_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
         model.save()
 
     if options.predict:
@@ -220,7 +223,7 @@ def run(options):
         model.compile(util.get_weights(aug_gen.labels))
 
         logging.info('Training model.')
-        model.train(aug_gen, val_gen, options.epochs)
+        model.train(aug_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
 
         logging.info('Saving model.')
         model.save()
