@@ -110,9 +110,10 @@ venv.bak/
 .nv/
 cuda
 
-# data and models
+# data, models, logs
 data/
 models/
+logs/
 
 # outputs
 *.err

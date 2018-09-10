@@ -1,7 +1,7 @@
 #!/bin/bash
 
 username=larryzhang
-remote_machine=aniseed
+remote_machine=cumin
 
 placenta_dir=/data/vision/polina/projects/placenta_segmentation
 
