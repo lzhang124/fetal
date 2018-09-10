@@ -4,9 +4,11 @@ import util
 from datetime import datetime
 from keras.models import Model
 from keras.optimizers import Adam
+from keras.callbacks import TensorBoard
 from keras import backend as K
 from keras import layers
 from process import uncrop
+from time import time
 
 
 def dice_coef(y_true, y_pred):
@@ -57,11 +59,13 @@ class BaseModel:
     def compile(self, weight):
         raise NotImplementedError()
 
-    def train(self, generator, val_gen, epochs):
+    def train(self, generator, val_gen, epochs. tensorboard=False):
+        callbacks = [TensorBoard(log_dir='./logs/{}'.format(time()))] if tensorboard else []
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
-                                 verbose=1)
+                                 verbose=1,
+                                 callbacks=callbacks)
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator, verbose=1)
