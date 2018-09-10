@@ -132,35 +132,35 @@ class UNetSmall(UNet):
     def _new_model(self):
         inputs = layers.Input(shape=self.input_size)
 
-        conv1 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(inputs)
-        conv1 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(conv1)
+        conv1 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(inputs)
+        conv1 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv1)
         pool1 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv1)
 
-        conv2 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(pool1)
-        conv2 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv2)
+        conv2 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(pool1)
+        conv2 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv2)
         pool2 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv2)
 
-        conv3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(pool2)
-        conv3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv3)
+        conv3 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(pool2)
+        conv3 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv3)
         pool3 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv3)
 
-        conv4 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(pool3)
-        conv4 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv4)
+        conv4 = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(pool3)
+        conv4 = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(conv4)
 
-        up5 = layers.Conv3DTranspose(64, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv4)
+        up5 = layers.Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv4)
         conc5 = layers.concatenate([up5, conv3])
-        conv5 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conc6)
-        conv5 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv5)
+        conv5 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conc6)
+        conv5 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv5)
 
-        up6 = layers.Conv3DTranspose(32, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv5)
+        up6 = layers.Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv5)
         conc6 = layers.concatenate([up6, conv2])
-        conv6 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conc6)
-        conv6 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv6)
+        conv6 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conc6)
+        conv6 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv6)
 
-        up7 = layers.Conv3DTranspose(16, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv6)
+        up7 = layers.Conv3DTranspose(64, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv6)
         conc7 = layers.concatenate([up7, conv1])
-        conv7 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(conc7)
-        conv7 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(conv7)
+        conv7 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conc7)
+        conv7 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv7)
 
         outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(conv7)
 
