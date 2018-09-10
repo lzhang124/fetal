@@ -59,7 +59,7 @@ class BaseModel:
     def compile(self, weight):
         raise NotImplementedError()
 
-    def train(self, generator, val_gen, epochs. tensorboard=False):
+    def train(self, generator, val_gen, epochs, tensorboard=False):
         callbacks = [TensorBoard(log_dir='./logs/{}'.format(time()))] if tensorboard else []
         self.model.fit_generator(generator,
                                  epochs=epochs,
