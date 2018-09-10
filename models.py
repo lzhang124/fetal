@@ -149,7 +149,7 @@ class UNetSmall(UNet):
 
         up5 = layers.Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv4)
         conc5 = layers.concatenate([up5, conv3])
-        conv5 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conc6)
+        conv5 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conc5)
         conv5 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv5)
 
         up6 = layers.Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv5)
