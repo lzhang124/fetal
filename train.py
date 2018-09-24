@@ -203,9 +203,7 @@ def run(options):
     model.save()
 
     logging.info('Making predictions.')
-    save_path = 'data/predict/{}/'.format(model.name)
-    os.makedirs(save_path, exist_ok=True)
-    model.predict(pred_gen, save_path)
+    model.predict(pred_gen, 'data/predict/')
 
     logging.info('Testing model.')
     metrics = model.test(test_gen)

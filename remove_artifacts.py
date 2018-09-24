@@ -13,8 +13,8 @@ def dice_coef(true, pred):
 
 metrics = {}
 
-for sample in constants.SAMPLES:
-    file = glob.glob('data/predict/{}/{}_0.nii.gz'.format(sample, sample))[0]
+for file in glob.glob('data/predict/*_0.nii.gz'):
+    sample = os.path.basname(file).split('_')[0]
     header = util.header(file)
 
     n = 2 if sample in constants.TWINS else 1
@@ -23,7 +23,6 @@ for sample in constants.SAMPLES:
     label = glob.glob('data/labels/{}/{}_0_all_brains.nii.gz'.format(sample, sample))[0]
     metrics[sample] = dice_coef(util.read_vol(label), volume)
 
-    os.makedirs('data/predict_cleaned/{}/'.format(sample), exist_ok=True)
-    util.save_vol(volume, 'data/predict_cleaned/{}/{}_0.nii.gz'.format(sample, sample), header)
+    util.save_vol(volume, 'data/predict_cleaned/{}_0.nii.gz'.format(sample, sample), header)
 
 print(metrics)
