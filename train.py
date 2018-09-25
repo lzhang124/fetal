@@ -160,7 +160,7 @@ def run(options):
     shuffled = np.random.permutation(constants.SAMPLES)
     train = shuffled[:(2*n)//3]
     val = shuffled[(2*n)//3:(5*n)//6]
-    test = shuffled[5(5*n)//6:]
+    test = shuffled[(5*n)//6:]
 
     logging.info('Creating model.')
     shape = constants.SHAPE
