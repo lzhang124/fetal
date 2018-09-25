@@ -194,10 +194,10 @@ def run(options):
                                include_labels=True)
 
     logging.info('Compiling model.')
-    model.compile(util.get_weights(aug_gen.labels))
+    model.compile(util.get_weights(train_gen.labels))
 
     logging.info('Training model.')
-    model.train(aug_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+    model.train(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
 
     logging.info('Saving model.')
     model.save()
