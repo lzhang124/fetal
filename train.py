@@ -158,9 +158,9 @@ def run(options):
     logging.info('Splitting data.')
     n = len(constants.SAMPLES)
     shuffled = np.random.permutation(constants.SAMPLES)
-    train = shuffled[:2/3*n]
-    val = shuffled[2/3*n:5/6*n]
-    test = shuffled[5/6*n:]
+    train = shuffled[:(2*n)//3]
+    val = shuffled[(2*n)//3:(5*n)//6]
+    test = shuffled[5(5*n)//6:]
 
     logging.info('Creating model.')
     shape = constants.SHAPE
