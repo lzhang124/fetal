@@ -59,7 +59,7 @@ if options.gpu:
 
 import constants
 import glob
-import np
+import numpy as np
 import time
 import util
 from data import AugmentGenerator, VolumeGenerator
