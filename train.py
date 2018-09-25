@@ -63,7 +63,7 @@ import numpy as np
 import time
 import util
 from data import AugmentGenerator, VolumeGenerator
-from models import UNet, UNetSmall, UNetBig
+from models import UNet, UNetSmall
 
 
 def main(options):
