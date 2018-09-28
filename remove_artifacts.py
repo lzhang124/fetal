@@ -14,7 +14,7 @@ def dice_coef(true, pred):
 metrics = {}
 
 for file in glob.glob('data/predict/*_0.nii.gz'):
-    sample = os.path.basname(file).split('_')[0]
+    sample = os.path.basename(file).split('_')[0]
     header = util.header(file)
 
     n = 2 if sample in constants.TWINS else 1
