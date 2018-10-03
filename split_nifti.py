@@ -1,5 +1,4 @@
 import glob
-import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
 import os
@@ -10,7 +9,11 @@ from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
 parser.add_argument('folder', type=str, nargs=1)
+parser.add_argument('no_matlab', action='store_false')
 options = parser.parse_args()
+
+if not options.no_matlab:
+    import matplotlib.pyplot as plt
 
 
 def main(folder):
@@ -49,35 +52,36 @@ def main(folder):
 
     odds = np.concatenate((np.zeros([1,] + list(shape[1:])), odds))
     
-    even_1 = evens[shape[0]//3,shape[1]//2,...]
-    even_2 = evens[shape[0]*2//3,shape[1]//2,...]
-    odd_1 = odds[shape[0]//3,shape[1]//2,...]
-    odd_2 = odds[shape[0]*2//3,shape[1]//2,...]
-    even_img_1 = np.zeros((shape[2], shape[3] * 2))
-    even_img_1[:,::2] = even_1
-    even_img_1[:,1::2] = odd_1
-    even_img_2 = np.zeros((shape[2], shape[3] * 2))
-    even_img_2[:,::2] = even_2
-    even_img_2[:,1::2] = odd_2
-    odd_img_1 = np.zeros((shape[2], shape[3] * 2))
-    odd_img_1[:,::2] = odd_1
-    odd_img_1[:,1::2] = even_1
-    odd_img_2 = np.zeros((shape[2], shape[3] * 2))
-    odd_img_2[:,::2] = odd_2
-    odd_img_2[:,1::2] = even_2
+    if not options.no_matlab:
+        even_1 = evens[shape[0]//3,shape[1]//2,...]
+        even_2 = evens[shape[0]*2//3,shape[1]//2,...]
+        odd_1 = odds[shape[0]//3,shape[1]//2,...]
+        odd_2 = odds[shape[0]*2//3,shape[1]//2,...]
+        even_img_1 = np.zeros((shape[2], shape[3] * 2))
+        even_img_1[:,::2] = even_1
+        even_img_1[:,1::2] = odd_1
+        even_img_2 = np.zeros((shape[2], shape[3] * 2))
+        even_img_2[:,::2] = even_2
+        even_img_2[:,1::2] = odd_2
+        odd_img_1 = np.zeros((shape[2], shape[3] * 2))
+        odd_img_1[:,::2] = odd_1
+        odd_img_1[:,1::2] = even_1
+        odd_img_2 = np.zeros((shape[2], shape[3] * 2))
+        odd_img_2[:,::2] = odd_2
+        odd_img_2[:,1::2] = even_2
 
-    img_1 = np.concatenate((odd_img_1, even_img_1), axis=0)
-    img_2 = np.concatenate((odd_img_2, even_img_2), axis=0)
+        img_1 = np.concatenate((odd_img_1, even_img_1), axis=0)
+        img_2 = np.concatenate((odd_img_2, even_img_2), axis=0)
 
-    fig = plt.figure(figsize=(9, 9))
-    fig.add_subplot(2, 1, 1)
-    plt.imshow(img_1)
-    plt.axis('off')
-    fig.add_subplot(2, 1, 2)
-    plt.imshow(img_2)
-    plt.axis('off')
-    plt.suptitle(sample)
-    plt.show(block=False)
+        fig = plt.figure(figsize=(9, 9))
+        fig.add_subplot(2, 1, 1)
+        plt.imshow(img_1)
+        plt.axis('off')
+        fig.add_subplot(2, 1, 2)
+        plt.imshow(img_2)
+        plt.axis('off')
+        plt.suptitle(sample)
+        plt.show(block=False)
 
     order = input('0. 3D\n1. odd\n2. even\n> ')
 
@@ -99,7 +103,8 @@ def main(folder):
         os.system('open {}odd.nii.gz'.format(temp_folder))
         order = input('1. odd\n2. even\n> ')
 
-    plt.close()
+    if not options.no_matlab:
+        plt.close()
     new_shape = list(shape)
     new_shape[-1] *= 2
     series = np.zeros(new_shape)
