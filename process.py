@@ -42,7 +42,7 @@ def preprocess(file, resize=False, rescale=False):
 
 def uncrop(vol, shape):
     if vol.shape != constants.SHAPE:
-        raise ValueError('The volume shape {} is not supported.'.format(constants.SHAPE))
+        raise ValueError('The volume shape {} is not supported.'.format(vol.SHAPE))
     if (shape[0] < vol.shape[0] or
         shape[1] < vol.shape[1] or
         shape[2] < vol.shape[2]):
