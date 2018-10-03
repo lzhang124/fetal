@@ -175,23 +175,16 @@ def run(options):
     logging.info('Creating data generators.')
     train_files = ['data/raw/{}/{}_0.nii.gz'.format(sample, sample) for sample in train]
     train_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in train]
-    train_gen = AugmentGenerator(train_files,
-                                 label_files=train_label_files)
+    train_gen = AugmentGenerator(train_files, label_files=train_label_files)
     
     val_files = ['data/raw/{}/{}_0.nii.gz'.format(sample, sample) for sample in val]
     val_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in val]
-    val_gen = VolumeGenerator(val_files,
-                              label_files=val_label_files,
-                              load_files=True,
-                              include_labels=True)
+    val_gen = VolumeGenerator(val_files, label_files=val_label_files, load_files=True, include_labels=True)
 
     test_files = ['data/raw/{}/{}_0.nii.gz'.format(sample, sample) for sample in test]
     test_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in test]
-    pred_gen = VolumeGenerator(test_files,
-                               include_labels=False)
-    test_gen = VolumeGenerator(test_files,
-                               label_files=test_label_files,
-                               include_labels=True)
+    pred_gens = [VolumeGenerator(test_file, include_labels=False) for test_file in test_files]
+    test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
     logging.info('Compiling model.')
     model.compile(util.get_weights(train_gen.labels))
