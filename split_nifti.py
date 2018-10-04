@@ -9,7 +9,7 @@ from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
 parser.add_argument('folder', type=str, nargs=1)
-parser.add_argument('--no_matlab', action='store_false')
+parser.add_argument('--no-matlab', dest='no_matlab', action='store_false')
 options = parser.parse_args()
 
 if not options.no_matlab:
