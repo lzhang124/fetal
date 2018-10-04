@@ -182,6 +182,7 @@ def run(options):
     val_gen = VolumeGenerator(val_files, label_files=val_label_files, load_files=True, include_labels=True)
 
     test_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in test]
+    print(test_files)
     test_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in test]
     pred_gens = [VolumeGenerator(test_file, include_labels=False) for test_file in test_files]
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
