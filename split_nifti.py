@@ -9,10 +9,10 @@ from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
 parser.add_argument('folder', type=str, nargs=1)
-parser.add_argument('--no-matlab', dest='no_matlab', action='store_false')
+parser.add_argument('--matlab', action='store_false')
 options = parser.parse_args()
 
-if not options.no_matlab:
+if options.matlab:
     import matplotlib.pyplot as plt
 
 
@@ -52,7 +52,7 @@ def main(folder):
 
     odds = np.concatenate((np.zeros([1,] + list(shape[1:])), odds))
     
-    if not options.no_matlab:
+    if options.matlab:
         even_1 = evens[shape[0]//3,shape[1]//2,...]
         even_2 = evens[shape[0]*2//3,shape[1]//2,...]
         odd_1 = odds[shape[0]//3,shape[1]//2,...]
@@ -103,7 +103,7 @@ def main(folder):
         os.system('open {}odd.nii.gz'.format(temp_folder))
         order = input('1. odd\n2. even\n> ')
 
-    if not options.no_matlab:
+    if options.matlab:
         plt.close()
     new_shape = list(shape)
     new_shape[-1] *= 2
