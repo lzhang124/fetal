@@ -173,10 +173,12 @@ def main(folder):
         new_shape[-1] *= 2
         series = np.zeros(new_shape)
 
-        if order == '1':
+        # if order == '1':
+        if order == 1:
             series[...,::2] = odds
             series[...,1::2] = evens
-        elif order == '2':
+        # elif order == '2':
+        elif order == 2:
             series[...,::2] = evens
             series[...,1::2] = odds
         else:
