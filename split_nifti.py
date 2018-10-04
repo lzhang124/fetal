@@ -80,6 +80,7 @@ def main(folder):
     # sample = folder.split('/')[2]
     
     for sample in samples:
+        print(sample)
         # files = glob.glob(folder + '*.nii.gz')
         files = glob.glob('data/nifti/{}/*.nii.gz'.format(sample))
         vols = np.concatenate([util.read_vol(file) for file in files], axis=-1)
