@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
-# parser.add_argument('folder', type=str, nargs=1)
+parser.add_argument('folder', type=str, nargs=1)
 parser.add_argument('--matlab', action='store_false')
 options = parser.parse_args()
 
@@ -80,7 +80,8 @@ def main(folder):
     # sample = folder.split('/')[2]
     
     for sample in samples:
-        files = glob.glob(folder + '*.nii.gz')
+        # files = glob.glob(folder + '*.nii.gz')
+        files = glob.glob('data/nifti/{}/*.nii.gz'.format(sample))
         vols = np.concatenate([util.read_vol(file) for file in files], axis=-1)
         if vols.shape[0] == vols.shape[1] == vols.shape[2]:
             axis = int(input('shape: {}\n> '.format(vols.shape)))
