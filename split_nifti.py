@@ -123,7 +123,7 @@ def main(folder):
     new_folder = 'data/raw/{}/'.format(folder.split('/')[2])
     os.makedirs(new_folder, exist_ok=True)
     for i in range(new_shape[-1]):
-        util.save_vol(series[...,i], new_folder + sample + '_{}.nii.gz'.format(i))
+        util.save_vol(series[...,i], new_folder + sample + '_{}.nii.gz'.format(str(i).zfill(4)))
 
 
 if __name__ == '__main__':
