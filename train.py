@@ -16,6 +16,10 @@ parser.add_argument('--test',
                     metavar='INPUT_FILES, [SEED_FILES,] LABEL_FILES',
                     help='Test model',
                     dest='test', type=str, nargs='+')
+parser.add_argument('--model',
+                    metavar='Model',
+                    help='Model',
+                    dest='model', type=str)
 parser.add_argument('--organ',
                     metavar='ORGAN',
                     help='Organ to segment',
@@ -40,10 +44,6 @@ parser.add_argument('--model-file',
                     metavar='MODEL_FILE',
                     help='Pretrained model file',
                     dest='model_file', type=str)
-parser.add_argument('--size',
-                    metavar='SIZE',
-                    help='Size of UNet',
-                    dest='size', type=str)
 parser.add_argument('--gpu',
                     metavar='GPU',
                     help='Which GPU to use',
@@ -63,7 +63,15 @@ import numpy as np
 import time
 import util
 from data import AugmentGenerator, VolumeGenerator
-from models import UNet, UNetSmall
+from models import UNet, UNetSmall, ACNN, AESeg
+
+
+MODELS = {
+    'unet': Unet,
+    'unet-small': UNetSmall,
+    'acnn': ACNN,
+    'aeseg': AESeg,
+}
 
 
 def main(options):
@@ -75,13 +83,7 @@ def main(options):
         shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
     if options.concat:
         shape = tuple(list(shape[:-1]) + [shape[-1] + 2])
-    if options.size == 'small':
-        m = UNetSmall
-    elif options.size == 'big':
-        m = UNetBig
-    else:
-        m = UNet
-    model = m(shape, name=options.name, filename=options.model_file)
+    model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
 
     gen_seed = (options.seed == 'slice' or options.seed == 'volume')
 
@@ -164,13 +166,7 @@ def run(options):
 
     logging.info('Creating model.')
     shape = constants.SHAPE
-    if options.size == 'small':
-        m = UNetSmall
-    elif options.size == 'big':
-        m = UNetBig
-    else:
-        m = UNet
-    model = m(shape, name='unet_{}'.format(options.organ), filename=options.model_file)
+    model = model = MODELS[options.model](shape, name='{}_{}'.format(options.model, options.organ), filename=options.model_file)
 
     logging.info('Creating data generators.')
     train_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in train]
