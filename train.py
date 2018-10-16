@@ -193,7 +193,7 @@ def run(options):
 
     logging.info('Making predictions.')
     for pred_gen in pred_gens:
-        model.predict(pred_gen, 'data/predict/')
+        model.predict(pred_gen, 'data/predict/{}/'.format(options.model))
 
     logging.info('Testing model.')
     metrics = model.test(test_gen)

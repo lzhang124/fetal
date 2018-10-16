@@ -79,7 +79,7 @@ class BaseModel:
         raise NotImplementedError()
 
     def train(self, generator, val_gen, epochs, tensorboard=False):
-        callbacks = [TensorBoard(log_dir='./logs/{}'.format(time()))] if tensorboard else []
+        callbacks = [TensorBoard(log_dir='./logs/{}/{}'.format(self.name, time()))] if tensorboard else []
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
