@@ -67,7 +67,7 @@ from models import UNet, UNetSmall, ACNN, AESeg
 
 
 MODELS = {
-    'unet': Unet,
+    'unet': UNet,
     'unet-small': UNetSmall,
     'acnn': ACNN,
     'aeseg': AESeg,
