@@ -4,6 +4,7 @@ import util
 from datetime import datetime
 from keras.models import Model
 from keras.optimizers import Adam
+from keras.losses import mean_squared_error
 from keras.callbacks import TensorBoard
 from keras import backend as K
 from keras import layers
@@ -42,13 +43,21 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
     return loss_fn
 
 
-def combination(weights, fns):
-    assert len(weights) == len(fns):
+def acnn_loss(weight=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
-        loss = 0
-        for i in range(len(weights)):
-            loss += weights[i] * fns[i](y_true, y_pred)
-        return loss
+        seg, ae_seg = y_pred
+        seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
+        ae_loss = weighted_crossentropy(weight)(seg, ae_seg)
+        return (seg_loss + ae_loss)/2
+    return loss_fn
+
+
+def aeseg_loss(weight=None, boundary_weight=None):
+    def loss_fn(y_true, y_pred):
+        vol, seg, ae_vol = y_pred
+        seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
+        ae_loss = mean_squared_error(vol, ae_vol)
+        return (seg_loss + ae_loss)/2
     return loss_fn
 
 
@@ -140,7 +149,7 @@ class UNet(BaseModel):
     def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=weighted_crossentropy(weight=weight, boundary_weight=2.),
-                           metrics=['accuracy', dice_coef])
+                           metrics=[dice_coef])
 
 
 class UNetSmall(UNet):
@@ -265,12 +274,14 @@ class ACNN(BaseModel):
 
         ae_outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(ae_conv9)
 
+        outputs = layers.concatenate([outputs, ae_outputs])
+
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=2.),
-                           metrics=['accuracy', dice_coef])
+                           loss=acnn_loss(weight=weight, boundary_weight=2.),
+                           metrics=[dice_coef])
 
 
 class AESeg(BaseModel):
@@ -336,9 +347,11 @@ class AESeg(BaseModel):
 
         ae_outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(ae_conv9)
 
+        outputs = layers.concatenate([inputs, outputs, ae_outputs])
+
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=2.),
-                           metrics=['accuracy', dice_coef])
+                           loss=aeseg_loss(weight=weight, boundary_weight=2.),
+                           metrics=[dice_coef])
