@@ -240,40 +240,40 @@ class ACNN(BaseModel):
 
         outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(conv9)
 
-        ae_conv1 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(outputs)
-        ae_conv1 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(ae_conv1)
+        ae_conv1 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(outputs)
+        ae_conv1 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(ae_conv1)
         ae_pool1 = layers.MaxPooling3D(pool_size=(2, 2, 2))(ae_conv1)
 
-        ae_conv2 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(ae_pool1)
-        ae_conv2 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(ae_conv2)
+        ae_conv2 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_pool1)
+        ae_conv2 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_conv2)
         ae_pool2 = layers.MaxPooling3D(pool_size=(2, 2, 2))(ae_conv2)
 
-        ae_conv3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_pool2)
-        ae_conv3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_conv3)
+        ae_conv3 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_pool2)
+        ae_conv3 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_conv3)
         ae_pool3 = layers.MaxPooling3D(pool_size=(2, 2, 2))(ae_conv3)
 
-        ae_conv4 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_pool3)
-        ae_conv4 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_conv4)
+        ae_conv4 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_pool3)
+        ae_conv4 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_conv4)
         ae_pool4 = layers.MaxPooling3D(pool_size=(2, 2, 2))(ae_conv4)
 
-        ae_conv5 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_pool4)
-        ae_repr = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_conv5)
+        ae_conv5 = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(ae_pool4)
+        ae_repr = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(ae_conv5)
 
-        ae_up6 = layers.Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_repr)
-        ae_conv6 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_up6)
-        ae_conv6 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_conv6)
+        ae_up6 = layers.Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_repr)
+        ae_conv6 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_up6)
+        ae_conv6 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_conv6)
 
-        ae_up7 = layers.Conv3DTranspose(64, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_conv6)
-        ae_conv7 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_up7)
-        ae_conv7 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_conv7)
+        ae_up7 = layers.Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_conv6)
+        ae_conv7 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_up7)
+        ae_conv7 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(ae_conv7)
 
-        ae_up8 = layers.Conv3DTranspose(32, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_conv7)
-        ae_conv8 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(ae_up8)
-        ae_conv8 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(ae_conv8)
+        ae_up8 = layers.Conv3DTranspose(64, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_conv7)
+        ae_conv8 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_up8)
+        ae_conv8 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(ae_conv8)
 
-        ae_up9 = layers.Conv3DTranspose(16, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_conv8)
-        ae_conv9 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(ae_up9)
-        ae_conv9 = layers.Conv3D(16, (3, 3, 3), activation='relu', padding='same')(ae_conv9)
+        ae_up9 = layers.Conv3DTranspose(32, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_conv8)
+        ae_conv9 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(ae_up9)
+        ae_conv9 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(ae_conv9)
 
         ae_outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(ae_conv9)
 
