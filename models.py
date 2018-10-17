@@ -10,7 +10,6 @@ from keras import backend as K
 from keras import layers
 from process import uncrop
 from time import time
-from tensorflow import unstack
 
 
 def dice_coef(y_true, y_pred):
@@ -46,7 +45,8 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
 
 def acnn_loss(weight=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
-        seg, ae_seg = unstack(y_pred)
+        seg = y_pred[:,0]
+        ae_seg = y_pred[:,1]
         seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
         ae_loss = weighted_crossentropy(weight)(seg, ae_seg)
         return (seg_loss + ae_loss)/2
@@ -55,7 +55,9 @@ def acnn_loss(weight=None, boundary_weight=None):
 
 def aeseg_loss(weight=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
-        vol, seg, ae_vol = unstack(y_pred)
+        vol = y_pred[:,0]
+        seg = y_pred[:,1]
+        ae_vol = y_pred[:,2]
         seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
         ae_loss = mean_squared_error(vol, ae_vol)
         return (seg_loss + ae_loss)/2
@@ -275,7 +277,7 @@ class ACNN(BaseModel):
 
         ae_outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(ae_conv9)
 
-        outputs = K.stack([outputs, ae_outputs])
+        outputs = layers.concatenate([outputs, ae_outputs])
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
@@ -348,7 +350,7 @@ class AESeg(BaseModel):
 
         ae_outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(ae_conv9)
 
-        outputs = K.stack([inputs, outputs, ae_outputs])
+        outputs = layers.concatenate([inputs, outputs, ae_outputs])
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
