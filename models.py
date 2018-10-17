@@ -45,8 +45,8 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
 
 def acnn_loss(weight=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
-        seg = y_pred[:,0]
-        ae_seg = y_pred[:,1]
+        seg = y_pred[...,0]
+        ae_seg = y_pred[...,1]
         seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
         ae_loss = weighted_crossentropy(weight)(seg, ae_seg)
         return (seg_loss + ae_loss)/2
@@ -54,14 +54,14 @@ def acnn_loss(weight=None, boundary_weight=None):
 
 
 def acnn_dice(y_true, y_pred):
-    return dice_coef(y_true, y_pred[:,0])
+    return dice_coef(y_true, y_pred[...,0])
 
 
 def aeseg_loss(weight=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
-        vol = y_pred[:,0]
-        seg = y_pred[:,1]
-        ae_vol = y_pred[:,2]
+        vol = y_pred[...,0]
+        seg = y_pred[...,1]
+        ae_vol = y_pred[...,2]
         seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
         ae_loss = mean_squared_error(vol, ae_vol)
         return (seg_loss + ae_loss)/2
@@ -69,7 +69,7 @@ def aeseg_loss(weight=None, boundary_weight=None):
 
 
 def aeseg_dice(y_true, y_pred):
-    return dice_coef(y_true, y_pred[:,1])
+    return dice_coef(y_true, y_pred[...,1])
 
 
 class BaseModel:
