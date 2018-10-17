@@ -53,6 +53,10 @@ def acnn_loss(weight=None, boundary_weight=None):
     return loss_fn
 
 
+def acnn_dice(y_true, y_pred):
+    return dice_coef(y_true, y_pred[:,0])
+
+
 def aeseg_loss(weight=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
         vol = y_pred[:,0]
@@ -62,6 +66,10 @@ def aeseg_loss(weight=None, boundary_weight=None):
         ae_loss = mean_squared_error(vol, ae_vol)
         return (seg_loss + ae_loss)/2
     return loss_fn
+
+
+def aeseg_dice(y_true, y_pred):
+    return dice_coef(y_true, y_pred[:,1])
 
 
 class BaseModel:
@@ -284,7 +292,7 @@ class ACNN(BaseModel):
     def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=acnn_loss(weight=weight, boundary_weight=2.),
-                           metrics=[dice_coef])
+                           metrics=[acnn_dice])
 
 
 class AESeg(BaseModel):
@@ -357,4 +365,4 @@ class AESeg(BaseModel):
     def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=aeseg_loss(weight=weight, boundary_weight=2.),
-                           metrics=[dice_coef])
+                           metrics=[aeseg_dice])
