@@ -23,7 +23,7 @@ parser.add_argument('--model',
 parser.add_argument('--organ',
                     metavar='ORGAN',
                     help='Organ to segment',
-                    dest='organ', type=str, nargs=1)
+                    dest='organ', type=str, required=True)
 parser.add_argument('--seed',
                     metavar='SEED_TYPE',
                     help='Seed slices',
@@ -47,7 +47,7 @@ parser.add_argument('--model-file',
 parser.add_argument('--gpu',
                     metavar='GPU',
                     help='Which GPU to use',
-                    dest='gpu', type=str, nargs=1)
+                    dest='gpu', type=str)
 parser.add_argument('--run',
                     dest='run', action='store_true')
 parser.add_argument('--tensorboard',
@@ -55,7 +55,7 @@ parser.add_argument('--tensorboard',
 options = parser.parse_args()
 
 if options.gpu:
-    os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu[0]
+    os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
 
 import constants
 import glob
@@ -155,7 +155,7 @@ def run(options):
     np.random.seed(12345)
     start = time.time()
     metrics = {}
-    organ = 'all_brains' if options.organ[0] == 'brains' else options.organ[0]
+    organ = 'all_brains' if options.organ == 'brains' else options.organ
 
     logging.info('Splitting data.')
     n = len(constants.SAMPLES)
