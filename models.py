@@ -72,6 +72,14 @@ def aeseg_dice(y_true, y_pred):
     return dice_coef(y_true, y_pred[...,1:2])
 
 
+def save_predictions(preds, generator, path):
+    #FIXME
+    for i in range(preds.shape[0]):
+        fname = generator.inputs[i].split('/')[-1]
+        header = util.header(generator.inputs[i])
+        util.save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
+
+
 class BaseModel:
     def __init__(self, input_size, name=None, filename=None):
         self.input_size = input_size
@@ -81,7 +89,7 @@ class BaseModel:
             self.model.load_weights(filename)
 
     def _new_model(self):
-        raise NotImplementedError()
+        raise NotImplementedError()        
 
     def save(self):
         self.model.save('models/{}_weights.{}.h5'.format(self.name, datetime.now().strftime('%m.%d.%y-%H:%M:%S')))
@@ -99,11 +107,7 @@ class BaseModel:
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator, verbose=1)
-        # FIXME
-        for i in range(preds.shape[0]):
-            fname = generator.inputs[i].split('/')[-1]
-            header = util.header(generator.inputs[i])
-            util.save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
+        save_predictions(preds, generator, path)
 
     def test(self, generator):
         return self.model.evaluate_generator(generator)
@@ -294,6 +298,10 @@ class ACNN(BaseModel):
                            loss=acnn_loss(weight=weight, boundary_weight=2.),
                            metrics=[acnn_dice])
 
+    def predict(self, generator, path):
+        preds = [pred[0] for pred in self.model.predict_generator(generator, verbose=1)]
+        save_predictions(preds, generator, path)
+
 
 class AESeg(BaseModel):
     def _new_model(self):
@@ -366,3 +374,7 @@ class AESeg(BaseModel):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=aeseg_loss(weight=weight, boundary_weight=2.),
                            metrics=[aeseg_dice])
+
+    def predict(self, generator, path):
+        preds = [pred[0] for pred in self.model.predict_generator(generator, verbose=1)]
+        save_predictions(preds, generator, path)
