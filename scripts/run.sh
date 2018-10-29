@@ -10,4 +10,5 @@ python_exe=${placenta_dir}/venv/bin/python
 ###################
 
 cd ${placenta_dir}
-${python_exe} train.py "$@" & tensorboard --logdirs=logs/
+${python_exe} train.py "$@" &
+tensorboard --logdirs=logs/
