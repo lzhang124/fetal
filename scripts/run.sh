@@ -10,5 +10,8 @@ python_exe=${placenta_dir}/venv/bin/python
 ###################
 
 cd ${placenta_dir}
-${python_exe} train.py "$@" &
-tensorboard --logdir=logs/ --port=6120
+if [ $1 = "view" ]; then
+    shift
+    tensorboard --logdir=logs/ --port=6120 &
+fi
+${python_exe} train.py "$@"
