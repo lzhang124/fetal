@@ -77,6 +77,7 @@ def save_predictions(preds, generator, path):
     for i in range(preds.shape[0]):
         fname = generator.inputs[i].split('/')[-1]
         header = util.header(generator.inputs[i])
+        os.makedirs(path, exist_ok=True)
         util.save_vol(uncrop(preds[i], generator.shape), os.path.join(path, fname), header)
 
 
