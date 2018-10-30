@@ -292,12 +292,19 @@ class ACNN(BaseModel):
 
         outputs = layers.concatenate([outputs, ae_outputs])
 
+        self.ae = Model(inputs=outputs, outputs=ae_outputs)
         self.model = Model(inputs=inputs, outputs=outputs)
+
+    def save(self):
+        pass
 
     def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=acnn_loss(weight=weight, boundary_weight=2.),
                            metrics=[acnn_dice])
+
+    def train(self, generator, val_gen, epochs, tensorboard=False):
+        pass
 
     def predict(self, generator, path):
         preds = [pred[0] for pred in self.model.predict_generator(generator, verbose=1)]
@@ -377,5 +384,5 @@ class AESeg(BaseModel):
                            metrics=[aeseg_dice])
 
     def predict(self, generator, path):
-        preds = [pred[0] for pred in self.model.predict_generator(generator, verbose=1)]
+        preds = [pred[1] for pred in self.model.predict_generator(generator, verbose=1)]
         save_predictions(preds, generator, path)
