@@ -9,14 +9,13 @@ from argparse import ArgumentParser
 from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
-parser.add_argument('folder', type=str, nargs=1)
+parser.add_argument('folder', type=str, required=True)
 options = parser.parse_args()
 
 
 def main(folder):
     sample = folder.split('/')[2]
     
-    files = glob.glob(folder + '*.nii.gz')
     files = glob.glob('data/nifti/{}/*.nii.gz'.format(sample))
     vols = np.concatenate([util.read_vol(file) for file in files], axis=-1)
     if vols.shape[0] == vols.shape[1] == vols.shape[2]:
@@ -92,12 +91,12 @@ def main(folder):
         odd_img[...,::2] = odd
         odd_img[...,1::2] = even
 
-        temp_folder = 'data/temp/'
+        temp_folder = 'data/temp'
         os.makedirs(temp_folder, exist_ok=True)
         util.save_vol(even_img, temp_folder + 'even.nii.gz')
         util.save_vol(odd_img, temp_folder + 'odd.nii.gz')
-        os.system('open {}even.nii.gz'.format(temp_folder))
-        os.system('open {}odd.nii.gz'.format(temp_folder))
+        os.system('open {}/even.nii.gz'.format(temp_folder))
+        os.system('open {}/odd.nii.gz'.format(temp_folder))
         order = input('1. odd\n2. even\n> ')
 
     plt.close()
@@ -123,4 +122,4 @@ def main(folder):
 
 
 if __name__ == '__main__':
-    main(options.folder[0])
+    main(options.folder)
