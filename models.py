@@ -208,6 +208,55 @@ class UNetSmall(UNet):
         self.model = Model(inputs=inputs, outputs=outputs)
 
 
+class AutoEncoder(BaseModel):
+    def _new_model(self):
+        inputs = layers.Input(shape=self.input_size)
+
+        conv1 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(inputs)
+        conv1 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv1)
+        pool1 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv1)
+
+        conv2 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(pool1)
+        conv2 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv2)
+        pool2 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv2)
+
+        conv3 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(pool2)
+        conv3 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv3)
+        pool3 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv3)
+
+        conv4 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(pool3)
+        conv4 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv4)
+        pool4 = layers.MaxPooling3D(pool_size=(2, 2, 2))(conv4)
+
+        conv5 = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(pool4)
+        encoding = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(conv5)
+
+        up6 = layers.Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(encoding)
+        conv6 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(up6)
+        conv6 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(conv6)
+
+        up7 = layers.Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv6)
+        conv7 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(up7)
+        conv7 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(conv7)
+
+        up8 = layers.Conv3DTranspose(64, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv7)
+        conv8 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(up8)
+        conv8 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(conv8)
+
+        up9 = layers.Conv3DTranspose(32, (2, 2, 2), strides=(2, 2, 2), padding='same')(conv8)
+        conv9 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(up9)
+        conv9 = layers.Conv3D(32, (3, 3, 3), activation='relu', padding='same')(conv9)
+
+        outputs = layers.Conv3D(1, (1, 1, 1), activation='sigmoid')(conv9)
+
+        self.model = Model(inputs=inputs, outputs=outputs)
+
+    def compile(self, weight=None):
+        self.model.compile(optimizer=Adam(lr=1e-4),
+                           loss=weighted_crossentropy(weight=weight, boundary_weight=2.),
+                           metrics=[dice_coef])
+
+
 class ACNN(BaseModel):
     def _new_model(self):
         inputs = layers.Input(shape=self.input_size)
@@ -270,9 +319,9 @@ class ACNN(BaseModel):
         ae_pool4 = layers.MaxPooling3D(pool_size=(2, 2, 2))(ae_conv4)
 
         ae_conv5 = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(ae_pool4)
-        ae_repr = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(ae_conv5)
+        ae_encoding = layers.Conv3D(512, (3, 3, 3), activation='relu', padding='same')(ae_conv5)
 
-        ae_up6 = layers.Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_repr)
+        ae_up6 = layers.Conv3DTranspose(256, (2, 2, 2), strides=(2, 2, 2), padding='same')(ae_encoding)
         ae_conv6 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_up6)
         ae_conv6 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(ae_conv6)
 
@@ -292,19 +341,12 @@ class ACNN(BaseModel):
 
         outputs = layers.concatenate([outputs, ae_outputs])
 
-        self.ae = Model(inputs=outputs, outputs=ae_outputs)
         self.model = Model(inputs=inputs, outputs=outputs)
-
-    def save(self):
-        pass
 
     def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=acnn_loss(weight=weight, boundary_weight=2.),
                            metrics=[acnn_dice])
-
-    def train(self, generator, val_gen, epochs, tensorboard=False):
-        pass
 
     def predict(self, generator, path):
         preds = [pred[0] for pred in self.model.predict_generator(generator, verbose=1)]
@@ -384,5 +426,5 @@ class AESeg(BaseModel):
                            metrics=[aeseg_dice])
 
     def predict(self, generator, path):
-        preds = [pred[1] for pred in self.model.predict_generator(generator, verbose=1)]
+        preds = np.array([pred[1] for pred in self.model.predict_generator(generator, verbose=1)])
         save_predictions(preds, generator, path)

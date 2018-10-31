@@ -166,7 +166,7 @@ def run(options):
 
     logging.info('Creating model.')
     shape = constants.SHAPE
-    model = model = MODELS[options.model](shape, name='{}_{}'.format(options.model, options.organ), filename=options.model_file)
+    model = MODELS[options.model](shape, name='{}_{}'.format(options.model, options.organ), filename=options.model_file)
 
     logging.info('Creating data generators.')
     train_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in train]
@@ -185,11 +185,14 @@ def run(options):
     logging.info('Compiling model.')
     model.compile(util.get_weights(train_gen.labels))
 
-    logging.info('Training model.')
-    model.train(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+    # logging.info('Training model.')
+    # if options.model == 'acnn':
+    #     model.train_ae(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+    #     model.save_ae()
+    # model.train(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
 
-    logging.info('Saving model.')
-    model.save()
+    # logging.info('Saving model.')
+    # model.save()
 
     logging.info('Making predictions.')
     for pred_gen in pred_gens:
