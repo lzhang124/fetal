@@ -8,7 +8,7 @@ import util
 from argparse import ArgumentParser
 
 parser = ArgumentParser()
-parser.add_argument('model', type=str, required=True)
+parser.add_argument('model', type=str)
 options = parser.parse_args()
 
 

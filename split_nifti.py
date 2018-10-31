@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 from scipy.interpolate import interp1d
 
 parser = ArgumentParser()
-parser.add_argument('folder', type=str, required=True)
+parser.add_argument('folder', type=str)
 options = parser.parse_args()
 
 
