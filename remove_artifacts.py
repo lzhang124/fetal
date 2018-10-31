@@ -31,6 +31,7 @@ def main(model):
         label = glob.glob('data/labels/{}/{}_0_all_brains.nii.gz'.format(sample, sample))[0]
         metrics[sample] = dice_coef(util.read_vol(label), volume)
 
+        os.makedirs('data/predict_cleaned/{}/'.format(model), exist_ok=True)
         util.save_vol(volume, 'data/predict_cleaned/{}/{}_0000.nii.gz'.format(model, sample), header)
 
     print(metrics)
