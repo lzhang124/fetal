@@ -32,6 +32,10 @@ parser.add_argument('--concat',
                     metavar='INPUT_FILE, LABEL_FILE',
                     help='Concatenate first volume',
                     dest='concat', nargs=2)
+parser.add_argument('--loss',
+                    metavar='LOSS',
+                    help='Loss',
+                    dest='loss', type=str, required=True)
 parser.add_argument('--epochs',
                     metavar='EPOCHS',
                     help='Training epochs',
@@ -183,7 +187,7 @@ def run(options):
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
     logging.info('Compiling model.')
-    model.compile(util.get_weights(train_gen.labels))
+    model.compile(weight=util.get_weights(train_gen.labels), loss=)
 
     logging.info('Training model.')
     if options.model == 'acnn':

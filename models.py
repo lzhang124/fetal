@@ -96,7 +96,7 @@ class BaseModel:
     def save(self):
         self.model.save('models/{}_weights.{}.h5'.format(self.name, datetime.now().strftime('%m.%d.%y-%H:%M:%S')))
 
-    def compile(self, weight=None):
+    def compile(self, weight=None, loss=None):
         raise NotImplementedError()
 
     def train(self, generator, val_gen, epochs, tensorboard=False):
@@ -163,9 +163,17 @@ class UNet(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def compile(self, weight=None, loss=None):
+        if loss == 'dice':
+            loss = dice_loss
+        elif loss == 'crossentropy':
+            loss = weighted_crossentropy(weight=weight)
+        elif loss == 'boundary':
+            loss = weighted_crossentropy(weight=weight, boundary_weight=2.)
+        else:
+            raise ValueError('Unknown loss.')
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=2.),
+                           loss=loss,
                            metrics=[dice_coef])
 
 
@@ -252,7 +260,7 @@ class AutoEncoder(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def compile(self, weight=None, loss=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=weighted_crossentropy(weight=weight, boundary_weight=2.),
                            metrics=[dice_coef])
@@ -344,7 +352,7 @@ class ACNN(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def compile(self, weight=None, loss=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=acnn_loss(weight=weight, boundary_weight=2.),
                            metrics=[acnn_dice])
@@ -421,7 +429,7 @@ class AESeg(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def compile(self, weight=None, loss=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=aeseg_loss(weight=weight, boundary_weight=2.),
                            metrics=[aeseg_dice])
