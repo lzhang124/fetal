@@ -185,14 +185,14 @@ def run(options):
     logging.info('Compiling model.')
     model.compile(util.get_weights(train_gen.labels))
 
-    # logging.info('Training model.')
-    # if options.model == 'acnn':
-    #     model.train_ae(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
-    #     model.save_ae()
-    # model.train(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+    logging.info('Training model.')
+    if options.model == 'acnn':
+        model.train_ae(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+        model.save_ae()
+    model.train(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
 
-    # logging.info('Saving model.')
-    # model.save()
+    logging.info('Saving model.')
+    model.save()
 
     logging.info('Making predictions.')
     for pred_gen in pred_gens:
