@@ -187,7 +187,7 @@ def run(options):
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
     logging.info('Compiling model.')
-    model.compile(weight=util.get_weights(train_gen.labels), loss=)
+    model.compile(weight=util.get_weights(train_gen.labels), loss=options.loss)
 
     logging.info('Training model.')
     if options.model == 'acnn':
