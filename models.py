@@ -164,12 +164,8 @@ class UNet(BaseModel):
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def compile(self, weight=None, loss=None):
-        if loss == 'crossentropy':
-            loss = weighted_crossentropy(weight=weight)
-        else:
-            loss = weighted_crossentropy(weight=weight, boundary_weight=float(loss))
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=loss,
+                           loss=weighted_crossentropy(weight=weight, boundary_weight=float(loss)),
                            metrics=[dice_coef])
 
 

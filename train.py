@@ -35,7 +35,7 @@ parser.add_argument('--concat',
 parser.add_argument('--loss',
                     metavar='LOSS',
                     help='Loss',
-                    dest='loss', type=str, required=True)
+                    dest='loss', type=float, required=True)
 parser.add_argument('--epochs',
                     metavar='EPOCHS',
                     help='Training epochs',
