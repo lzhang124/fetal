@@ -167,6 +167,7 @@ class UNet(BaseModel):
         if loss == 'crossentropy':
             loss = weighted_crossentropy(weight=weight)
         else:
+            print(float(loss))
             loss = weighted_crossentropy(weight=weight, boundary_weight=float(loss))
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=loss,
