@@ -37,4 +37,4 @@ def get_weights(vols):
         weight += np.sum(vol)
         total += vol.size
     w = weight/total
-    return (1 - w, w)
+    return (w, 1 - w)
