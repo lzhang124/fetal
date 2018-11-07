@@ -169,7 +169,7 @@ class UNet(BaseModel):
         elif loss == 'crossentropy':
             loss = weighted_crossentropy(weight=weight)
         elif loss == 'boundary':
-            loss = weighted_crossentropy(weight=weight, boundary_weight=1.)
+            loss = weighted_crossentropy(weight=weight, boundary_weight=0.5)
         else:
             raise ValueError('Unknown loss.')
         self.model.compile(optimizer=Adam(lr=1e-4),
@@ -262,7 +262,7 @@ class AutoEncoder(BaseModel):
 
     def compile(self, weight=None, loss=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=1.),
+                           loss=weighted_crossentropy(weight=weight, boundary_weight=0.5),
                            metrics=[dice_coef])
 
 
@@ -354,7 +354,7 @@ class ACNN(BaseModel):
 
     def compile(self, weight=None, loss=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=acnn_loss(weight=weight, boundary_weight=1.),
+                           loss=acnn_loss(weight=weight, boundary_weight=0.5),
                            metrics=[acnn_dice])
 
     def predict(self, generator, path):
@@ -431,7 +431,7 @@ class AESeg(BaseModel):
 
     def compile(self, weight=None, loss=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=aeseg_loss(weight=weight, boundary_weight=1.),
+                           loss=aeseg_loss(weight=weight, boundary_weight=0.5),
                            metrics=[aeseg_dice])
 
     def predict(self, generator, path):
