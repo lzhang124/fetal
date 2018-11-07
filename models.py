@@ -164,14 +164,10 @@ class UNet(BaseModel):
         self.model = Model(inputs=inputs, outputs=outputs)
 
     def compile(self, weight=None, loss=None):
-        if loss == 'dice':
-            loss = dice_loss
-        elif loss == 'crossentropy':
+        if loss == 'crossentropy':
             loss = weighted_crossentropy(weight=weight)
-        elif loss == 'boundary':
-            loss = weighted_crossentropy(weight=weight, boundary_weight=0.5)
         else:
-            raise ValueError('Unknown loss.')
+            loss = weighted_crossentropy(weight=weight, boundary_weight=float(loss))
         self.model.compile(optimizer=Adam(lr=1e-4),
                            loss=loss,
                            metrics=[dice_coef])
@@ -260,9 +256,9 @@ class AutoEncoder(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None, loss=None):
+    def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=0.5),
+                           loss=weighted_crossentropy(weight=weight, boundary_weight=1.),
                            metrics=[dice_coef])
 
 
@@ -352,9 +348,9 @@ class ACNN(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None, loss=None):
+    def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=acnn_loss(weight=weight, boundary_weight=0.5),
+                           loss=acnn_loss(weight=weight, boundary_weight=1.),
                            metrics=[acnn_dice])
 
     def predict(self, generator, path):
@@ -429,9 +425,9 @@ class AESeg(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None, loss=None):
+    def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=aeseg_loss(weight=weight, boundary_weight=0.5),
+                           loss=aeseg_loss(weight=weight, boundary_weight=1.),
                            metrics=[aeseg_dice])
 
     def predict(self, generator, path):
