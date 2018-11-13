@@ -427,5 +427,8 @@ class AESeg(BaseModel):
                            metrics=[aeseg_dice])
 
     def predict(self, generator, path):
-        preds = np.array([pred[...,1:2] for pred in self.model.predict_generator(generator, verbose=1)])
-        save_predictions(preds, generator, path)
+        preds = self.model.predict_generator(generator, verbose=1)
+        vols = np.array([pred[...,0:1] for pred in preds])
+        segs = np.array([pred[...,1:2] for pred in preds])
+        save_predictions(vols, generator, path + 'ae_reconstructions/')
+        save_predictions(segs, generator, path)
