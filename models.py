@@ -40,7 +40,6 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
                          * K.cast(y_true_avg <= 1 - epsilon, 'float32')
             loss += cross_entropy * K.stack([boundaries, boundaries], axis=-1) * boundary_weight
 
-        print(K.sum(loss, axis=-1))
         return K.mean(K.sum(loss, axis=-1))
     return loss_fn
 
