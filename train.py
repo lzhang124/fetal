@@ -19,7 +19,7 @@ parser.add_argument('--test',
 parser.add_argument('--model',
                     metavar='Model',
                     help='Model',
-                    dest='model', type=str)
+                    dest='model', type=str, required=True)
 parser.add_argument('--organ',
                     metavar='ORGAN',
                     help='Organ to segment',
@@ -43,7 +43,7 @@ parser.add_argument('--epochs',
 parser.add_argument('--name',
                     metavar='MODEL_NAME',
                     help='Name of model',
-                    dest='name', type=str)
+                    dest='name', type=str, required=True)
 parser.add_argument('--model-file',
                     metavar='MODEL_FILE',
                     help='Pretrained model file',
@@ -170,7 +170,7 @@ def run(options):
 
     logging.info('Creating model.')
     shape = constants.SHAPE
-    model = MODELS[options.model](shape, name='{}_{}'.format(options.model, options.organ), filename=options.model_file)
+    model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
 
     logging.info('Creating data generators.')
     train_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in train]

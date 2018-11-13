@@ -94,13 +94,13 @@ class BaseModel:
         raise NotImplementedError()        
 
     def save(self):
-        self.model.save('models/{}_weights.{}.h5'.format(self.name, datetime.now().strftime('%m.%d.%y-%H:%M:%S')))
+        self.model.save('models/{}.h5'.format(self.name))
 
     def compile(self, weight=None, loss=None):
         raise NotImplementedError()
 
     def train(self, generator, val_gen, epochs, tensorboard=False):
-        callbacks = [TensorBoard(log_dir='./logs/{}/{}'.format(self.name, time()))] if tensorboard else []
+        callbacks = [TensorBoard(log_dir='./logs/{}'.format(self.name))] if tensorboard else []
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
