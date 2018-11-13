@@ -33,7 +33,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
         cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))],
                                 axis=0)
         print(cross_entropy)
-        loss = cross_entropy * w
+        loss = K.dot(w, cross_entropy)
         print(loss)
 
         if boundary_weight is not None:
