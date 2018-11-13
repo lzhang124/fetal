@@ -1,6 +1,6 @@
 import numpy as np
 import os
-import tensorflow as tf
+# import tensorflow as tf
 import util
 from datetime import datetime
 from keras.models import Model
@@ -31,7 +31,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
     def loss_fn(y_true, y_pred):
         y_pred = K.clip(y_pred, epsilon, 1 - epsilon)
         cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))],
-                                axis=0)
+                                axis=-1)
         print(cross_entropy)
         loss = w * cross_entropy
         print(loss)
@@ -40,9 +40,9 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
             # boundaries = K.cast(y_true_avg > 0, 'float32') * K.cast(y_true_avg < 1, 'float32')
             boundaries = K.map_fn(lambda x: x > 0 and x < 1, y_true_avg, dtype='float32')
-            loss += boundary_weight * K.stack([boundaries, boundaries], axis=0) * cross_entropy
+            loss += boundary_weight * K.stack([boundaries, boundaries], axis=-1) * cross_entropy
 
-        return K.mean(K.sum(loss, axis=0))
+        return K.mean(K.sum(loss, axis=-1))
     return loss_fn
 
 
