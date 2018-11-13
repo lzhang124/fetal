@@ -165,7 +165,7 @@ class UNet(BaseModel):
 
     def compile(self, weight=None, loss=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=float(loss)),
+                           loss=weighted_crossentropy(weight=weight, boundary_weight=loss),
                            metrics=[dice_coef])
 
 
