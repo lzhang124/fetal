@@ -37,7 +37,6 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
         if boundary_weight is not None:
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
             boundaries = K.cast(y_true_avg > 0, 'float32') * K.cast(y_true_avg < 1, 'float32')
-            util.save_vol(K.eval(boundaries), 'test.nii.gz')
             loss += boundary_weight * K.stack([boundaries, boundaries], axis=-1) * cross_entropy
 
         return K.mean(K.sum(loss, axis=-1))
