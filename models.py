@@ -32,14 +32,12 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
         y_pred = K.clip(y_pred, epsilon, 1 - epsilon)
         cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))],
                                 axis=-1)
-        print(cross_entropy)
         loss = w * cross_entropy
-        print(loss)
 
         if boundary_weight is not None:
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
-            # boundaries = K.cast(y_true_avg > 0, 'float32') * K.cast(y_true_avg < 1, 'float32')
-            boundaries = K.map_fn(lambda x: x > 0 and x < 1, y_true_avg, dtype='float32')
+            boundaries = K.cast(y_true_avg > 0, 'float32') * K.cast(y_true_avg < 1, 'float32')
+            util.save_vol(K.eval(boundaries), 'test.nii.gz')
             loss += boundary_weight * K.stack([boundaries, boundaries], axis=-1) * cross_entropy
 
         return K.mean(K.sum(loss, axis=-1))
