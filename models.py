@@ -24,20 +24,20 @@ def dice_loss(y_true, y_pred):
     return 1 - dice_coef(y_true, y_pred)
 
 
-def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
+def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
     w = (.5, .5) if weight is None else weight
     epsilon = K.epsilon()
 
     def loss_fn(y_true, y_pred):
         y_pred = K.clip(y_pred, epsilon, 1 - epsilon)
-        cross_entropy = K.stack([-(y_true * K.log(y_pred)), -((1 - y_true) * K.log(1 - y_pred))],
+        cross_entropy = K.stack([-(w[0] * y_true * K.log(y_pred)),
+                                 -(w[1] * (1 - y_true) * K.log(1 - y_pred))],
                                 axis=-1)
-        loss = cross_entropy * w
+        # loss = cross_entropy * w
 
         if boundary_weight is not None:
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
-            boundaries = K.cast(y_true_avg >= epsilon, 'float32') \
-                         * K.cast(y_true_avg <= 1 - epsilon, 'float32')
+            boundaries = K.cast(y_true_avg >= 0, 'float32') + K.cast(y_true_avg <= 1, 'float32')
             loss += cross_entropy * K.stack([boundaries, boundaries], axis=-1) * boundary_weight
 
         return K.mean(K.sum(loss, axis=-1))
