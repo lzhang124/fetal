@@ -40,6 +40,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=3):
                          * K.cast(y_true_avg <= 1 - epsilon, 'float32')
             loss += cross_entropy * K.stack([boundaries, boundaries], axis=-1) * boundary_weight
 
+        print(K.sum(loss, axis=-1))
         return K.mean(K.sum(loss, axis=-1))
     return loss_fn
 
@@ -99,13 +100,12 @@ class BaseModel:
     def compile(self, weight=None, loss=None):
         raise NotImplementedError()
 
-    def train(self, generator, val_gen, epochs, tensorboard=False):
-        callbacks = [TensorBoard(log_dir='./logs/{}'.format(self.name))] if tensorboard else []
+    def train(self, generator, val_gen, epochs):
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=callbacks)
+                                 callbacks=[TensorBoard(log_dir='./logs/{}'.format(self.name))])
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator, verbose=1)

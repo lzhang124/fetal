@@ -35,7 +35,7 @@ parser.add_argument('--concat',
 parser.add_argument('--loss',
                     metavar='LOSS',
                     help='Loss',
-                    dest='loss', type=float, required=True)
+                    dest='loss', type=float)
 parser.add_argument('--epochs',
                     metavar='EPOCHS',
                     help='Training epochs',
@@ -54,8 +54,6 @@ parser.add_argument('--gpu',
                     dest='gpu', type=str)
 parser.add_argument('--run',
                     dest='run', action='store_true')
-parser.add_argument('--tensorboard',
-                    dest='tensorboard', action='store_true')
 options = parser.parse_args()
 
 if options.gpu:
@@ -116,7 +114,7 @@ def main(options):
         model.compile(util.get_weights(aug_gen.labels))
 
         logging.info('Training model.')
-        model.train(aug_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+        model.train(aug_gen, val_gen, options.epochs)
         model.save()
 
     if options.predict:
@@ -191,16 +189,16 @@ def run(options):
 
     logging.info('Training model.')
     if options.model == 'acnn':
-        model.train_ae(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+        model.train_ae(train_gen, val_gen, options.epochs)
         model.save_ae()
-    model.train(train_gen, val_gen, options.epochs, tensorboard=options.tensorboard)
+    model.train(train_gen, val_gen, options.epochs)
 
     logging.info('Saving model.')
     model.save()
 
     logging.info('Making predictions.')
     for pred_gen in pred_gens:
-        model.predict(pred_gen, 'data/predict/{}/'.format(options.model))
+        model.predict(pred_gen, 'data/predict/{}/'.format(options.name))
 
     logging.info('Testing model.')
     metrics = model.test(test_gen)
