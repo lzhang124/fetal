@@ -34,6 +34,7 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
                                  -(w[1] * (1 - y_true) * K.log(1 - y_pred))],
                                 axis=-1)
         # loss = cross_entropy * w
+        loss = cross_entropy
 
         if boundary_weight is not None:
             y_true_avg = K.pool3d(y_true, pool_size=(pool,)*3, padding='same', pool_mode='avg')
