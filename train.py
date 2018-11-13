@@ -155,7 +155,7 @@ def main(options):
 
 
 def run(options):
-    np.random.seed(12345)
+    np.random.seed(123454321)
     start = time.time()
     metrics = {}
     organ = 'all_brains' if options.organ == 'brains' else options.organ
