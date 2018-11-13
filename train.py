@@ -60,6 +60,7 @@ if options.gpu:
     os.environ['CUDA_VISIBLE_DEVICES'] = options.gpu
 
 import constants
+import datetime
 import glob
 import numpy as np
 import time
@@ -205,7 +206,7 @@ def run(options):
     logging.info(metrics)
 
     end = time.time()
-    logging.info('total time: {}s'.format(end - start))
+    logging.info('total time: {}s'.format(timedelta(seconds=(end - start)))
 
 
 if __name__ == '__main__':
