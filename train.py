@@ -206,7 +206,7 @@ def run(options):
     logging.info(metrics)
 
     end = time.time()
-    logging.info('total time: {}s'.format(timedelta(seconds=(end - start))))
+    logging.info('total time: {}s'.format(datetime.timedelta(seconds=(end - start))))
 
 
 if __name__ == '__main__':

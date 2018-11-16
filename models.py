@@ -1,8 +1,6 @@
 import numpy as np
 import os
-# import tensorflow as tf
 import util
-from datetime import datetime
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.losses import mean_squared_error
@@ -10,7 +8,6 @@ from keras.callbacks import TensorBoard
 from keras import backend as K
 from keras import layers
 from process import uncrop
-from time import time
 
 
 def dice_coef(y_true, y_pred):
