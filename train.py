@@ -9,9 +9,9 @@ parser.add_argument('--train',
                     help='Train model',
                     dest='train', type=str, nargs=2)
 parser.add_argument('--predict',
-                    metavar='INPUT_FILES, SEED_FILES/LABEL_FILES, SAVE_PATH',
+                    metavar='INPUT_FILES, [SEED_FILES/LABEL_FILES,] SAVE_PATH',
                     help='Predict segmentations',
-                    dest='predict', type=str, nargs=3)
+                    dest='predict', type=str, nargs='+')
 parser.add_argument('--test',
                     metavar='INPUT_FILES, [SEED_FILES,] LABEL_FILES',
                     help='Test model',
@@ -32,10 +32,6 @@ parser.add_argument('--concat',
                     metavar='INPUT_FILE, LABEL_FILE',
                     help='Concatenate first volume',
                     dest='concat', nargs=2)
-parser.add_argument('--loss',
-                    metavar='LOSS',
-                    help='Loss',
-                    dest='loss', type=float)
 parser.add_argument('--epochs',
                     metavar='EPOCHS',
                     help='Training epochs',
@@ -124,7 +120,7 @@ def main(options):
         input_files = glob.glob(options.predict[0])
         seed_files = None if gen_seed else glob.glob(options.predict[1])
         label_files = glob.glob(options.predict[1]) if gen_seed else None
-        save_path = options.predict[2]
+        save_path = options.predict[1] if options.seed else options.predict[2]
 
         pred_gen = VolumeGenerator(input_files,
                                    seed_files=seed_files,
@@ -151,7 +147,7 @@ def main(options):
         logging.info(metrics)
 
     end = time.time()
-    logging.info('total time: {}s'.format(end - start))
+    logging.info('total time: {}s'.format(datetime.timedelta(seconds=(end - start))))
 
 
 def run(options):
@@ -186,7 +182,7 @@ def run(options):
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
     logging.info('Compiling model.')
-    model.compile(weight=util.get_weights(train_gen.labels), loss=options.loss)
+    model.compile(weight=util.get_weights(train_gen.labels))
 
     logging.info('Training model.')
     if options.model == 'acnn':

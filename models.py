@@ -92,7 +92,7 @@ class BaseModel:
     def save(self):
         self.model.save('models/{}.h5'.format(self.name))
 
-    def compile(self, weight=None, loss=None):
+    def compile(self, weight=None):
         raise NotImplementedError()
 
     def train(self, generator, val_gen, epochs):
@@ -158,9 +158,9 @@ class UNet(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None, loss=None):
+    def compile(self, weight=None):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=loss),
+                           loss=weighted_crossentropy(weight=weight, boundary_weight=1.),
                            metrics=[dice_coef])
 
 
