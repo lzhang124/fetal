@@ -95,6 +95,7 @@ def main(options):
         logging.info('Making predictions.')
 
         input_files = glob.glob(options.predict[0])
+        input_files.remove('data/raw/051818/051818_0000.nii.gz')
         save_path = options.predict[1]
 
         pred_gen = VolumeGenerator(input_files, include_labels=False)
