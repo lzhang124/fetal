@@ -9,13 +9,13 @@ parser.add_argument('--train',
                     help='Train model',
                     dest='train', type=str, nargs=2)
 parser.add_argument('--predict',
-                    metavar='INPUT_FILES, [SEED_FILES/LABEL_FILES,] SAVE_PATH',
+                    metavar='INPUT_FILES, SAVE_PATH',
                     help='Predict segmentations',
-                    dest='predict', type=str, nargs='+')
+                    dest='predict', type=str, nargs=2)
 parser.add_argument('--test',
-                    metavar='INPUT_FILES, [SEED_FILES,] LABEL_FILES',
+                    metavar='INPUT_FILES, LABEL_FILES',
                     help='Test model',
-                    dest='test', type=str, nargs='+')
+                    dest='test', type=str, nargs=2)
 parser.add_argument('--model',
                     metavar='Model',
                     help='Model',
@@ -24,14 +24,6 @@ parser.add_argument('--organ',
                     metavar='ORGAN',
                     help='Organ to segment',
                     dest='organ', type=str, required=True)
-parser.add_argument('--seed',
-                    metavar='SEED_TYPE',
-                    help='Seed slices',
-                    dest='seed', type=str)
-parser.add_argument('--concat',
-                    metavar='INPUT_FILE, LABEL_FILE',
-                    help='Concatenate first volume',
-                    dest='concat', nargs=2)
 parser.add_argument('--epochs',
                     metavar='EPOCHS',
                     help='Training epochs',
@@ -78,13 +70,7 @@ def main(options):
 
     logging.info('Creating model.')
     shape = constants.SHAPE
-    if options.seed:
-        shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
-    if options.concat:
-        shape = tuple(list(shape[:-1]) + [shape[-1] + 2])
     model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
-
-    gen_seed = (options.seed == 'slice' or options.seed == 'volume')
 
     if options.train:
         logging.info('Creating data generator.')
@@ -95,17 +81,8 @@ def main(options):
         label_files = glob.glob(options.train[1])
         input_files = [label_file.replace(label_path, input_path) for label_file in label_files]
 
-        aug_gen = AugmentGenerator(input_files,
-                                   label_files=label_files,
-                                   seed_type=options.seed,
-                                   concat_files=options.concat)
-        #FIXME
-        val_gen = VolumeGenerator(input_files,
-                                  label_files=label_files,
-                                  seed_type=options.seed,
-                                  concat_files=options.concat,
-                                  load_files=True,
-                                  include_labels=True)
+        aug_gen = AugmentGenerator(input_files, label_files=label_files)
+        val_gen = VolumeGenerator(input_files, label_files=label_files, load_files=True, include_labels=True)
 
         logging.info('Compiling model.')
         model.compile(util.get_weights(aug_gen.labels))
@@ -118,31 +95,18 @@ def main(options):
         logging.info('Making predictions.')
 
         input_files = glob.glob(options.predict[0])
-        seed_files = None if gen_seed else glob.glob(options.predict[1])
-        label_files = glob.glob(options.predict[1]) if gen_seed else None
-        save_path = options.predict[1] if options.seed else options.predict[2]
+        save_path = options.predict[1]
 
-        pred_gen = VolumeGenerator(input_files,
-                                   seed_files=seed_files,
-                                   label_files=label_files,
-                                   seed_type=options.seed,
-                                   concat_files=options.concat,
-                                   include_labels=False)
+        pred_gen = VolumeGenerator(input_files, label_files=label_files, include_labels=False)
         model.predict(pred_gen, save_path)
 
     if options.test:
         logging.info('Testing model.')
 
         input_files = glob.glob(options.test[0])
-        seed_files = None if gen_seed else glob.glob(options.test[1])
-        label_files = glob.glob(options.test[1]) if gen_seed else glob.glob(options.test[2])
+        label_files = glob.glob(options.test[1])
 
-        test_gen = VolumeGenerator(input_files,
-                                   seed_files=seed_files,
-                                   label_files=label_files,
-                                   seed_type=options.seed,
-                                   concat_files=options.concat,
-                                   include_labels=True)
+        test_gen = VolumeGenerator(input_files, label_files=label_files, include_labels=True)
         metrics = model.test(test_gen)
         logging.info(metrics)
 
@@ -165,23 +129,21 @@ def run(options):
 
     logging.info('Creating model.')
     shape = constants.SHAPE
-    if options.seed:
-        shape = tuple(list(shape[:-1]) + [shape[-1] + 1])
     model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
 
     logging.info('Creating data generators.')
     train_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in train]
     train_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in train]
-    train_gen = AugmentGenerator(train_files, label_files=train_label_files, seed_type=options.seed)
+    train_gen = AugmentGenerator(train_files, label_files=train_label_files)
     
     val_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in val]
     val_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in val]
-    val_gen = VolumeGenerator(val_files, label_files=val_label_files, seed_type=options.seed, load_files=True, include_labels=True)
+    val_gen = VolumeGenerator(val_files, label_files=val_label_files, load_files=True, include_labels=True)
 
     test_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in test]
     test_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in test]
-    pred_gens = VolumeGenerator(test_files, label_files=test_label_files, seed_type=options.seed, include_labels=False)
-    test_gen = VolumeGenerator(test_files, label_files=test_label_files, seed_type=options.seed, include_labels=True)
+    pred_gens = VolumeGenerator(test_files, label_files=test_label_files, include_labels=False)
+    test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
     logging.info('Compiling model.')
     model.compile(weight=util.get_weights(train_gen.labels))
