@@ -92,7 +92,7 @@ class VolumeGenerator(Sequence):
         self.load_files = load_files
         self.include_labels = include_labels
         self.rescale = rescale
-        self.shape = shape(input_files[0])
+        self.shapes = [shape(file) for file in input_files]
         self.n = len(input_files)
         self.idx = 0
         
