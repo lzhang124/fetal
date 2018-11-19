@@ -97,7 +97,7 @@ def main(options):
         input_files = glob.glob(options.predict[0])
         save_path = options.predict[1]
 
-        pred_gen = VolumeGenerator(input_files, label_files=label_files, include_labels=False)
+        pred_gen = VolumeGenerator(input_files, include_labels=False)
         model.predict(pred_gen, save_path)
 
     if options.test:
