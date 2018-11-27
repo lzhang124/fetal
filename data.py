@@ -56,6 +56,9 @@ class VolumeGenerator(Sequence):
         if load_files:
             self.inputs = np.array([preprocess(file, resize=True) for file in input_files])
 
+            if label_files is not None:
+                self.labels = np.array([preprocess(file, resize=True) for file in label_files])
+
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
 
