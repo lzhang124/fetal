@@ -105,7 +105,7 @@ class BaseModel:
         raise NotImplementedError()
 
     def save(self):
-        self.model.save('models/{}/{}_final.h5'.format(self.name))
+        self.model.save('models/{n}/{n}_final.h5'.format(n=self.name))
 
     def train(self, generator, val_gen, epochs):
         self._compile(util.get_weights(generator.labels))
@@ -113,7 +113,7 @@ class BaseModel:
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=[ModelCheckpoint('models/{}/{}_\{epoch:02d\}_\{val_loss:.2f\}.h5'.format(self.name), period=50),
+                                 callbacks=[ModelCheckpoint('models/{n}/{n}_{epoch:02d}_{val_loss:.2f}.h5'.format(n=self.name), period=50),
                                             TensorBoard(log_dir='logs/{}'.format(self.name))])
 
     def predict(self, generator, path):
