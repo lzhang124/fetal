@@ -70,7 +70,7 @@ def main(options):
 
     logging.info('Creating model.')
     shape = constants.SHAPE
-    model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
+    model = MODELS[options.model](shape, weights=util.get_weights(aug_gen.labels), name=options.name, filename=options.model_file)
 
     if options.train:
         logging.info('Creating data generator.')
@@ -85,7 +85,7 @@ def main(options):
         val_gen = VolumeGenerator(input_files, label_files=label_files, load_files=True, include_labels=True)
 
         logging.info('Training model.')
-        model.train(aug_gen, val_gen, options.epochs, weights=util.get_weights(aug_gen.labels))
+        model.train(aug_gen, val_gen, options.epochs)
         model.save()
 
     if options.predict:
@@ -126,7 +126,7 @@ def run(options):
 
     logging.info('Creating model.')
     shape = constants.SHAPE
-    model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
+    model = MODELS[options.model](shape, weights=util.get_weights(aug_gen.labels), name=options.name, filename=options.model_file)
 
     logging.info('Creating data generators.')
     train_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in train]
@@ -142,11 +142,11 @@ def run(options):
     pred_gen = VolumeGenerator(test_files, include_labels=False)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
-    logging.info('Training model.')
-    model.train(train_gen, val_gen, options.epochs, weight=util.get_weights(train_gen.labels))
+    # logging.info('Training model.')
+    # model.train(train_gen, val_gen, options.epochs)
 
-    logging.info('Saving model.')
-    model.save()
+    # logging.info('Saving model.')
+    # model.save()
 
     logging.info('Making predictions.')
     model.predict(pred_gen, 'data/predict/{}/'.format(options.name))
