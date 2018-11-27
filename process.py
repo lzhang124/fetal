@@ -29,7 +29,7 @@ def crop(vol):
 
 def preprocess(file, resize=False):
     vol = read_vol(file)
-    vol /= np.max(vol)
+    vol = vol / np.max(vol)
     if resize:
         vol = crop(vol)
     return vol
