@@ -85,7 +85,6 @@ def main(options):
 
         logging.info('Training model.')
         model.train(train_gen, val_gen, options.epochs)
-        model.save()
 
     if options.predict:
         logging.info('Making predictions.')
@@ -143,9 +142,6 @@ def run(options):
 
     logging.info('Training model.')
     model.train(train_gen, val_gen, options.epochs)
-
-    logging.info('Saving model.')
-    model.save()
 
     logging.info('Making predictions.')
     model.predict(pred_gen, 'data/predict/{}/'.format(options.name))
