@@ -69,6 +69,17 @@ def aeseg_dice(y_true, y_pred):
     return dice_coef(y_true, y_pred[...,1:2])
 
 
+CUSTOM_OBJECTS = {
+    'dice_coef': dice_coef,
+    'dice_loss': dice_loss,
+    'weighted_crossentropy': weighted_crossentropy,
+    'acnn_loss': acnn_loss,
+    'acnn_dice': acnn_dice,
+    'aeseg_loss': aeseg_loss,
+    'aeseg_dice': aeseg_dice,
+}
+
+
 def save_predictions(preds, generator, path, scale=False):
     #FIXME
     for i in range(preds.shape[0]):
@@ -85,7 +96,7 @@ class BaseModel:
         if filename is None:
             self._new_model()
         else:
-            self.model = load_model(filename)
+            self.model = load_model(filename, custom_objects=CUSTOM_OBJECTS)
 
     def _new_model(self):
         raise NotImplementedError()        
