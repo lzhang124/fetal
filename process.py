@@ -27,16 +27,11 @@ def crop(vol):
     return resized
 
 
-def scale(vol):
-    return vol / np.max(vol)
-
-
-def preprocess(file, resize=False, rescale=False):
+def preprocess(file, resize=False):
     vol = read_vol(file)
+    vol /= np.max(vol)
     if resize:
         vol = crop(vol)
-    if rescale:
-        vol = scale(vol)
     return vol
 
 

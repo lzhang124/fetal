@@ -18,7 +18,7 @@ class AugmentGenerator(VolumeIterator):
                  fill_mode='nearest',
                  cval=0.,
                  flip=True):
-        self.inputs = [preprocess(file, rescale=True) for file in input_files]
+        self.inputs = [preprocess(file) for file in input_files]
 
         if label_files is not None:
             self.labels = [preprocess(file) for file in label_files]
@@ -43,21 +43,18 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  load_files=False,
-                 include_labels=False,
-                 rescale=True):
+                 include_labels=False):
         self.inputs = input_files
         self.labels = label_files
         self.batch_size = batch_size
         self.load_files = load_files
         self.include_labels = include_labels
-        self.rescale = rescale
         self.shapes = [shape(file) for file in input_files]
         self.n = len(input_files)
         self.idx = 0
         
         if load_files:
-            self.inputs = np.array([preprocess(file, resize=True, rescale=self.rescale)
-                                    for file in input_files])
+            self.inputs = np.array([preprocess(file, resize=True) for file in input_files])
 
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
@@ -68,7 +65,7 @@ class VolumeGenerator(Sequence):
             if self.load_files:
                 volume = file
             else:
-                volume = preprocess(file, resize=True, rescale=self.rescale)
+                volume = preprocess(file, resize=True)
             batch.append(volume)
         batch = np.array(batch)
 
