@@ -84,7 +84,7 @@ class BaseModel:
         self.name = name if name else self.__class__.__name__.lower()
         self._new_model()
         if filename is not None:
-            self.model.load_weights(filename)
+            self.model.load_model(filename)
 
     def _new_model(self):
         raise NotImplementedError()        
