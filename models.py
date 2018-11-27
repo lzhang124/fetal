@@ -22,7 +22,7 @@ def dice_loss(y_true, y_pred):
 
 
 def weighted_crossentropy(weights=None, boundary_weight=None, pool=5):
-    w = (.5, .5) if weight is None else weight
+    w = (.5, .5) if weights is None else weights
     epsilon = K.epsilon()
 
     def loss_fn(y_true, y_pred):
