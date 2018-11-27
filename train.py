@@ -142,20 +142,20 @@ def run(options):
 
     test_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in test]
     test_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in test]
-    pred_gens = VolumeGenerator(test_files, include_labels=False)
+    pred_gen = VolumeGenerator(test_files, include_labels=False)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
     logging.info('Compiling model.')
     model.compile(weight=util.get_weights(train_gen.labels))
 
-    logging.info('Training model.')
-    if options.model == 'acnn':
-        model.train_ae(train_gen, val_gen, options.epochs)
-        model.save_ae()
-    model.train(train_gen, val_gen, options.epochs)
+    # logging.info('Training model.')
+    # if options.model == 'acnn':
+    #     model.train_ae(train_gen, val_gen, options.epochs)
+    #     model.save_ae()
+    # model.train(train_gen, val_gen, options.epochs)
 
-    logging.info('Saving model.')
-    model.save()
+    # logging.info('Saving model.')
+    # model.save()
 
     logging.info('Making predictions.')
     model.predict(pred_gen, 'data/predict/{}/'.format(options.name))
