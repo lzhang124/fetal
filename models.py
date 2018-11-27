@@ -4,7 +4,7 @@ import util
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.losses import mean_squared_error
-from keras.callbacks import TensorBoard
+from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras import backend as K
 from keras import layers
 from process import uncrop
@@ -21,7 +21,7 @@ def dice_loss(y_true, y_pred):
     return 1 - dice_coef(y_true, y_pred)
 
 
-def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
+def weighted_crossentropy(weights=None, boundary_weight=None, pool=5):
     w = (.5, .5) if weight is None else weight
     epsilon = K.epsilon()
 
@@ -40,12 +40,12 @@ def weighted_crossentropy(weight=None, boundary_weight=None, pool=5):
     return loss_fn
 
 
-def acnn_loss(weight=None, boundary_weight=None):
+def acnn_loss(weights=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
         seg = y_pred[...,:1]
         ae_seg = y_pred[...,1:]
-        seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
-        ae_loss = weighted_crossentropy(weight)(seg, ae_seg)
+        seg_loss = weighted_crossentropy(weights, boundary_weight)(y_true, seg)
+        ae_loss = weighted_crossentropy(weights)(seg, ae_seg)
         return (seg_loss + ae_loss)/2
     return loss_fn
 
@@ -54,12 +54,12 @@ def acnn_dice(y_true, y_pred):
     return dice_coef(y_true, y_pred[...,:1])
 
 
-def aeseg_loss(weight=None, boundary_weight=None):
+def aeseg_loss(weights=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
         vol = y_pred[...,:1]
         seg = y_pred[...,1:2]
         ae_vol = y_pred[...,2:]
-        seg_loss = weighted_crossentropy(weight, boundary_weight)(y_true, seg)
+        seg_loss = weighted_crossentropy(weights, boundary_weight)(y_true, seg)
         ae_loss = mean_squared_error(vol, ae_vol)
         return (seg_loss + ae_loss)/2
     return loss_fn
@@ -88,19 +88,21 @@ class BaseModel:
 
     def _new_model(self):
         raise NotImplementedError()        
-
-    def save(self):
-        self.model.save('models/{}.h5'.format(self.name))
-
-    def compile(self, weight=None):
+    
+    def _compile(self, weights):
         raise NotImplementedError()
 
-    def train(self, generator, val_gen, epochs):
+    def save(self):
+        self.model.save('models/{}/{}_final.h5'.format(self.name))
+
+    def train(self, generator, val_gen, epochs, weights=None):
+        self._compile(weights)
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=[TensorBoard(log_dir='./logs/{}'.format(self.name))])
+                                 callbacks=[ModelCheckpoint('models/{}/{}_{epoch:02d}_{val_loss:.2f}.h5'.format(self.name), period=50),
+                                            TensorBoard(log_dir='logs/{}'.format(self.name))])
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator, verbose=1)
@@ -158,9 +160,9 @@ class UNet(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def _compile(self, weights):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=1.),
+                           loss=weighted_crossentropy(weights=weights, boundary_weight=1.),
                            metrics=[dice_coef])
 
 
@@ -247,9 +249,9 @@ class AutoEncoder(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def _compile(self, weights):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=weighted_crossentropy(weight=weight, boundary_weight=1.),
+                           loss=weighted_crossentropy(weights=weights, boundary_weight=1.),
                            metrics=[dice_coef])
 
 
@@ -339,14 +341,17 @@ class ACNN(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def _compile(self, weights):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=acnn_loss(weight=weight, boundary_weight=1.),
+                           loss=acnn_loss(weights=weights, boundary_weight=1.),
                            metrics=[acnn_dice])
 
     def predict(self, generator, path):
-        preds = [pred[0] for pred in self.model.predict_generator(generator, verbose=1)]
-        save_predictions(preds, generator, path)
+        preds = self.model.predict_generator(generator, verbose=1)
+        segs = np.array([pred[...,:1] for pred in preds])
+        vols = np.array([pred[...,1:] for pred in preds])
+        save_predictions(segs, generator, path)
+        save_predictions(vols, generator, path + 'ae_reconstructions/', scale=True)
 
 
 class AESeg(BaseModel):
@@ -416,14 +421,14 @@ class AESeg(BaseModel):
 
         self.model = Model(inputs=inputs, outputs=outputs)
 
-    def compile(self, weight=None):
+    def _compile(self, weights):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss=aeseg_loss(weight=weight, boundary_weight=1.),
+                           loss=aeseg_loss(weights=weights, boundary_weight=1.),
                            metrics=[aeseg_dice])
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator, verbose=1)
         segs = np.array([pred[...,1:2] for pred in preds])
-        vols = np.array([pred[...,2:3] for pred in preds])
+        vols = np.array([pred[...,2:] for pred in preds])
         save_predictions(segs, generator, path)
         save_predictions(vols, generator, path + 'ae_reconstructions/', scale=True)

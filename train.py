@@ -84,11 +84,8 @@ def main(options):
         aug_gen = AugmentGenerator(input_files, label_files=label_files)
         val_gen = VolumeGenerator(input_files, label_files=label_files, load_files=True, include_labels=True)
 
-        logging.info('Compiling model.')
-        model.compile(util.get_weights(aug_gen.labels))
-
         logging.info('Training model.')
-        model.train(aug_gen, val_gen, options.epochs)
+        model.train(aug_gen, val_gen, options.epochs, weights=util.get_weights(aug_gen.labels))
         model.save()
 
     if options.predict:
@@ -149,10 +146,7 @@ def run(options):
     model.compile(weight=util.get_weights(train_gen.labels))
 
     logging.info('Training model.')
-    if options.model == 'acnn':
-        model.train_ae(train_gen, val_gen, options.epochs)
-        model.save_ae()
-    model.train(train_gen, val_gen, options.epochs)
+    model.train(train_gen, val_gen, options.epochs, weight=util.get_weights(train_gen.labels))
 
     logging.info('Saving model.')
     model.save()
