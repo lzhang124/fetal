@@ -107,8 +107,8 @@ class BaseModel:
     def save(self):
         self.model.save('models/{}/{}_final.h5'.format(self.name))
 
-    def train(self, generator, val_gen, epochs, weights=None):
-        self._compile(weights)
+    def train(self, generator, val_gen, epochs):
+        self._compile(util.get_weights(generator.labels))
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,

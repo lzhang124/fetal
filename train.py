@@ -52,7 +52,6 @@ import datetime
 import glob
 import numpy as np
 import time
-import util
 from data import AugmentGenerator, VolumeGenerator
 from models import UNet, UNetSmall, ACNN, AESeg
 
@@ -81,11 +80,11 @@ def main(options):
         label_files = glob.glob(options.train[1])
         input_files = [label_file.replace(label_path, input_path) for label_file in label_files]
 
-        aug_gen = AugmentGenerator(input_files, label_files=label_files)
+        train_gen = AugmentGenerator(input_files, label_files=label_files)
         val_gen = VolumeGenerator(input_files, label_files=label_files, load_files=True, include_labels=True)
 
         logging.info('Training model.')
-        model.train(aug_gen, val_gen, options.epochs, weights=util.get_weights(aug_gen.labels), )
+        model.train(train_gen, val_gen, options.epochs)
         model.save()
 
     if options.predict:
@@ -143,7 +142,7 @@ def run(options):
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
     logging.info('Training model.')
-    model.train(train_gen, val_gen, options.epochs, weights=util.get_weights(aug_gen.labels))
+    model.train(train_gen, val_gen, options.epochs)
 
     logging.info('Saving model.')
     model.save()
