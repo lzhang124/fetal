@@ -423,7 +423,7 @@ class AESeg(BaseModel):
 
     def predict(self, generator, path):
         preds = self.model.predict_generator(generator, verbose=1)
-        vols = np.array([pred[...,0:1] for pred in preds])
         segs = np.array([pred[...,1:2] for pred in preds])
-        save_predictions(vols, generator, path + 'ae_reconstructions/', scale=True)
+        vols = np.array([pred[...,2:3] for pred in preds])
         save_predictions(segs, generator, path)
+        save_predictions(vols, generator, path + 'ae_reconstructions/', scale=True)
