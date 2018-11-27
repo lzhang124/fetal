@@ -142,9 +142,6 @@ def run(options):
     pred_gen = VolumeGenerator(test_files, include_labels=False)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
-    logging.info('Compiling model.')
-    model.compile(weight=util.get_weights(train_gen.labels))
-
     logging.info('Training model.')
     model.train(train_gen, val_gen, options.epochs, weight=util.get_weights(train_gen.labels))
 
