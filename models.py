@@ -69,13 +69,13 @@ def aeseg_dice(y_true, y_pred):
     return dice_coef(y_true, y_pred[...,1:2])
 
 
-def save_predictions(preds, generator, path):
+def save_predictions(preds, generator, path, scale=False):
     #FIXME
     for i in range(preds.shape[0]):
         fname = generator.inputs[i].split('/')[-1]
         header = util.header(generator.inputs[i])
         os.makedirs(path, exist_ok=True)
-        util.save_vol(uncrop(preds[i], generator.shapes[i]), os.path.join(path, fname), header)
+        util.save_vol(uncrop(preds[i], generator.shapes[i]), os.path.join(path, fname), header, scale)
 
 
 class BaseModel:
@@ -425,5 +425,5 @@ class AESeg(BaseModel):
         preds = self.model.predict_generator(generator, verbose=1)
         vols = np.array([pred[...,0:1] for pred in preds])
         segs = np.array([pred[...,1:2] for pred in preds])
-        save_predictions(vols, generator, path + 'ae_reconstructions/')
+        save_predictions(vols, generator, path + 'ae_reconstructions/', scale=True)
         save_predictions(segs, generator, path)
