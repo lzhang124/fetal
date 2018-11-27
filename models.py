@@ -79,12 +79,11 @@ def save_predictions(preds, generator, path, scale=False):
 
 
 class BaseModel:
-    def __init__(self, input_size, weights=None, name=None, filename=None):
+    def __init__(self, input_size, name=None, filename=None):
         self.input_size = input_size
         self.name = name if name else self.__class__.__name__.lower()
         if filename is None:
             self._new_model()
-            self._compile(weights)
         else:
             self.model = load_model(filename)
 
@@ -97,7 +96,8 @@ class BaseModel:
     def save(self):
         self.model.save('models/{}/{}_final.h5'.format(self.name))
 
-    def train(self, generator, val_gen, epochs):
+    def train(self, generator, val_gen, epochs, weights=None):
+        self._compile(weights)
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
