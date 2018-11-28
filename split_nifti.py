@@ -15,10 +15,10 @@ options = parser.parse_args()
 
 
 def main(sample, order):
-    files = glob.glob('data/nifti/{}/*.nii.gz'.format(sample))
+    files = glob.glob(f'data/nifti/{sample}/*.nii.gz')
     vols = np.concatenate([util.read_vol(file) for file in files], axis=-1)
     if vols.shape[0] == vols.shape[1] == vols.shape[2]:
-        axis = int(input('shape: {}\n> '.format(vols.shape)))
+        axis = int(input(f'shape: {vols.shape}\n> '))
     elif vols.shape[0] == vols.shape[1]:
         axis = 2
     elif vols.shape[0] == vols.shape[2]:
@@ -26,7 +26,7 @@ def main(sample, order):
     elif vols.shape[1] == vols.shape[2]:
         axis = 0
     else:
-        axis = int(input('shape: {}\n> '.format(vols.shape)))
+        axis = int(input(f'shape: {vols.shape}\n> '))
     vols = np.moveaxis(vols, axis, 0)
     shape = vols.shape
 
@@ -99,8 +99,8 @@ def main(sample, order):
             os.makedirs(temp_folder, exist_ok=True)
             util.save_vol(even_img, temp_folder + 'even.nii.gz')
             util.save_vol(odd_img, temp_folder + 'odd.nii.gz')
-            os.system('open {}/even.nii.gz'.format(temp_folder))
-            os.system('open {}/odd.nii.gz'.format(temp_folder))
+            os.system(f'open {temp_folder}/even.nii.gz')
+            os.system(f'open {temp_folder}/odd.nii.gz')
             order = input('1. odd\n2. even\n> ')
 
         plt.close()
@@ -116,10 +116,10 @@ def main(sample, order):
 
     series = np.moveaxis(series, 0, axis)
 
-    new_folder = 'data/raw/{}/'.format(sample)
+    new_folder = f'data/raw/{sample}/'
     os.makedirs(new_folder, exist_ok=True)
     for i in range(new_shape[-1]):
-        util.save_vol(series[...,i], new_folder + sample + '_{}.nii.gz'.format(str(i).zfill(4)))
+        util.save_vol(series[...,i], new_folder + sample + f'_{str(i).zfill(4)}.nii.gz')
 
 
 if __name__ == '__main__':

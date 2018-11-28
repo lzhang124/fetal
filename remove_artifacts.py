@@ -22,11 +22,11 @@ def main(model):
     old_metrics = {}
     new_metrics = {}
 
-    for file in glob.glob('data/predict/{}/*_0000.nii.gz'.format(model)):
+    for file in glob.glob(f'data/predict/{model}/*_0000.nii.gz'):
         sample = os.path.basename(file).split('_')[0]
         header = util.header(file)
         volume = util.read_vol(file)
-        label = util.read_vol(glob.glob('data/labels/{}/{}_0_all_brains.nii.gz'.format(sample, sample))[0])
+        label = util.read_vol(glob.glob(f'data/labels/{sample}/{sample}_0_all_brains.nii.gz')[0])
 
         old_metrics[sample] = dice_coef(label, volume)
 
@@ -35,8 +35,8 @@ def main(model):
 
         new_metrics[sample] = dice_coef(label, volume)
 
-        os.makedirs('data/predict_cleaned/{}/'.format(model), exist_ok=True)
-        util.save_vol(volume, 'data/predict_cleaned/{}/{}_0000.nii.gz'.format(model, sample), header)
+        os.makedirs(f'data/predict_cleaned/{model}/', exist_ok=True)
+        util.save_vol(volume, f'data/predict_cleaned/{model}/{sample}_0000.nii.gz', header)
 
     print('before: ', old_metrics)
     print('after: ', new_metrics)

@@ -9,7 +9,7 @@ def crop(vol):
     if (vol.shape[0] < constants.SHAPE[0] or
         vol.shape[1] < constants.SHAPE[1] or
         vol.shape[2] < constants.SHAPE[2]):
-        raise ValueError('The input shape {} is not supported.'.format(vol.shape))
+        raise ValueError(f'The input shape {vol.shape} is not supported.')
 
     # convert to target shape
     dx = (vol.shape[0] - constants.SHAPE[0]) // 2
@@ -20,10 +20,7 @@ def crop(vol):
                   dy:(dy+constants.SHAPE[1]),
                   dz:(dz+constants.SHAPE[2])]
     if resized.shape != constants.SHAPE:
-        raise ValueError('The resized shape {shape} '
-                         'does not match the target '
-                         'shape {target}'.format(shape=resized.shape,
-                                                 target=constants.SHAPE))
+        raise ValueError(f'The resized shape {resized.shape} does not match the target shape {constants.SHAPE}')
     return resized
 
 
@@ -37,11 +34,11 @@ def preprocess(file, resize=False):
 
 def uncrop(vol, shape):
     if vol.shape != constants.SHAPE:
-        raise ValueError('The volume shape {} is not supported.'.format(vol.shape))
+        raise ValueError(f'The volume shape {vol.shape} is not supported.')
     if (shape[0] < vol.shape[0] or
         shape[1] < vol.shape[1] or
         shape[2] < vol.shape[2]):
-        raise ValueError('The target shape {} is not supported.'.format(shape))
+        raise ValueError(f'The target shape {shape} is not supported.')
 
     # convert to original shape
     dx = (shape[0] - vol.shape[0]) // 2
@@ -53,10 +50,7 @@ def uncrop(vol, shape):
                            (dz, shape[2] - vol.shape[2] - dz),
                            (0, 0)), 'constant')
     if resized.shape != shape:
-        raise ValueError('The resized shape {shape} '
-                         'does not match the target '
-                         'shape {target}'.format(shape=resized.shape,
-                                                 target=shape))
+        raise ValueError(f'The resized shape {resized.shape} does not match the target shape {shape}')
     return resized
 
 

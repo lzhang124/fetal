@@ -273,10 +273,7 @@ class Iterator(Sequence):
 
     def __getitem__(self, idx):
         if idx >= len(self):
-            raise ValueError('Asked to retrieve element {idx}, '
-                             'but the Sequence '
-                             'has length {length}'.format(idx=idx,
-                                                          length=len(self)))
+            raise ValueError(f'Asked to retrieve element {idx}, but the Sequence has length {len(self)}')
         if self.seed is not None:
             np.random.seed(self.seed + self.total_batches_seen)
         self.total_batches_seen += 1

@@ -106,7 +106,7 @@ def main(options):
         logging.info(metrics)
 
     end = time.time()
-    logging.info('total time: {}s'.format(datetime.timedelta(seconds=(end - start))))
+    logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
 
 
 def run(options):
@@ -127,16 +127,16 @@ def run(options):
     model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
 
     logging.info('Creating data generators.')
-    train_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in train]
-    train_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in train]
+    train_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in train]
+    train_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in train]
     train_gen = AugmentGenerator(train_files, label_files=train_label_files)
     
-    val_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in val]
-    val_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in val]
+    val_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in val]
+    val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
     val_gen = VolumeGenerator(val_files, label_files=val_label_files, load_files=True, include_labels=True)
 
-    test_files = ['data/raw/{}/{}_0000.nii.gz'.format(sample, sample) for sample in test]
-    test_label_files = ['data/labels/{}/{}_0_{}.nii.gz'.format(sample, sample, organ) for sample in test]
+    test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
+    test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
     pred_gen = VolumeGenerator(test_files, include_labels=False)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
@@ -144,14 +144,14 @@ def run(options):
     model.train(train_gen, val_gen, options.epochs)
 
     logging.info('Making predictions.')
-    model.predict(pred_gen, 'data/predict/{}/'.format(options.name))
+    model.predict(pred_gen, f'data/predict/{options.name}/')
 
     logging.info('Testing model.')
     metrics = model.test(test_gen)
     logging.info(metrics)
 
     end = time.time()
-    logging.info('total time: {}s'.format(datetime.timedelta(seconds=(end - start))))
+    logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
 
 
 if __name__ == '__main__':
