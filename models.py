@@ -17,6 +17,14 @@ def dice_coef(y_true, y_pred):
     return (2. * intersection) / (K.sum(y_true_f) + K.sum(y_pred_f))
 
 
+def acnn_dice(y_true, y_pred):
+    return dice_coef(y_true, y_pred[...,:1])
+
+
+def aeseg_dice(y_true, y_pred):
+    return dice_coef(y_true, y_pred[...,1:2])
+
+
 def dice_loss(y_true, y_pred):
     return 1 - dice_coef(y_true, y_pred)
 
@@ -50,10 +58,6 @@ def acnn_loss(weights=None, boundary_weight=None):
     return loss_fn
 
 
-def acnn_dice(y_true, y_pred):
-    return dice_coef(y_true, y_pred[...,:1])
-
-
 def aeseg_loss(weights=None, boundary_weight=None):
     def loss_fn(y_true, y_pred):
         vol = y_pred[...,:1]
@@ -63,21 +67,6 @@ def aeseg_loss(weights=None, boundary_weight=None):
         ae_loss = mean_squared_error(vol, ae_vol)
         return (seg_loss + ae_loss)/2
     return loss_fn
-
-
-def aeseg_dice(y_true, y_pred):
-    return dice_coef(y_true, y_pred[...,1:2])
-
-
-CUSTOM_OBJECTS = {
-    'dice_coef': dice_coef,
-    'dice_loss': dice_loss,
-    'weighted_crossentropy': weighted_crossentropy,
-    'acnn_loss': acnn_loss,
-    'acnn_dice': acnn_dice,
-    'aeseg_loss': aeseg_loss,
-    'aeseg_dice': aeseg_dice,
-}
 
 
 def save_predictions(preds, generator, path, scale=False):
@@ -92,10 +81,9 @@ class BaseModel:
     def __init__(self, input_size, name=None, filename=None):
         self.input_size = input_size
         self.name = name if name else self.__class__.__name__.lower()
-        if filename is None:
-            self._new_model()
-        else:
-            self.model = load_model(filename, custom_objects=CUSTOM_OBJECTS)
+        self._new_model()
+        if filename is not None:
+            self.model.load_weights(filename)
 
     def _new_model(self):
         raise NotImplementedError()        
@@ -112,7 +100,7 @@ class BaseModel:
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=[ModelCheckpoint(path + '{epoch:0>3d}_{val_loss:.5f}.h5', period=50),
+                                 callbacks=[ModelCheckpoint(path + '{epoch:0>3d}_{val_loss:.5f}.h5', save_weights_only=True, period=50),
                                             TensorBoard(log_dir=f'logs/{self.name}')])
 
     def predict(self, generator, path):
