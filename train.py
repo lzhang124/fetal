@@ -4,18 +4,6 @@ logging.basicConfig(level=logging.INFO)
 
 from argparse import ArgumentParser
 parser = ArgumentParser()
-parser.add_argument('--train',
-                    metavar='INPUT_FILES, LABEL_FILES',
-                    help='Train model',
-                    dest='train', type=str, nargs=2)
-parser.add_argument('--predict',
-                    metavar='INPUT_FILES, SAVE_PATH',
-                    help='Predict segmentations',
-                    dest='predict', type=str, nargs=2)
-parser.add_argument('--test',
-                    metavar='INPUT_FILES, LABEL_FILES',
-                    help='Test model',
-                    dest='test', type=str, nargs=2)
 parser.add_argument('--model',
                     metavar='Model',
                     help='Model',
@@ -40,8 +28,6 @@ parser.add_argument('--gpu',
                     metavar='GPU',
                     help='Which GPU to use',
                     dest='gpu', type=str)
-parser.add_argument('--run',
-                    dest='run', action='store_true')
 options = parser.parse_args()
 
 if options.gpu:
@@ -52,6 +38,7 @@ import datetime
 import glob
 import numpy as np
 import time
+import util
 from data import AugmentGenerator, VolumeGenerator
 from models import UNet, UNetSmall, ACNN, AESeg
 
@@ -65,51 +52,6 @@ MODELS = {
 
 
 def main(options):
-    start = time.time()
-
-    logging.info('Creating model.')
-    shape = constants.SHAPE
-    model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
-
-    if options.train:
-        logging.info('Creating data generator.')
-
-        input_path = options.train[0].split('*')[0]
-        label_path = options.train[1].split('*')[0]
-
-        label_files = glob.glob(options.train[1])
-        input_files = [label_file.replace(label_path, input_path) for label_file in label_files]
-
-        train_gen = AugmentGenerator(input_files, label_files=label_files)
-        val_gen = VolumeGenerator(input_files, label_files=label_files, load_files=True, include_labels=True)
-
-        logging.info('Training model.')
-        model.train(train_gen, val_gen, options.epochs)
-
-    if options.predict:
-        logging.info('Making predictions.')
-
-        input_files = glob.glob(options.predict[0])
-        save_path = options.predict[1]
-
-        pred_gen = VolumeGenerator(input_files, include_labels=False)
-        model.predict(pred_gen, save_path)
-
-    if options.test:
-        logging.info('Testing model.')
-
-        input_files = glob.glob(options.test[0])
-        label_files = glob.glob(options.test[1])
-
-        test_gen = VolumeGenerator(input_files, label_files=label_files, include_labels=True)
-        metrics = model.test(test_gen)
-        logging.info(metrics)
-
-    end = time.time()
-    logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
-
-
-def run(options):
     np.random.seed(123454321)
     start = time.time()
     metrics = {}
@@ -122,14 +64,11 @@ def run(options):
     val = shuffled[(2*n)//3:(5*n)//6]
     test = shuffled[(5*n)//6:]
 
-    logging.info('Creating model.')
-    shape = constants.SHAPE
-    model = MODELS[options.model](shape, name=options.name, filename=options.model_file)
-
     logging.info('Creating data generators.')
     train_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in train]
     train_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in train]
     train_gen = AugmentGenerator(train_files, label_files=train_label_files)
+    weights = util.get_weights(train_gen.labels)
     
     val_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in val]
     val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
@@ -139,6 +78,10 @@ def run(options):
     test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
     pred_gen = VolumeGenerator(test_files, include_labels=False)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
+
+    logging.info('Creating model.')
+    shape = constants.SHAPE
+    model = MODELS[options.model](shape, name=options.name, filename=options.model_file, weights=weights)
 
     # logging.info('Training model.')
     # model.train(train_gen, val_gen, options.epochs)
@@ -155,7 +98,4 @@ def run(options):
 
 
 if __name__ == '__main__':
-    if options.run:
-        run(options)
-    else:
-        main(options)
+    main(options)

@@ -78,12 +78,13 @@ def save_predictions(preds, generator, path, scale=False):
 
 
 class BaseModel:
-    def __init__(self, input_size, name=None, filename=None):
+    def __init__(self, input_size, name=None, filename=None, weights=None):
         self.input_size = input_size
         self.name = name if name else self.__class__.__name__.lower()
         self._new_model()
         if filename is not None:
             self.model.load_weights(filename)
+        self._compile(weights)
 
     def _new_model(self):
         raise NotImplementedError()        
@@ -94,8 +95,6 @@ class BaseModel:
     def train(self, generator, val_gen, epochs):
         path = f'models/{self.name}/'
         os.makedirs(path, exist_ok=True)
-
-        self._compile(util.get_weights(generator.labels))
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
