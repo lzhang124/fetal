@@ -105,12 +105,14 @@ class BaseModel:
         raise NotImplementedError()
 
     def train(self, generator, val_gen, epochs):
+        path = 'models/{}/'.format(self.name)
         self._compile(util.get_weights(generator.labels))
+        os.makedirs(path, exist_ok=True)
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=[ModelCheckpoint('models/{}/'.format(self.name) + '{epoch:02d}_{val_loss:.2f}.h5', period=50),
+                                 callbacks=[ModelCheckpoint(path + '{epoch:02d}_{val_loss:.2f}.h5', period=50),
                                             TensorBoard(log_dir='logs/{}'.format(self.name))])
 
     def predict(self, generator, path):
