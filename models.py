@@ -106,8 +106,9 @@ class BaseModel:
 
     def train(self, generator, val_gen, epochs):
         path = 'models/{}/'.format(self.name)
-        self._compile(util.get_weights(generator.labels))
         os.makedirs(path, exist_ok=True)
+        
+        self._compile(util.get_weights(generator.labels))
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
