@@ -40,21 +40,21 @@ import numpy as np
 import time
 import util
 from data import AugmentGenerator, VolumeGenerator
-from models import UNet, UNetSmall, ACNN, AESeg
+from models import UNet, UNetSmall, AESeg
 
 
 MODELS = {
     'unet': UNet,
     'unet-small': UNetSmall,
-    'acnn': ACNN,
     'aeseg': AESeg,
 }
 
 
 def main(options):
-    np.random.seed(123454321)
     start = time.time()
-    metrics = {}
+    
+    np.random.seed(123454321)
+    
     organ = 'all_brains' if options.organ == 'brains' else options.organ
 
     logging.info('Splitting data.')

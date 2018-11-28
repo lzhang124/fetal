@@ -15,9 +15,7 @@ def save_vol(vol, filename, header=None, scale=False):
         if vol.ndim > 4:
             vol = vol[0]
         if scale:
-            print(np.max(vol))
             vol *= 255
-            print(np.max(vol))
         else:
             vol = np.rint(vol)
         vol = nib.Nifti1Image(vol.astype('int16'), np.diag([3, 3, 3, 1]), header=header)
