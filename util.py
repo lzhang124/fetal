@@ -15,6 +15,7 @@ def save_vol(vol, filename, header=None, scale=False):
         if vol.ndim > 4:
             vol = vol[0]
         if scale:
+            print(np.max(vol))
             vol *= 255
             print(np.max(vol))
         else:
