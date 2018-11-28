@@ -140,8 +140,8 @@ def run(options):
     pred_gen = VolumeGenerator(test_files, include_labels=False)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
 
-    logging.info('Training model.')
-    model.train(train_gen, val_gen, options.epochs)
+    # logging.info('Training model.')
+    # model.train(train_gen, val_gen, options.epochs)
 
     logging.info('Making predictions.')
     model.predict(pred_gen, f'data/predict/{options.name}/')

@@ -81,7 +81,6 @@ CUSTOM_OBJECTS = {
 
 
 def save_predictions(preds, generator, path, scale=False):
-    #FIXME
     for i in range(preds.shape[0]):
         fname = generator.inputs[i].split('/')[-1]
         header = util.header(generator.inputs[i])

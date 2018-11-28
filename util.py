@@ -5,7 +5,6 @@ import numpy as np
 def read_vol(filename):
     vol = nib.load(filename).get_data()
     
-    # need to add channel axis
     if vol.ndim == 3:
         vol = vol[..., np.newaxis]
     return vol
@@ -17,6 +16,7 @@ def save_vol(vol, filename, header=None, scale=False):
             vol = vol[0]
         if scale:
             vol *= 255
+            print(np.max(vol))
         else:
             vol = np.rint(vol)
         vol = nib.Nifti1Image(vol.astype('int16'), np.diag([3, 3, 3, 1]), header=header)
