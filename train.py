@@ -90,8 +90,8 @@ def main(options):
     shape = constants.SHAPE
     model = MODELS[options.model](shape, name=options.name, filename=options.model_file, weights=weights)
 
-    # logging.info('Training model.')
-    # model.train(train_gen, val_gen, options.epochs)
+    logging.info('Training model.')
+    model.train(train_gen, val_gen, options.epochs)
 
     logging.info('Making predictions.')
     model.predict(pred_gen, f'data/predict/{options.name}/')
