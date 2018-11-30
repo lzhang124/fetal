@@ -74,7 +74,7 @@ class BaseModel:
 
     def test(self, generator):
         metrics = self.model.evaluate_generator(generator)
-        return dict(zip(self.model.metrics_names, [metrics] if len(metrics) == 1 else metrics))
+        return dict(zip(self.model.metrics_names, [metrics] if isinstance(metrics, float) else metrics))
 
 
 class UNet(BaseModel):
