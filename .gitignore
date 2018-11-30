@@ -118,3 +118,6 @@ logs/
 # outputs
 *.err
 *.out
+
+# sftp
+sftp-config.json
