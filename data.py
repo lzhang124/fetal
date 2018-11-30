@@ -96,3 +96,7 @@ class VolumeGenerator(Sequence):
             return batch
         else:
             raise StopIteration()
+
+class CombineGenerator(Sequence):
+    def __init__(self, args):
+        pass
