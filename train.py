@@ -49,6 +49,12 @@ MODELS = {
     'aeseg': AESeg,
 }
 
+LABELS = {
+    'unet': ['label'],
+    'unet-small': ['label'],
+    'aeseg': ['label', 'input'],
+}
+
 
 def main(options):
     start = time.time()
@@ -65,19 +71,20 @@ def main(options):
     test = shuffled[(5*n)//6:]
 
     logging.info('Creating data generators.')
+    label_types = LABELS[options.model]
     train_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in train]
     train_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in train]
-    train_gen = AugmentGenerator(train_files, label_files=train_label_files)
+    train_gen = AugmentGenerator(train_files, label_files=train_label_files, label_types=label_types)
     weights = util.get_weights(train_gen.labels)
     
     val_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in val]
     val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
-    val_gen = VolumeGenerator(val_files, label_files=val_label_files, load_files=True, include_labels=True)
+    val_gen = VolumeGenerator(val_files, label_files=val_label_files, load_files=True, label_types=label_types)
 
     test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
     test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
-    pred_gen = VolumeGenerator(test_files, include_labels=False)
-    test_gen = VolumeGenerator(test_files, label_files=test_label_files, include_labels=True)
+    pred_gen = VolumeGenerator(test_files)
+    test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
 
     logging.info('Creating model.')
     shape = constants.SHAPE

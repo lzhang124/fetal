@@ -339,11 +339,10 @@ class VolumeIterator(Iterator):
         batch_size: Integer, size of a batch.
         shuffle: Boolean, whether to shuffle the data between epochs.
         seed: Random seed for data shuffling.
-        generate_labels: If labels should be generated.
     """
 
     def __init__(self, x, y, image_transformer,
-                 batch_size=32, shuffle=True, seed=None, generate_labels=False):
+                 batch_size=32, shuffle=True, seed=None):
         self.x = [np.asarray(x[i], dtype=K.floatx()) for i in range(len(x))]
         if any(x[i].ndim != 4 for i in range(len(x))):
             raise ValueError('Each volume of the input data for '
@@ -354,7 +353,6 @@ class VolumeIterator(Iterator):
             self.y = None
 
         self.image_transformer = image_transformer
-        self.generate_labels = generate_labels
         super().__init__(len(x), batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array):
@@ -365,7 +363,7 @@ class VolumeIterator(Iterator):
                 x = self.image_transformer.random_transform(x.astype(K.floatx()))
                 batch_x.append(x)
             batch_x = np.asarray(batch_x, dtype=K.floatx())
-            return (batch_x, batch_x) if self.generate_labels else batch_x
+            return batch_x
         
         batch_y = []
         for i, j in enumerate(index_array):

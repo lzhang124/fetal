@@ -17,7 +17,9 @@ class AugmentGenerator(VolumeIterator):
                  crop_size=constants.SHAPE,
                  fill_mode='nearest',
                  cval=0.,
-                 flip=True):
+                 flip=True,
+                 label_types=None):
+        self.label_types = label_types
         self.inputs = [preprocess(file) for file in input_files]
 
         if label_files is not None:
@@ -36,6 +38,24 @@ class AugmentGenerator(VolumeIterator):
 
         super().__init__(self.inputs, self.labels, image_transformer, batch_size=batch_size)
 
+    def _get_batches_of_transformed_samples(self, index_array):
+        batch = super()._get_batches_of_transformed_samples(index_array)
+        labels = None
+        if self.labels is not None:
+            batch, labels = batch
+
+        all_labels = []
+        for label_type in self.label_types:
+            if label_type == 'label':
+                if labels is None:
+                    raise ValueError('Labels not provided.')
+                all_labels.append(labels)
+            elif label_type == 'input':
+                all_labels.append(batch)
+            else:
+                raise ValueError(f'Label type {label_type} is not supported.')
+        return (batch, all_labels) if len(all_labels) > 0 else batch
+
 
 class VolumeGenerator(Sequence):
     def __init__(self,
@@ -43,12 +63,12 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  load_files=False,
-                 include_labels=False):
+                 label_types=None):
         self.inputs = input_files
         self.labels = label_files
         self.batch_size = batch_size
         self.load_files = load_files
-        self.include_labels = include_labels
+        self.label_types = label_types
         self.shapes = [shape(file) for file in input_files]
         self.n = len(input_files)
         self.idx = 0
@@ -69,16 +89,24 @@ class VolumeGenerator(Sequence):
             batch.append(volume)
         batch = np.array(batch)
 
-        if self.include_labels:
+        if self.label_types:
             if self.labels is None:
                 raise ValueError('No labels provided.')
 
-            labels = []
-            for file in self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]:
-                label = file if self.load_files else preprocess(file, resize=True)
-                labels.append(label)
-            labels = np.array(labels)
-            batch = (batch, labels)
+            all_labels = []
+            for label_type in self.label_types:
+                if label_type == 'label':
+                    labels = []
+                    for file in self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]:
+                        label = file if self.load_files else preprocess(file, resize=True)
+                        labels.append(label)
+                    all_labels.append(np.array(labels))
+                elif label_type == 'input':
+                    all_labels.append(batch)
+                else:
+                    raise ValueError(f'Label type {label_type} is not supported.')
+            if len(all_labels) > 0:
+                batch = (batch, all_labels)
         
         return batch
 
@@ -96,7 +124,3 @@ class VolumeGenerator(Sequence):
             return batch
         else:
             raise StopIteration()
-
-class CombineGenerator(Sequence):
-    def __init__(self, args):
-        pass
