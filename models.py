@@ -3,7 +3,6 @@ import os
 import util
 from keras.models import load_model, Model
 from keras.optimizers import Adam
-from keras.losses import mean_squared_error
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras import backend as K
 from keras import layers
@@ -238,7 +237,7 @@ class AESeg(BaseModel):
 
     def _compile(self, weights):
         self.model.compile(optimizer=Adam(lr=1e-4),
-                           loss={'outputs': weighted_crossentropy(weights=weights, boundary_weight=1.), 'ae_outputs': 'mean_squared_error'},
+                           loss={'outputs': weighted_crossentropy(weights=weights, boundary_weight=1.), 'ae_outputs': 'mse'},
                            loss_weights={'outputs': .5, 'ae_outputs': .5},
                            metrics={'outputs': dice_coef, 'ae_outputs': 'accuracy'})
 
