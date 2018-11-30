@@ -74,7 +74,7 @@ class BaseModel:
         save_predictions(preds, generator, path)
 
     def test(self, generator):
-        return self.model.evaluate_generator(generator)
+        return dict(zip(self.model.metrics_names, self.model.evaluate_generator(generator)))
 
 
 class UNet(BaseModel):
