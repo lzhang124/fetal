@@ -1,12 +1,12 @@
-import numpy as np
-import os
-import util
 from keras.models import load_model, Model
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras import backend as K
 from keras import layers
-from process import uncrop
+import numpy as np
+import os
+import process
+import util
 
 
 def dice_coef(y_true, y_pred):
@@ -36,11 +36,18 @@ def weighted_crossentropy(weights=None, boundary_weight=None, pool=5):
 
 
 def save_predictions(preds, generator, path, scale=False):
+    os.makedirs(path, exist_ok=True)
+
+    if generator.tile_inputs:
+        preds = np.reshape(preds, (-1, 8) + preds.shape[1:])
+
     for i in range(preds.shape[0]):
-        fname = generator.inputs[i].split('/')[-1]
-        header = util.header(generator.inputs[i])
-        os.makedirs(path, exist_ok=True)
-        util.save_vol(uncrop(preds[i], generator.shapes[i]), os.path.join(path, fname), header, scale)
+        input_file = generator.input_files[i]
+        fname = input_file.split('/')[-1]
+        header = util.header(input_file)
+        shape = util.shape(input_file)
+        volume = process.postprocess(preds[i], shape, resize=True, tile=generator.tile_inputs)
+        util.save_vol(volume, os.path.join(path, fname), header, scale)
 
 
 class BaseModel:

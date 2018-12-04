@@ -6,12 +6,6 @@ from scipy.ndimage.measurements import label
 
 
 def crop(vol):
-    if (vol.shape[0] < constants.SHAPE[0] or
-        vol.shape[1] < constants.SHAPE[1] or
-        vol.shape[2] < constants.SHAPE[2]):
-        raise ValueError(f'The input shape {vol.shape} is not supported.')
-
-    # convert to target shape
     dx = (vol.shape[0] - constants.SHAPE[0]) // 2
     dy = (vol.shape[1] - constants.SHAPE[1]) // 2
     dz = (vol.shape[2] - constants.SHAPE[2]) // 2
@@ -19,8 +13,6 @@ def crop(vol):
     resized = vol[dx:(dx+constants.SHAPE[0]),
                   dy:(dy+constants.SHAPE[1]),
                   dz:(dz+constants.SHAPE[2])]
-    if resized.shape != constants.SHAPE:
-        raise ValueError(f'The resized shape {resized.shape} does not match the target shape {constants.SHAPE}')
     return resized
 
 
@@ -36,6 +28,12 @@ def split(vol):
 def preprocess(file, resize=False, tile=False):
     vol = read_vol(file)
     vol = vol / np.max(vol)
+
+    if (vol.shape[0] < constants.SHAPE[0] or
+        vol.shape[1] < constants.SHAPE[1] or
+        vol.shape[2] < constants.SHAPE[2]):
+        raise ValueError(f'The input shape {vol.shape} is not supported.')
+
     if tile:
         vol = split(vol)
     elif resize:
@@ -44,14 +42,6 @@ def preprocess(file, resize=False, tile=False):
 
 
 def uncrop(vol, shape):
-    if vol.shape != constants.SHAPE:
-        raise ValueError(f'The volume shape {vol.shape} is not supported.')
-    if (shape[0] < vol.shape[0] or
-        shape[1] < vol.shape[1] or
-        shape[2] < vol.shape[2]):
-        raise ValueError(f'The target shape {shape} is not supported.')
-
-    # convert to original shape
     dx = (shape[0] - vol.shape[0]) // 2
     dy = (shape[1] - vol.shape[1]) // 2
     dz = (shape[2] - vol.shape[2]) // 2
@@ -60,9 +50,37 @@ def uncrop(vol, shape):
                            (dy, shape[1] - vol.shape[1] - dy),
                            (dz, shape[2] - vol.shape[2] - dz),
                            (0, 0)), 'constant')
-    if resized.shape != shape:
-        raise ValueError(f'The resized shape {resized.shape} does not match the target shape {shape}')
-    return resized
+    return np.rint(resized / 8).astype(int)
+
+
+def unsplit(vols, shape):
+    vol = np.zeros(shape)
+
+    dx = shape[0] - vol.shape[0]
+    dy = shape[1] - vol.shape[1]
+    dz = shape[2] - vol.shape[2]
+
+    for i in (0, dx), (dx, 0):
+        for j in (1, dx), (dx, 1):
+            for k in (2, dx), (dx, 2):
+        vol += np.pad(vol, (i, j, k, (0, 0)), 'constant')
+
+    vol = 
+
+
+def postprocess(vol, shape, resize=False, tile=False):
+    if vol.shape != constants.SHAPE:
+        raise ValueError(f'The volume shape {vol.shape} is not supported.')
+    if (shape[0] < vol.shape[0] or
+        shape[1] < vol.shape[1] or
+        shape[2] < vol.shape[2]):
+        raise ValueError(f'The target shape {shape} is not supported.')
+
+    if tile:
+        vol = unsplit(vol, shape)
+    elif resize:
+        vol = uncrop(vol, shape)
+    return vol
 
 
 def remove_artifacts(vol, n):

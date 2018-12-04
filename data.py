@@ -3,7 +3,7 @@ import constants
 from image3d import ImageTransformer, VolumeIterator
 from keras.utils.data_utils import Sequence
 from process import preprocess
-from util import shape
+
 
 class AugmentGenerator(VolumeIterator):
     def __init__(self,
@@ -19,13 +19,16 @@ class AugmentGenerator(VolumeIterator):
                  cval=0.,
                  flip=True,
                  label_types=None):
-        self.label_types = label_types
+        self.input_files = input_files
+        self.label_files = label_files
         self.inputs = [preprocess(file) for file in input_files]
 
         if label_files is not None:
             self.labels = [preprocess(file) for file in label_files]
         else:
             self.labels = None
+            
+        self.label_types = label_types
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -64,6 +67,8 @@ class VolumeGenerator(Sequence):
                  batch_size=1,
                  label_types=None,
                  tile_inputs=True):
+        self.input_files = input_files
+        self.label_files = label_files
         self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in input_files])
         self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[2:])
         if label_files is not None:
@@ -75,7 +80,6 @@ class VolumeGenerator(Sequence):
         self.batch_size = batch_size
         self.label_types = label_types
         self.tile_inputs = tile_inputs
-        self.shapes = [shape(file) for file in input_files]
         self.n = len(self.inputs)
         self.idx = 0
         
