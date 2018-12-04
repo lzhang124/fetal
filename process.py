@@ -63,7 +63,7 @@ def unsplit(vols, shape):
     for i in (0, dx), (dx, 0):
         for j in (1, dx), (dx, 1):
             for k in (2, dx), (dx, 2):
-        vol += np.pad(vol, (i, j, k, (0, 0)), 'constant')
+                vol += np.pad(vol, (i, j, k, (0, 0)), 'constant')
 
     return np.rint(vol / 8).astype(int)
 
