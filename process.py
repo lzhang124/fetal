@@ -50,7 +50,7 @@ def uncrop(vol, shape):
                            (dy, shape[1] - vol.shape[1] - dy),
                            (dz, shape[2] - vol.shape[2] - dz),
                            (0, 0)), 'constant')
-    return np.rint(resized / 8).astype(int)
+    return resized
 
 
 def unsplit(vols, shape):
@@ -65,7 +65,7 @@ def unsplit(vols, shape):
             for k in (2, dx), (dx, 2):
         vol += np.pad(vol, (i, j, k, (0, 0)), 'constant')
 
-    vol = 
+    return np.rint(vol / 8).astype(int)
 
 
 def postprocess(vol, shape, resize=False, tile=False):

@@ -83,7 +83,7 @@ def main(options):
 
     test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
     test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
-    pred_gen = VolumeGenerator(test_files)
+    pred_gen = VolumeGenerator(test_files, tile_inputs=True)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
 
     logging.info('Creating model.')
