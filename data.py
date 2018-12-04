@@ -62,32 +62,28 @@ class VolumeGenerator(Sequence):
                  input_files,
                  label_files=None,
                  batch_size=1,
-                 load_files=False,
-                 label_types=None):
-        self.inputs = input_files
-        self.labels = label_files
+                 label_types=None,
+                 tile_inputs=True):
+        self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in input_files])
+        self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[2:])
+        if label_files is not None:
+            self.labels = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in label_files])
+            self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[2:])
+        else:
+            self.labels = None
+
         self.batch_size = batch_size
-        self.load_files = load_files
         self.label_types = label_types
+        self.tile_inputs = tile_inputs
         self.shapes = [shape(file) for file in input_files]
-        self.n = len(input_files)
+        self.n = len(self.inputs)
         self.idx = 0
         
-        if load_files:
-            self.inputs = np.array([preprocess(file, resize=True) for file in input_files])
-
-            if label_files is not None:
-                self.labels = np.array([preprocess(file, resize=True) for file in label_files])
-
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
 
     def __getitem__(self, idx):
-        batch = []
-        for file in self.inputs[self.batch_size * idx:self.batch_size * (idx + 1)]:
-            volume = file if self.load_files else preprocess(file, resize=True)
-            batch.append(volume)
-        batch = np.array(batch)
+        batch = np.array(self.inputs[self.batch_size * idx:self.batch_size * (idx + 1)])
 
         if self.label_types:
             if self.labels is None:
@@ -96,11 +92,7 @@ class VolumeGenerator(Sequence):
             all_labels = []
             for label_type in self.label_types:
                 if label_type == 'label':
-                    labels = []
-                    for file in self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]:
-                        label = file if self.load_files else preprocess(file, resize=True)
-                        labels.append(label)
-                    all_labels.append(np.array(labels))
+                    all_labels.append(np.array(self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]))
                 elif label_type == 'input':
                     all_labels.append(batch)
                 else:

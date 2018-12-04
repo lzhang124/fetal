@@ -79,7 +79,7 @@ def main(options):
     
     val_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in val]
     val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
-    val_gen = VolumeGenerator(val_files, label_files=val_label_files, load_files=True, label_types=label_types)
+    val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
 
     test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
     test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]

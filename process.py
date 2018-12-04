@@ -24,10 +24,21 @@ def crop(vol):
     return resized
 
 
-def preprocess(file, resize=False):
+def split(vol):
+    vols = []
+    for i in slice(constants.SHAPE[0]), slice(-constants.SHAPE[0], vol.shape[0]):
+        for j in slice(constants.SHAPE[1]), slice(-constants.SHAPE[1], vol.shape[1]):
+            for k in slice(constants.SHAPE[2]), slice(-constants.SHAPE[2], vol.shape[2]):
+                vols.append(vol[i, j, k])
+    return np.array(vols)
+
+
+def preprocess(file, resize=False, tile=False):
     vol = read_vol(file)
     vol = vol / np.max(vol)
-    if resize:
+    if tile:
+        vol = split(vol)
+    elif resize:
         vol = crop(vol)
     return vol
 
