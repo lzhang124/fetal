@@ -72,7 +72,7 @@ class BaseModel:
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=[ModelCheckpoint(path + '{epoch:0>3d}_{val_loss:.5f}.h5', save_weights_only=True, period=50),
+                                 callbacks=[ModelCheckpoint(path + '{epoch:0>4d}_{val_dice_coef:.4f}.h5', save_weights_only=True, period=50),
                                             TensorBoard(log_dir=f'logs/{self.name}')])
 
     def predict(self, generator, path):

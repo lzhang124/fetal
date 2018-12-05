@@ -56,24 +56,25 @@ def uncrop(vol, shape):
 def unsplit(vols, shape):
     vol = np.zeros(shape)
 
-    dx = shape[0] - vol.shape[0]
-    dy = shape[1] - vol.shape[1]
-    dz = shape[2] - vol.shape[2]
+    dx = shape[0] - vols.shape[1]
+    dy = shape[1] - vols.shape[2]
+    dz = shape[2] - vols.shape[3]
 
+    n = 0
     for i in (0, dx), (dx, 0):
-        for j in (1, dx), (dx, 1):
-            for k in (2, dx), (dx, 2):
-                vol += np.pad(vol, (i, j, k, (0, 0)), 'constant')
-
-    return np.rint(vol / 8).astype(int)
+        for j in (0, dy), (dy, 0):
+            for k in (0, dz), (dz, 0):
+                vol = np.maximum(vol, np.pad(vols[n], (i, j, k, (0, 0)), 'constant'))
+                n += 1
+    return np.rint(vol).astype(int)
 
 
 def postprocess(vol, shape, resize=False, tile=False):
-    if vol.shape != constants.SHAPE:
+    if vol.shape[-4:] != constants.SHAPE:
         raise ValueError(f'The volume shape {vol.shape} is not supported.')
-    if (shape[0] < vol.shape[0] or
-        shape[1] < vol.shape[1] or
-        shape[2] < vol.shape[2]):
+    if (shape[0] < constants.SHAPE[0] or
+        shape[1] < constants.SHAPE[1] or
+        shape[2] < constants.SHAPE[2]):
         raise ValueError(f'The target shape {shape} is not supported.')
 
     if tile:
