@@ -81,9 +81,11 @@ def main(options):
     val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
     val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
 
+    pred_files = glob.glob('data/raw/*/*.nii.gz')
+    pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
+
     test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
     test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
-    pred_gen = VolumeGenerator(test_files, tile_inputs=True)
     test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
 
     logging.info('Creating model.')
@@ -99,6 +101,12 @@ def main(options):
     logging.info('Testing model.')
     metrics = model.test(test_gen)
     logging.info(metrics)
+    dice = {}
+    for i in range(len(test)):
+        sample = test[i]
+        dice[sample] = util.dice_coef(util.read_vol(test_label_files[i]), util.read_vol(f'data/predict/{options.name}/{sample}_0000.nii.gz'))
+    logging.info(metrics)
+    logging.info(np.mean(list(metrics.values())))
 
     end = time.time()
     logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')

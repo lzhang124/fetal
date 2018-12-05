@@ -40,3 +40,10 @@ def get_weights(vols):
         total += vol.size
     w = weight/total
     return (1 - w, w)
+
+
+def dice_coef(true, pred):
+    true_f = true.flatten()
+    pred_f = pred.flatten()
+    intersection = np.sum(true_f * pred_f)
+    return (2. * intersection) / (np.sum(true_f) + np.sum(pred_f))
