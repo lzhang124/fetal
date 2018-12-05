@@ -55,6 +55,7 @@ def uncrop(vol, shape):
 
 def unsplit(vols, shape):
     vol = np.zeros(shape)
+    mask = np.zeros(shape)
 
     dx = shape[0] - vols.shape[1]
     dy = shape[1] - vols.shape[2]
@@ -64,9 +65,11 @@ def unsplit(vols, shape):
     for i in (0, dx), (dx, 0):
         for j in (0, dy), (dy, 0):
             for k in (0, dz), (dz, 0):
-                vol = np.maximum(vol, np.pad(vols[n], (i, j, k, (0, 0)), 'constant'))
+                vol += np.pad(vols[n], (i, j, k, (0, 0)), 'constant')
+                mask += np.pad(np.ones(vols[n].shape), (i, j, k, (0, 0)), 'constant')
                 n += 1
-    return np.rint(vol).astype(int)
+
+    return np.rint(vol / mask).astype(int)
 
 
 def postprocess(vol, shape, resize=False, tile=False):
