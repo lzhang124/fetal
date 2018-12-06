@@ -109,6 +109,7 @@ def main(options):
     for folder in glob.glob('data/raw/*'):
         try:
             sample = folder.split('/')[-1]
+            logging.info(f'{sample}..............................')
             pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
             pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
             model.predict(pred_gen, f'data/predict/{options.name}/{sample}/')
