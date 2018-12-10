@@ -22,7 +22,6 @@ def main(model, metrics):
 
     for file in glob.glob(files):
         sample, i = os.path.basename(file).split('_')
-        print(sample)
         i = i[:4]
         header = util.header(file)
         volume = util.read_vol(file)

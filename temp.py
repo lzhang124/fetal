@@ -7,6 +7,7 @@ files = glob.glob('data/predict_cleaned/unet3000/*')
 samples = [i.split('/')[-1] for i in files]
 
 for s in samples:
+    print(s)
     f = f'data/predict_cleaned/unet3000/{s}/{s}_0000.nii.gz'
     if len(glob.glob(f)) == 0:
         continue
