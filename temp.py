@@ -2,6 +2,7 @@ import util
 import glob
 import os
 import numpy as np
+import matpotlib
 
 files = glob.glob('data/predict_cleaned/unet3000/*')
 samples = [i.split('/')[-1] for i in files]
