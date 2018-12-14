@@ -36,12 +36,12 @@ for s in samples:
 
     for i in range(len(vols)):
         var[f'{s}_{i}'] = np.var(vols[i])
-        # x = np.arange(len(segs))
-        # y = (vols[i] / vols[i][0] - 1) * 100
-        # plt.ylabel('Change in Volume (%)')
-        # plt.plot(x, y, marker='', linewidth=1)
-        # plt.savefig(f'data/volumes/{s}_{i}.png')
-        # plt.close()
+        x = np.arange(len(segs))
+        y = (vols[i] / vols[i][0] - 1) * 100
+        plt.ylabel('Change in Volume (%)')
+        plt.plot(x, y, marker='', linewidth=1)
+        plt.savefig(f'data/volumes/{s}_{i}.png')
+        plt.close()
 
 sort = sorted(var.items(), key=lambda x: x[1])
 plt.figure(figsize=(10,8))
