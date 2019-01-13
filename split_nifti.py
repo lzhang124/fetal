@@ -15,7 +15,7 @@ options = parser.parse_args()
 
 
 def main(sample, order):
-    files = glob.glob(f'data/nifti/{sample}/*.nii.gz')
+    files = sorted(glob.glob(f'data/nifti/{sample}/*.nii.gz'))
     vols = np.concatenate([util.read_vol(file) for file in files], axis=-1)
     if vols.shape[0] == vols.shape[1] == vols.shape[2]:
         axis = int(input(f'shape: {vols.shape}\n> '))
@@ -40,13 +40,13 @@ def main(sample, order):
     if shape[0] % 2 == 0:
         evens = even_interpolator(np.arange(0, shape[0] - 1))
         odds = odd_interpolator(np.arange(1, shape[0]))
-        evens = np.concatenate((evens, evens[np.newaxis,-1,...]))
+        evens = np.concatenate((evens, evens[-1:,...]))
     else:
         evens = even_interpolator(np.arange(0, shape[0]))
         odds = odd_interpolator(np.arange(1, shape[0] - 1))
-        odds = np.concatenate((odds, odds[np.newaxis,-1,...]))
+        odds = np.concatenate((odds, odds[-1:,...]))
 
-    odds = np.concatenate((np.zeros([1,] + list(shape[1:])), odds))
+    odds = np.concatenate((odds[:1,...], odds))
     
     new_shape = list(shape)
     new_shape[-1] *= 2
@@ -116,7 +116,7 @@ def main(sample, order):
 
     series = np.moveaxis(series, 0, axis)
 
-    new_folder = f'data/raw/{sample}/'
+    new_folder = f'data/new_raw/{sample}/'
     os.makedirs(new_folder, exist_ok=True)
     for i in range(new_shape[-1]):
         util.save_vol(series[...,i], new_folder + sample + f'_{str(i).zfill(4)}.nii.gz')

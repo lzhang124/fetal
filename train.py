@@ -90,31 +90,31 @@ def main(options):
     shape = constants.SHAPE
     model = MODELS[options.model](shape, name=options.name, filename=options.model_file, weights=weights)
 
-    logging.info('Training model.')
-    model.train(train_gen, val_gen, options.epochs)
+    # logging.info('Training model.')
+    # model.train(train_gen, val_gen, options.epochs)
 
-    logging.info('Making predictions.')
-    model.predict(pred_gen, f'data/predict/{options.name}/')
+    # logging.info('Making predictions.')
+    # model.predict(pred_gen, f'data/predict/{options.name}/')
 
-    logging.info('Testing model.')
-    metrics = model.test(test_gen)
-    logging.info(metrics)
-    dice = {}
-    for i in range(len(test)):
-        sample = test[i]
-        dice[sample] = util.dice_coef(util.read_vol(test_label_files[i]), util.read_vol(f'data/predict/{options.name}/{sample}_0000.nii.gz'))
-    logging.info(metrics)
-    logging.info(np.mean(list(metrics.values())))
+    # logging.info('Testing model.')
+    # metrics = model.test(test_gen)
+    # logging.info(metrics)
+    # dice = {}
+    # for i in range(len(test)):
+    #     sample = test[i]
+    #     dice[sample] = util.dice_coef(util.read_vol(test_label_files[i]), util.read_vol(f'data/predict/{options.name}/{sample}_0000.nii.gz'))
+    # logging.info(metrics)
+    # logging.info(np.mean(list(metrics.values())))
 
-    # for folder in glob.glob('data/raw/*'):
-    #     try:
-    #         sample = folder.split('/')[-1]
-    #         logging.info(f'{sample}..............................')
-    #         pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
-    #         pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
-    #         model.predict(pred_gen, f'data/predict/{options.name}/{sample}/')
-    #     except Exception as e:
-    #         logging.error(f'ERROR during {sample}:')
+    for folder in glob.glob('data/raw/*'):
+        try:
+            sample = folder.split('/')[-1]
+            logging.info(f'{sample}..............................')
+            pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
+            pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
+            model.predict(pred_gen, f'data/predict/{options.name}/{sample}/')
+        except Exception as e:
+            logging.error(f'ERROR during {sample}:')
 
     end = time.time()
     logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')

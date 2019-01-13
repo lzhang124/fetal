@@ -66,7 +66,7 @@ class VolumeGenerator(Sequence):
                  label_files=None,
                  batch_size=1,
                  label_types=None,
-                 tile_inputs=True):
+                 tile_inputs=False):
         self.input_files = input_files
         self.label_files = label_files
         self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in input_files])
