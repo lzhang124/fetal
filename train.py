@@ -109,6 +109,8 @@ def main(options):
     for folder in glob.glob('data/raw/*'):
         try:
             sample = folder.split('/')[-1]
+            if sample not in ['121516', '051818']:
+                continue
             logging.info(f'{sample}..............................')
             pred_files = glob.glob(f'data/new_raw/{sample}/{sample}_*.nii.gz')
             pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
