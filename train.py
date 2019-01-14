@@ -106,16 +106,16 @@ def main(options):
     logging.info(metrics)
     logging.info(np.mean(list(metrics.values())))
 
-    # for folder in glob.glob('data/raw/*'):
-    #     try:
-    #         sample = folder.split('/')[-1]
-    #         logging.info(f'{sample}..............................')
-    #         pred_files = glob.glob(f'data/new_raw/{sample}/{sample}_*.nii.gz')
-    #         pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
-    #         model.predict(pred_gen, f'data/new_predict_/{options.name}/{sample}/')
-    #     except Exception as e:
-    #         logging.error(f'ERROR during {sample}:')
-    #         logging.error(e)
+    for folder in glob.glob('data/raw/*'):
+        try:
+            sample = folder.split('/')[-1]
+            logging.info(f'{sample}..............................')
+            pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
+            pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
+            model.predict(pred_gen, f'data/predict_/{options.name}/{sample}/')
+        except Exception as e:
+            logging.error(f'ERROR during {sample}:')
+            logging.error(e)
 
     end = time.time()
     logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
