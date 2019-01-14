@@ -112,7 +112,7 @@ def main(options):
             logging.info(f'{sample}..............................')
             pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
             pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
-            model.predict(pred_gen, f'data/predict_/{options.name}/{sample}/')
+            model.predict(pred_gen, f'data/predict/{options.name}/{sample}/')
         except Exception as e:
             logging.error(f'ERROR during {sample}:')
             logging.error(e)
