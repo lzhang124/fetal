@@ -117,6 +117,7 @@ def main(options):
             model.predict(pred_gen, f'data/new_predict_/{options.name}/{sample}/')
         except Exception as e:
             logging.error(f'ERROR during {sample}:')
+            logging.error(e)
 
     end = time.time()
     logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
