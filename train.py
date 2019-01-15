@@ -77,14 +77,14 @@ def main(options):
     train_gen = AugmentGenerator(train_files, label_files=train_label_files, label_types=label_types)
     weights = util.get_weights(train_gen.labels)
     
-    # val_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in val]
-    # val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
-    # val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
+    val_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in val]
+    val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
+    val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
 
-    # test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
-    # test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
-    # pred_gen = VolumeGenerator(test_files, tile_inputs=True)
-    # test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
+    test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
+    test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
+    pred_gen = VolumeGenerator(test_files, tile_inputs=True)
+    test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
 
     logging.info('Creating model.')
     shape = constants.SHAPE
@@ -106,13 +106,13 @@ def main(options):
     # logging.info(metrics)
     # logging.info(np.mean(list(metrics.values())))
 
-    for folder in glob.glob('data/new_raw/*'):
+    for folder in glob.glob('data/raw/*'):
         try:
             sample = folder.split('/')[-1]
             logging.info(f'{sample}..............................')
-            pred_files = glob.glob(f'data/new_raw/{sample}/{sample}_*.nii.gz')
+            pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
             pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
-            model.predict(pred_gen, f'data/new_predict/{options.name}/{sample}/')
+            model.predict(pred_gen, f'data/predict/{options.name}/{sample}/')
         except Exception as e:
             logging.error(f'ERROR during {sample}:')
             logging.error(e)
