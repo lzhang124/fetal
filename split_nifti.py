@@ -1,5 +1,4 @@
 import glob
-import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
 import os
@@ -53,6 +52,8 @@ def main(sample, order):
     series = np.zeros(new_shape)
 
     if order is None:
+        import matplotlib.pyplot as plt
+        
         even_1 = evens[shape[0]//3,shape[1]//2,...]
         even_2 = evens[shape[0]*2//3,shape[1]//2,...]
         odd_1 = odds[shape[0]//3,shape[1]//2,...]
