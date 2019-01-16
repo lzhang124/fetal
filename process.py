@@ -68,7 +68,7 @@ def unsplit(vols, shape):
                 vol += np.pad(vols[n], (i, j, k, (0, 0)), 'constant')
                 mask += np.pad(np.ones(vols[n].shape), (i, j, k, (0, 0)), 'constant')
                 n += 1
-
+    print(np.min(mask))
     return np.rint(vol / mask).astype(int)
 
 
