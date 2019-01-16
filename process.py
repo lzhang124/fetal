@@ -54,6 +54,7 @@ def uncrop(vol, shape):
 
 
 def unsplit(vols, shape):
+    print(vols.shape, shape)
     vol = np.zeros(shape)
     mask = np.zeros(shape)
 
