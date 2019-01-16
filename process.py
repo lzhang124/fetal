@@ -31,7 +31,10 @@ def preprocess(file, resize=False, tile=False):
 
     if (vol.shape[0] < constants.SHAPE[0] or
         vol.shape[1] < constants.SHAPE[1] or
-        vol.shape[2] < constants.SHAPE[2]):
+        vol.shape[2] < constants.SHAPE[2] or
+        vol.shape[0] > 2*constants.SHAPE[0] or
+        vol.shape[1] > 2*constants.SHAPE[1] or
+        vol.shape[2] > 2*constants.SHAPE[2]):
         raise ValueError(f'The input shape {vol.shape} is not supported.')
 
     if tile:
@@ -54,7 +57,6 @@ def uncrop(vol, shape):
 
 
 def unsplit(vols, shape):
-    print(vols.shape, shape)
     vol = np.zeros(shape)
     mask = np.zeros(shape)
 
@@ -69,16 +71,15 @@ def unsplit(vols, shape):
                 vol += np.pad(vols[n], (i, j, k, (0, 0)), 'constant')
                 mask += np.pad(np.ones(vols[n].shape), (i, j, k, (0, 0)), 'constant')
                 n += 1
-    print(np.min(mask))
     return np.rint(vol / mask).astype(int)
 
 
 def postprocess(vol, shape, resize=False, tile=False):
     if vol.shape[-4:] != constants.SHAPE:
         raise ValueError(f'The volume shape {vol.shape} is not supported.')
-    if (shape[0] < constants.SHAPE[0] or
-        shape[1] < constants.SHAPE[1] or
-        shape[2] < constants.SHAPE[2]):
+    if (shape[-4] < constants.SHAPE[0] or
+        shape[-3] < constants.SHAPE[1] or
+        shape[-2] < constants.SHAPE[2]):
         raise ValueError(f'The target shape {shape} is not supported.')
 
     if tile:
