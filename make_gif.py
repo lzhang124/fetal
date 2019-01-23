@@ -8,14 +8,14 @@ from scipy.ndimage import binary_erosion
 from scipy.ndimage.measurements import center_of_mass, label
 
 
-samples = [i.split('/')[-1] for i in glob.glob('data/predict/unet3000/*')]
+samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
 os.makedirs(f'data/gifs/', exist_ok=True)
 
 for s in sorted(samples):
     print(s)
     vols = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/raw/{s}/{s}_*.nii.gz'))])
     vols = np.clip(np.log(1 + vols / np.percentile(vols, 95)), 0, 1)
-    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict/unet3000/{s}/{s}_*.nii.gz'))])
+    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
 
     if s in constants.TWINS:
         brains = [label(seg)[0] for seg in segs]

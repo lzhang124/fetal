@@ -14,13 +14,13 @@ train = ['031317T', '031616', '013018S', '041318S', '050318S',
          '040716', '032318b', '021015', '040417', '041818',
          '022318L', '041017']
 
-samples = [i.split('/')[-1] for i in glob.glob('data/predict/unet3000/*')]
+samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
 os.makedirs(f'data/volumes/', exist_ok=True)
 var = {}
 
 for s in samples:
     print(s)
-    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict/unet3000/{s}/{s}_*.nii.gz'))])
+    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
 
     if s in constants.TWINS:
         brains = [measurements.label(seg)[0] for seg in segs]
