@@ -1,6 +1,7 @@
 import numpy as np
 import glob
 import util
+import pickle
 
 samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
 
@@ -44,3 +45,5 @@ for s in sorted(samples):
     print(len(frames))
 
 print(frames)
+with open('good_frames.p', 'wb') as f:
+    pickle.dump(frames, f)
