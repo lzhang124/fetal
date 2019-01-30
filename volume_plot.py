@@ -18,7 +18,7 @@ samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*'
 os.makedirs(f'data/volumes/', exist_ok=True)
 var = {}
 
-for s in samples:
+for s in sorted(samples):
     print(s)
     segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
 
