@@ -46,14 +46,14 @@ def main(sample, order):
         odds = np.concatenate((odds, odds[-1:,...]))
 
     odds = np.concatenate((odds[:1,...], odds))
-    
+
     new_shape = list(shape)
     new_shape[-1] *= 2
     series = np.zeros(new_shape)
 
     if order is None:
         import matplotlib.pyplot as plt
-        
+
         even_1 = evens[shape[0]//3,shape[1]//2,...]
         even_2 = evens[shape[0]*2//3,shape[1]//2,...]
         odd_1 = odds[shape[0]//3,shape[1]//2,...]
