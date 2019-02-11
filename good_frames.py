@@ -28,6 +28,8 @@ for s in sorted(samples):
             dif = abs(volume - curr_vol)
             if dif / volume <= OVERALL_VOL_DIF and util.dice_coef(vol, seg) >= OVERALL_DICE:
                 if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF and util.dice_coef(prev, seg) >= SEQ_DICE:
+                    if i == 1:
+                        frames.append(0)
                     frames.append(i)
             prev = seg
             prev_vol = curr_vol
@@ -41,6 +43,8 @@ for s in sorted(samples):
             dif = abs(volume - curr_vol)
             if dif / volume <= OVERALL_VOL_DIF:
                 if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF and util.dice_coef(prev, seg) >= SEQ_DICE:
+                    if i == 1:
+                        frames.append(0)
                     frames.append(i)
             prev = seg
             prev_vol = curr_vol
