@@ -1,3 +1,3 @@
-# placenta
+# fetal
 
-Temporal segmentation of BOLD MRI scans of the placenta
+Temporal segmentation of BOLD MRI scans of fetal orgains

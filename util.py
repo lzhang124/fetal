@@ -4,7 +4,7 @@ import numpy as np
 
 def read_vol(filename):
     vol = nib.load(filename).get_data()
-    
+
     if vol.ndim == 3:
         vol = vol[..., np.newaxis]
     return vol

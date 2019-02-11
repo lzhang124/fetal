@@ -191,7 +191,7 @@ class ImageTransformer(object):
                                                              self.shear_range,
                                                              6)
             shear_matrix = np.array([[1, sxy, sxz, 0],
-                                     [syx, 1, syz, 0], 
+                                     [syx, 1, syz, 0],
                                      [szx, szy, 1, 0],
                                      [0, 0, 0, 1]])
             if transform_matrix is None:
@@ -364,7 +364,7 @@ class VolumeIterator(Iterator):
                 batch_x.append(x)
             batch_x = np.asarray(batch_x, dtype=K.floatx())
             return batch_x
-        
+
         batch_y = []
         for i, j in enumerate(index_array):
             x, y = self.x[j], self.y[j]

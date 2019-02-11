@@ -60,8 +60,8 @@ class BaseModel:
         self._compile(weights)
 
     def _new_model(self):
-        raise NotImplementedError()        
-    
+        raise NotImplementedError()
+
     def _compile(self, weights):
         raise NotImplementedError()
 

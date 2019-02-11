@@ -27,7 +27,7 @@ class AugmentGenerator(VolumeIterator):
             self.labels = [preprocess(file) for file in label_files]
         else:
             self.labels = None
-            
+
         self.label_types = label_types
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
@@ -82,7 +82,7 @@ class VolumeGenerator(Sequence):
         self.tile_inputs = tile_inputs
         self.n = len(self.inputs)
         self.idx = 0
-        
+
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size
 
@@ -103,7 +103,7 @@ class VolumeGenerator(Sequence):
                     raise ValueError(f'Label type {label_type} is not supported.')
             if len(all_labels) > 0:
                 batch = (batch, all_labels)
-        
+
         return batch
 
     def __iter__(self):
