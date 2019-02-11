@@ -3,6 +3,12 @@ import glob
 import util
 import pickle
 
+OVERALL_VOL_DIF = 0.1
+OVERALL_DICE = 0.8
+SEQ_VOL_DIF = 0.05
+SEQ_DICE = 0.9
+PERCENT_GOOD = 0.6
+
 samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
 good_frames = {}
 
@@ -21,8 +27,8 @@ for s in sorted(samples):
             seg = segs[i]
             curr_vol = np.sum(seg)
             dif = abs(volume - curr_vol)
-            if dif / volume <= 0.1 and util.dice_coef(vol, seg) >= 0.8:
-                if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= 0.05 and util.dice_coef(prev, seg) >= 0.9:
+            if dif / volume <= OVERALL_VOL_DIF and util.dice_coef(vol, seg) >= OVERALL_DICE:
+                if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF and util.dice_coef(prev, seg) >= SEQ_DICE:
                     frames.append(i)
             prev = seg
             prev_vol = curr_vol
@@ -34,15 +40,13 @@ for s in sorted(samples):
             seg = segs[i]
             curr_vol = np.sum(seg)
             dif = abs(volume - curr_vol)
-            if dif / volume <= 0.1:
-                if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= 0.05 and util.dice_coef(prev, seg) >= 0.9:
+            if dif / volume <= OVERALL_VOL_DIF:
+                if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF and util.dice_coef(prev, seg) >= SEQ_DICE:
                     frames.append(i)
             prev = seg
             prev_vol = curr_vol
-    print(len(frames)/len(segs))
-    if len(frames)/len(segs) > 0.6:
+    if len(frames)/len(segs) >= PERCENT_GOOD:
         good_frames[s] = frames
 
-print(good_frames)
 with open('good_frames.p', 'wb') as f:
     pickle.dump(good_frames, f)
