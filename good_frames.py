@@ -1,7 +1,6 @@
 import numpy as np
 import glob
 import util
-import pickle
 
 OVERALL_VOL_DIF = 0.1
 OVERALL_DICE = 0.8
@@ -47,6 +46,5 @@ for s in sorted(samples):
             prev_vol = curr_vol
     if len(frames)/len(segs) >= PERCENT_GOOD:
         good_frames[s] = frames
-
-with open('good_frames.p', 'wb') as f:
-    pickle.dump(good_frames, f)
+    print(len(frames))
+    print(frames)
