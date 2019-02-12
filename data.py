@@ -9,6 +9,7 @@ class AugmentGenerator(VolumeIterator):
     def __init__(self,
                  input_files,
                  label_files=None,
+                 concat_files=None,
                  batch_size=1,
                  rotation_range=90.,
                  shift_range=0.1,
@@ -22,6 +23,10 @@ class AugmentGenerator(VolumeIterator):
         self.input_files = input_files
         self.label_files = label_files
         self.inputs = [preprocess(file) for file in input_files]
+
+        if concat_files is not None:
+            concats = [[preprocess(file) for file in channel] for channel in concat_files]
+            self.inputs = np.concatenate((self.inputs, concats*))
 
         if label_files is not None:
             self.labels = [preprocess(file) for file in label_files]
@@ -71,6 +76,12 @@ class VolumeGenerator(Sequence):
         self.label_files = label_files
         self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in input_files])
         self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[2:])
+
+        if concat_files is not None:
+            concats = [[preprocess(file, resize=True, tile=tile_inputs) for file in channel] for channel in concat_files]
+            concats = np.reshape(concats, (-1,) + self.inputs.shape[2:-1] + (len(concats),))
+            self.inputs = np.concatenate((self.inputs, concats*))
+
         if label_files is not None:
             self.labels = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in label_files])
             self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[2:])
