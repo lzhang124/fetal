@@ -345,6 +345,7 @@ class VolumeIterator(Iterator):
     def __init__(self, x, y, image_transformer,
                  batch_size=32, shuffle=True, seed=None):
         self.x = x
+        print(type(x[0]))
         if type(x[0]) is not str and any(x[i].ndim != 4 for i in range(len(x))):
             raise ValueError('Each volume of the input data for '
                              '`VolumeIterator` should have rank 4.')
