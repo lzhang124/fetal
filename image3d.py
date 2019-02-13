@@ -344,17 +344,16 @@ class VolumeIterator(Iterator):
 
     def __init__(self, x, y, image_transformer,
                  batch_size=32, shuffle=True, seed=None):
-        self.x = [np.asarray(x[i], dtype=K.floatx()) for i in range(len(x))]
+        self.x = x
         if any(x[i].ndim != 4 for i in range(len(x))):
             raise ValueError('Each volume of the input data for '
                              '`VolumeIterator` should have rank 4.')
         if y is not None:
-            self.y = [np.asarray(y[i], dtype=K.floatx()) for i in range(len(y))]
+            self.y = y
         else:
             self.y = None
 
         self.image_transformer = image_transformer
-        super().__init__(len(x), batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
         batch_x = []
@@ -364,7 +363,7 @@ class VolumeIterator(Iterator):
                     x = self.x[j]
                 else:
                     x = load_fn(self.x[j])
-                x = self.image_transformer.random_transform(x.astype(K.floatx()))
+                x = self.image_transformer.random_transform(x)
                 batch_x.append(x)
             batch_x = np.asarray(batch_x, dtype=K.floatx())
             return batch_x
@@ -375,8 +374,7 @@ class VolumeIterator(Iterator):
                 x, y = self.x[j], self.y[j]
             else:
                 x, y = load_fn(self.x[j]), load_fn(self.y[j])
-            x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
-                                                           y.astype(K.floatx()))
+            x, y = self.image_transformer.random_transform(x, y)
             batch_x.append(x)
             batch_y.append(y)
         return (np.asarray(batch_x, dtype=K.floatx()), np.asarray(batch_y, dtype=K.floatx()))

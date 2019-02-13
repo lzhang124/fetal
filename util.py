@@ -1,5 +1,6 @@
 import nibabel as nib
 import numpy as np
+from keras import backend as K
 
 
 def read_vol(filename):
@@ -7,7 +8,7 @@ def read_vol(filename):
 
     if vol.ndim == 3:
         vol = vol[..., np.newaxis]
-    return vol
+    return np.asarray(vol, dtype=K.floatx())
 
 
 def save_vol(vol, filename, header=None, scale=False):
