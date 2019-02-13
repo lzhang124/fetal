@@ -169,6 +169,7 @@ def main(options):
                 logging.info(f'{sample}..............................')
                 if options.temporal:
                     # TODO
+                    pass
                 else:
                     pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
                     pred_gen = VolumeGenerator(pred_files, tile_inputs=True)
