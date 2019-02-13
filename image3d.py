@@ -316,11 +316,12 @@ class Iterator(Sequence):
     def __next__(self, *args, **kwargs):
         return self.next(*args, **kwargs)
 
-    def _get_batches_of_transformed_samples(self, index_array):
+    def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
         """Gets a batch of transformed samples.
 
         # Arguments
             index_array: array of sample indices to include in batch.
+            load_fn: function for loading in data.
 
         # Returns
             A batch of transformed samples.
@@ -355,11 +356,14 @@ class VolumeIterator(Iterator):
         self.image_transformer = image_transformer
         super().__init__(len(x), batch_size, shuffle, seed)
 
-    def _get_batches_of_transformed_samples(self, index_array):
+    def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
         batch_x = []
         if self.y is None:
             for i, j in enumerate(index_array):
-                x = self.x[j]
+                if load_fn is None:
+                    x = self.x[j]
+                else:
+                    x = load_fn(self.x[j])
                 x = self.image_transformer.random_transform(x.astype(K.floatx()))
                 batch_x.append(x)
             batch_x = np.asarray(batch_x, dtype=K.floatx())
@@ -367,7 +371,10 @@ class VolumeIterator(Iterator):
 
         batch_y = []
         for i, j in enumerate(index_array):
-            x, y = self.x[j], self.y[j]
+            if load_fn is None:
+                x, y = self.x[j], self.y[j]
+            else:
+                x, y = load_fn(self.x[j]), load_fn(self.y[j])
             x, y = self.image_transformer.random_transform(x.astype(K.floatx()),
                                                            y.astype(K.floatx()))
             batch_x.append(x)

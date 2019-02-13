@@ -19,21 +19,26 @@ class AugmentGenerator(VolumeIterator):
                  fill_mode='nearest',
                  cval=0.,
                  flip=True,
-                 label_types=None):
+                 label_types=None,
+                 load_files=True):
         self.input_files = input_files
         self.label_files = label_files
-        self.inputs = [preprocess(file) for file in input_files]
+        self.concat_files = concat_files
+        self.inputs = input_files
+        self.labels = label_files
 
-        if concat_files is not None:
-            concats = [[preprocess(file) for file in channel] for channel in concat_files]
-            self.inputs = np.concatenate((self.inputs, *concats))
-
-        if label_files is not None:
-            self.labels = [preprocess(file) for file in label_files]
-        else:
-            self.labels = None
+        if load_files:
+            self.inputs = [preprocess(file) for file in input_files]
+            if concat_files is not None:
+                concats = [[preprocess(file) for file in channel] for channel in concat_files]
+                self.inputs = np.concatenate((self.inputs, *concats))
+            if label_files is not None:
+                self.labels = [preprocess(file) for file in label_files]
+        elif concat_files is not None:
+            self.inputs = np.concatenate((self.inputs, *concat_files))
 
         self.label_types = label_types
+        self.load_files = load_files
 
         image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
@@ -46,10 +51,16 @@ class AugmentGenerator(VolumeIterator):
 
         super().__init__(self.inputs, self.labels, image_transformer, batch_size=batch_size)
 
-    def _get_batches_of_transformed_samples(self, index_array):
-        batch = super()._get_batches_of_transformed_samples(index_array)
+    def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
+        if not self.load_files:
+            if self.concat_files is None:
+                load_fn = lambda x: preprocess(x)
+            else:
+                load_fn = lambda x: np.concatenate((*[preprocess(c) for c in x]))
+
+        batch = super()._get_batches_of_transformed_samples(index_array, load_fn=load_fn)    
         labels = None
-        if self.labels is not None:
+        if self.label_types is not None:
             batch, labels = batch
 
         all_labels = []
@@ -69,27 +80,33 @@ class VolumeGenerator(Sequence):
     def __init__(self,
                  input_files,
                  label_files=None,
+                 concat_files=None,
                  batch_size=1,
                  label_types=None,
+                 load_files=True,
                  tile_inputs=False):
         self.input_files = input_files
         self.label_files = label_files
-        self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in input_files])
-        self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[2:])
+        self.concat_files = concat_files
+        self.inputs = input_files
+        self.labels = label_files
 
-        if concat_files is not None:
-            concats = [[preprocess(file, resize=True, tile=tile_inputs) for file in channel] for channel in concat_files]
-            concats = np.reshape(concats, (-1,) + self.inputs.shape[2:-1] + (len(concats),))
-            self.inputs = np.concatenate((self.inputs, *concats))
+        if load_files:
+            self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in self.inputs])
+            self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[2:])
 
-        if label_files is not None:
-            self.labels = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in label_files])
-            self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[2:])
-        else:
-            self.labels = None
+            if concat_files is not None:
+                concats = [[preprocess(file, resize=True, tile=tile_inputs) for file in channel] for channel in self.concat_files]
+                concats = np.reshape(concats, (-1,) + self.inputs.shape[2:-1] + (len(concats),))
+                self.inputs = np.concatenate((self.inputs, *concats))
+
+            if label_files is not None:
+                self.labels = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in self.labels])
+                self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[2:])
 
         self.batch_size = batch_size
         self.label_types = label_types
+        self.load_files = load_files
         self.tile_inputs = tile_inputs
         self.n = len(self.inputs)
         self.idx = 0
@@ -98,7 +115,18 @@ class VolumeGenerator(Sequence):
         return (self.n + self.batch_size - 1) // self.batch_size
 
     def __getitem__(self, idx):
-        batch = np.array(self.inputs[self.batch_size * idx:self.batch_size * (idx + 1)])
+        batch_start = self.batch_size * idx
+        batch_end = self.batch_size * (idx + 1)
+
+        if self.load_files:
+            batch = np.array(self.inputs[batch_start:batch_end])
+        else:
+            batch = np.array([preprocess(file, resize=True, tile=self.tile_inputs) for file in self.inputs[batch_start:batch_end]])
+            batch = np.reshape(batch, (-1,) + batch.shape[2:])
+            if self.concat_files is not None:
+                concats = [[preprocess(file, resize=True, tile=self.tile_inputs) for file in channel[batch_start:batch_end]] for channel in self.concat_files]
+                concats = np.reshape(concats, (-1,) + batch.shape[2:-1] + (len(concats),))
+                batch = np.concatenate((batch, *concats))
 
         if self.label_types:
             if self.labels is None:
@@ -107,7 +135,12 @@ class VolumeGenerator(Sequence):
             all_labels = []
             for label_type in self.label_types:
                 if label_type == 'label':
-                    all_labels.append(np.array(self.labels[self.batch_size * idx:self.batch_size * (idx + 1)]))
+                    if self.load_files:
+                        label = np.array(self.labels[batch_start:batch_end])
+                    else:
+                        label = np.array([preprocess(file, resize=True, tile=self.tile_inputs) for file in self.labels[batch_start:batch_end]])
+                        label = np.reshape(label, (-1,) + label.shape[2:])
+                    all_labels.append(label)
                 elif label_type == 'input':
                     all_labels.append(batch)
                 else:

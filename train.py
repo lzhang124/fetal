@@ -84,7 +84,8 @@ def main(options):
         train_gen = AugmentGenerator(train_for + train_rev,
                                      label_files=train_label_for + train_label_rev,
                                      concat_files=[[train_rev + train_for], [train_label_rev + train_label_for]],
-                                     label_types=label_types)
+                                     label_types=label_types,
+                                     load_files=False)
         weights = util.get_weights(train_gen.labels)
 
         if not options.skip_training:
@@ -101,7 +102,8 @@ def main(options):
             val_gen = VolumeGenerator(val_for + val_rev,
                                       label_files=val_label_for + val_label_rev,
                                       concat_files=[[val_rev + val_for], [val_label_rev + val_label_for]],
-                                      label_types=label_types)
+                                      label_types=label_types,
+                                      load_files=False)
 
         if options.predict_all:
             pass
@@ -116,11 +118,12 @@ def main(options):
                 test_rev.extend([f'data/raw/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
                 test_label_for.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames])
                 test_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
-            pred_gen = VolumeGenerator(test_for + test_rev, tile_inputs=True)
+            pred_gen = VolumeGenerator(test_for + test_rev, tile_inputs=True, load_files=False)
             test_gen = VolumeGenerator(test_for + test_rev,
                                        label_files=test_label_for + test_label_rev,
                                        concat_files=[[test_rev + test_for], [test_label_rev + test_label_for]],
-                                       label_types=label_types)
+                                       label_types=label_types,
+                                       load_files=False)
 
         logging.info('Creating model.')
         shape = constants.SHAPE[:-1] + (3,)
