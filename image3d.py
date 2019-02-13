@@ -352,6 +352,7 @@ class VolumeIterator(Iterator):
             self.y = None
 
         self.image_transformer = image_transformer
+        super().__init__(len(x), batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
         batch_x = []
