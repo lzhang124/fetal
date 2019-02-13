@@ -36,6 +36,7 @@ class AugmentGenerator(VolumeIterator):
                 self.labels = [preprocess(file) for file in label_files]
         elif concat_files is not None:
             self.inputs = np.concatenate((self.inputs, *concat_files))
+            print(self.inputs[0])
 
         self.label_types = label_types
         self.load_files = load_files
