@@ -82,7 +82,7 @@ def main(options):
             train_rev.extend([f'data/raw/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
             train_label_for.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames])
             train_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
-            weight_labels.extend([f'data/labels/{s}/{s}_{constants.LABELED_FRAME[s]}_{organ}.nii.gz'])
+            weight_labels.extend(glob.glob(f'data/labels/{s}/{s}_{constants.LABELED_FRAME[s]}_{organ}.nii.gz'))
         train_gen = AugmentGenerator(train_for + train_rev,
                                      label_files=train_label_for + train_label_rev,
                                      concat_files=[train_rev + train_for, train_label_rev + train_label_for],
