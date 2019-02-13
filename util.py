@@ -34,6 +34,8 @@ def header(filename):
 def get_weights(vols):
     if vols is None:
         return None
+    if type(vols[0]) is not np.ndarray:
+        vols = [read_vol(vol) for vol in vols]
     weight = 0
     total = 0
     for vol in vols:

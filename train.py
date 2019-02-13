@@ -75,18 +75,20 @@ def main(options):
         train_rev = []
         train_label_for = []
         train_label_rev = []
+        weight_labels = []
         for s in train:
             frames = constants.GOOD_FRAMES[s]
             train_for.extend([f'data/raw/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames])
             train_rev.extend([f'data/raw/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
             train_label_for.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames])
             train_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
+            weight_labels.extend([f'data/labels/{s}/{s}_{constants.LABELED_FRAME[s]}_{organ}.nii.gz'])
         train_gen = AugmentGenerator(train_for + train_rev,
                                      label_files=train_label_for + train_label_rev,
                                      concat_files=[train_rev + train_for, train_label_rev + train_label_for],
                                      label_types=label_types,
                                      load_files=False)
-        weights = util.get_weights(train_gen.labels)
+        weights = util.get_weights(weight_labels)
 
         if not options.skip_training:
             val_for = []
@@ -138,21 +140,21 @@ def main(options):
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
-        train_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in train]
-        train_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in train]
+        train_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in train]
+        train_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in train]
         train_gen = AugmentGenerator(train_files, label_files=train_label_files, label_types=label_types)
         weights = util.get_weights(train_gen.labels)
 
         if not options.skip_training:
-            val_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in val]
-            val_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in val]
+            val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
+            val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
             val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
 
         if options.predict_all:
             pass
         else:
-            test_files = [f'data/raw/{sample}/{sample}_0000.nii.gz' for sample in test]
-            test_label_files = [f'data/labels/{sample}/{sample}_0_{organ}.nii.gz' for sample in test]
+            test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
+            test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
             pred_gen = VolumeGenerator(test_files, tile_inputs=True)
             test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
 
@@ -188,7 +190,7 @@ def main(options):
         dice = {}
         for i in range(len(test)):
             sample = test[i]
-            dice[sample] = util.dice_coef(util.read_vol(test_label_files[i]), util.read_vol(f'data/predict/{options.name}/{sample}_0000.nii.gz'))
+            dice[sample] = util.dice_coef(util.read_vol(test_label_files[i]), util.read_vol(f'data/predict/{options.name}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz'))
         logging.info(metrics)
         logging.info(np.mean(list(metrics.values())))
 
