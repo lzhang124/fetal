@@ -88,6 +88,7 @@ def main(options):
         weights = util.get_weights(train_gen.labels)
 
         if not options.skip_training:
+            logging.info('Creating data generators.')
             val_for = []
             val_rev = []
             val_label_for = []
@@ -161,7 +162,6 @@ def main(options):
         logging.info('Training model.')
         model.train(train_gen, val_gen, options.epochs)
 
-    # FIXME
     if options.predict_all:
         for folder in glob.glob('data/raw/*'):
             try:
