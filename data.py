@@ -26,7 +26,7 @@ class AugmentGenerator(VolumeIterator):
 
         if concat_files is not None:
             concats = [[preprocess(file) for file in channel] for channel in concat_files]
-            self.inputs = np.concatenate((self.inputs, concats*))
+            self.inputs = np.concatenate((self.inputs, *concats))
 
         if label_files is not None:
             self.labels = [preprocess(file) for file in label_files]
@@ -80,7 +80,7 @@ class VolumeGenerator(Sequence):
         if concat_files is not None:
             concats = [[preprocess(file, resize=True, tile=tile_inputs) for file in channel] for channel in concat_files]
             concats = np.reshape(concats, (-1,) + self.inputs.shape[2:-1] + (len(concats),))
-            self.inputs = np.concatenate((self.inputs, concats*))
+            self.inputs = np.concatenate((self.inputs, *concats))
 
         if label_files is not None:
             self.labels = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in label_files])
