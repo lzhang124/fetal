@@ -62,7 +62,7 @@ def main(options):
 
     if options.temporal:
         logging.info('Splitting data.')
-        samples = constants.GOOD_FRAMES.keys()
+        samples = list(constants.GOOD_FRAMES.keys())
         n = len(samples)
         shuffled = np.random.permutation(samples)
         train = shuffled[:(2*n)//3]
