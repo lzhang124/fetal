@@ -88,7 +88,6 @@ def main(options):
         weights = util.get_weights(train_gen.labels)
 
         if not options.skip_training:
-            logging.info('Creating data generators.')
             val_for = []
             val_rev = []
             val_label_for = []
