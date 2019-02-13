@@ -83,7 +83,7 @@ def main(options):
             train_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
         train_gen = AugmentGenerator(train_for + train_rev,
                                      label_files=train_label_for + train_label_rev,
-                                     concat_files=[[train_rev + train_for], [train_label_rev + train_label_for]],
+                                     concat_files=[train_rev + train_for, train_label_rev + train_label_for],
                                      label_types=label_types,
                                      load_files=False)
         weights = util.get_weights(train_gen.labels)
@@ -101,7 +101,7 @@ def main(options):
                 val_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
             val_gen = VolumeGenerator(val_for + val_rev,
                                       label_files=val_label_for + val_label_rev,
-                                      concat_files=[[val_rev + val_for], [val_label_rev + val_label_for]],
+                                      concat_files=[val_rev + val_for, val_label_rev + val_label_for],
                                       label_types=label_types,
                                       load_files=False)
 
@@ -121,7 +121,7 @@ def main(options):
             pred_gen = VolumeGenerator(test_for + test_rev, tile_inputs=True, load_files=False)
             test_gen = VolumeGenerator(test_for + test_rev,
                                        label_files=test_label_for + test_label_rev,
-                                       concat_files=[[test_rev + test_for], [test_label_rev + test_label_for]],
+                                       concat_files=[test_rev + test_for, test_label_rev + test_label_for],
                                        label_types=label_types,
                                        load_files=False)
 
