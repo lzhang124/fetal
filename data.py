@@ -93,18 +93,16 @@ class VolumeGenerator(Sequence):
 
         if load_files:
             self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in self.inputs])
-            print(self.inputs.shape)
-            self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[2:])
-            print(self.inputs.shape)
+            self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[-4:])
 
             if concat_files is not None:
                 concats = [[preprocess(file, resize=True, tile=tile_inputs) for file in channel] for channel in self.concat_files]
-                concats = np.reshape(concats, (-1,) + self.inputs.shape[2:-1] + (len(concats),))
+                concats = np.reshape(concats, (-1,) + self.inputs.shape[-4:-1] + (len(concats),))
                 self.inputs = np.concatenate((self.inputs, *concats), axis=-1)
 
             if label_files is not None:
                 self.labels = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in self.labels])
-                self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[2:])
+                self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[-4:])
 
         self.batch_size = batch_size
         self.label_types = label_types
@@ -124,10 +122,10 @@ class VolumeGenerator(Sequence):
             batch = np.array(self.inputs[batch_start:batch_end])
         else:
             batch = np.array([preprocess(file, resize=True, tile=self.tile_inputs) for file in self.inputs[batch_start:batch_end]])
-            batch = np.reshape(batch, (-1,) + batch.shape[2:])
+            batch = np.reshape(batch, (-1,) + batch.shape[-4:])
             if self.concat_files is not None:
                 concats = [[preprocess(file, resize=True, tile=self.tile_inputs) for file in channel[batch_start:batch_end]] for channel in self.concat_files]
-                concats = np.reshape(concats, (-1,) + batch.shape[2:-1] + (len(concats),))
+                concats = np.reshape(concats, (-1,) + batch.shape[-4:-1] + (len(concats),))
                 batch = np.concatenate((batch, *concats), axis=-1)
 
         if self.label_types:
@@ -141,7 +139,7 @@ class VolumeGenerator(Sequence):
                         label = np.array(self.labels[batch_start:batch_end])
                     else:
                         label = np.array([preprocess(file, resize=True, tile=self.tile_inputs) for file in self.labels[batch_start:batch_end]])
-                        label = np.reshape(label, (-1,) + label.shape[2:])
+                        label = np.reshape(label, (-1,) + label.shape[-4:])
                     all_labels.append(label)
                 elif label_type == 'input':
                     all_labels.append(batch)
