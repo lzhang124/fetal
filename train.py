@@ -146,13 +146,13 @@ def main(options):
         train_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in train]
         train_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in train]
         train_gen = AugmentGenerator(train_files, label_files=train_label_files, label_types=label_types, load_files=options.load_files)
-        print(train_gen.inputs[0].shape)
         weights = util.get_weights(train_gen.labels)
 
         if not options.skip_training:
             val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
             val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
             val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files)
+            print(val_gen.inputs[0].shape)
 
         if options.predict_all:
             pass
