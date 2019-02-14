@@ -345,7 +345,6 @@ class VolumeIterator(Iterator):
     def __init__(self, x, y, image_transformer,
                  batch_size=32, shuffle=True, seed=None):
         self.x = x
-        print(type(x[0]))
         if y is not None:
             self.y = y
         else:
