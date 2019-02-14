@@ -152,6 +152,7 @@ def main(options):
             val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
             val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
             val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files)
+            val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files, tile_inputs=True)
 
         if options.predict_all:
             pass
