@@ -93,7 +93,9 @@ class VolumeGenerator(Sequence):
 
         if load_files:
             self.inputs = np.array([preprocess(file, resize=True, tile=tile_inputs) for file in self.inputs])
+            print(self.inputs.shape)
             self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[2:])
+            print(self.inputs.shape)
 
             if concat_files is not None:
                 concats = [[preprocess(file, resize=True, tile=tile_inputs) for file in channel] for channel in self.concat_files]
