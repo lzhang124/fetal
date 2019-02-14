@@ -19,6 +19,9 @@ parser.add_argument('--name',
 parser.add_argument('--model-file',
                     help='Pretrained model file',
                     dest='model_file', type=str)
+parser.add_argument('--load-files',
+                    help='Load files',
+                    dest='load_files', action='store_true')
 parser.add_argument('--skip-training',
                     help='Skip training',
                     dest='skip_training', action='store_true')
@@ -87,7 +90,7 @@ def main(options):
                                      label_files=train_label_for + train_label_rev,
                                      concat_files=[train_rev + train_for, train_label_rev + train_label_for],
                                      label_types=label_types,
-                                     load_files=False)
+                                     load_files=options.load_files)
         weights = util.get_weights(weight_labels)
 
         if not options.skip_training:
@@ -105,7 +108,7 @@ def main(options):
                                       label_files=val_label_for + val_label_rev,
                                       concat_files=[val_rev + val_for, val_label_rev + val_label_for],
                                       label_types=label_types,
-                                      load_files=False)
+                                      load_files=options.load_files)
 
         if options.predict_all:
             pass
@@ -120,12 +123,12 @@ def main(options):
                 test_rev.extend([f'data/raw/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
                 test_label_for.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames])
                 test_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames])
-            pred_gen = VolumeGenerator(test_for + test_rev, tile_inputs=True, load_files=False)
+            pred_gen = VolumeGenerator(test_for + test_rev, tile_inputs=True, load_files=options.load_files)
             test_gen = VolumeGenerator(test_for + test_rev,
                                        label_files=test_label_for + test_label_rev,
                                        concat_files=[test_rev + test_for, test_label_rev + test_label_for],
                                        label_types=label_types,
-                                       load_files=False)
+                                       load_files=options.load_files)
 
         logging.info('Creating model.')
         shape = constants.SHAPE[:-1] + (3,)
@@ -142,21 +145,21 @@ def main(options):
         label_types = LABELS[options.model]
         train_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in train]
         train_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in train]
-        train_gen = AugmentGenerator(train_files, label_files=train_label_files, label_types=label_types)
+        train_gen = AugmentGenerator(train_files, label_files=train_label_files, label_types=label_types, load_files=options.load_files)
         weights = util.get_weights(train_gen.labels)
 
         if not options.skip_training:
             val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
             val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
-            val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
+            val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files)
 
         if options.predict_all:
             pass
         else:
             test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
             test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
-            pred_gen = VolumeGenerator(test_files, tile_inputs=True)
-            test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
+            pred_gen = VolumeGenerator(test_files, tile_inputs=True, load_files=options.load_files)
+            test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types, load_files=options.load_files)
 
         logging.info('Creating model.')
         shape = constants.SHAPE
