@@ -92,8 +92,8 @@ def main(options):
                                      label_types=label_types,
                                      load_files=options.load_files)
         weights = util.get_weights(weight_labels)
-        print(len(train_for))
-        print(weights)
+        logging.info(len(train_for))
+        logging.info(weights)
 
         if not options.skip_training:
             val_for = []
