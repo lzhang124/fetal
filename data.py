@@ -52,16 +52,13 @@ class AugmentGenerator(VolumeIterator):
         super().__init__(self.inputs, self.labels, image_transformer, batch_size=batch_size)
 
     def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
-        def test(x):
-            print(x)
-            return np.concatenate([preprocess(c) for c in x], axis=-1)
         if not self.load_files:
-            if self.concat_files is None:
-                load_fn = lambda x: preprocess(x)
-            else:
-                # load_fn = lambda x: np.concatenate([preprocess(c) for c in x], axis=-1)
-                load_fn = test
-
+            def load(sample):
+                if isinstance(sample, str):
+                    return preprocess(sample)
+                else:
+                    return np.concatenate([preprocess(s) for s in sample], axis=-1)
+            load_fn = load
         batch = super()._get_batches_of_transformed_samples(index_array, load_fn=load_fn)    
         labels = None
         if self.label_types is not None:
