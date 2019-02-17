@@ -64,6 +64,7 @@ def main(options):
     organ = 'all_brains' if options.organ == 'brains' else options.organ
 
     if options.temporal:
+        logging.info('Temporal model.')
         logging.info('Splitting data.')
         samples = list(constants.GOOD_FRAMES.keys())
         n = len(samples)
@@ -134,6 +135,7 @@ def main(options):
         shape = constants.SHAPE[:-1] + (3,)
         model = MODELS[options.model](shape, name=options.name, filename=options.model_file, weights=weights)
     else:
+        logging.info('Non-temporal model.')
         logging.info('Splitting data.')
         n = len(constants.SAMPLES)
         shuffled = np.random.permutation(constants.SAMPLES)
