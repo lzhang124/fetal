@@ -360,7 +360,6 @@ class VolumeIterator(Iterator):
                 if load_fn is None:
                     x = self.x[j]
                 else:
-                    print(self.x[j])
                     x = load_fn(self.x[j])
                 x = self.image_transformer.random_transform(x)
                 batch_x.append(x)
