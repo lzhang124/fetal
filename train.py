@@ -159,9 +159,6 @@ def main(options):
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
-        # train_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in train]
-        # train_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in train]
-        # train_gen = DataGenerator(train_files, label_files=train_label_files, label_types=label_types, load_files=options.load_files, augment=True)
         train_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in train},
                                   'data/raw/{s}/{s}_{n}.nii.gz',
                                   f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
@@ -173,9 +170,6 @@ def main(options):
 
         val_gen = None
         if not options.skip_training and options.validate:
-            # val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
-            # val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
-            # val_gen = DataGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files, resize=True)
             val_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in val},
                                     'data/raw/{s}/{s}_{n}.nii.gz',
                                     f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
@@ -190,10 +184,6 @@ def main(options):
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         else:
-            # test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
-            # test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
-            # pred_gen = DataGenerator(test_files, tile_inputs=True)
-            # test_gen = DataGenerator(test_files, label_files=test_label_files, label_types=label_types, load_files=options.load_files, resize=True)
             pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      tile_inputs=True)
