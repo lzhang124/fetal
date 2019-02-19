@@ -65,7 +65,7 @@ LABELS = {
 def main(options):
     start = time.time()
 
-    np.random.seed(123454321)
+    np.random.seed(123456789)
 
     organ = 'all_brains' if options.organ == 'brains' else options.organ
 
@@ -168,13 +168,13 @@ def main(options):
         if not options.skip_training and options.validate:
             val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
             val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
-            val_gen = DataGenerator(val_files, label_files=val_label_files, label_types=label_types, resize=True)
+            val_gen = DataGenerator(val_files, label_files=val_label_files, label_types=label_types, resize=True, shuffle=False)
 
         if not options.predict_all:
             test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
             test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
-            pred_gen = DataGenerator(test_files, tile_inputs=True)
-            test_gen = DataGenerator(test_files, label_files=test_label_files, label_types=label_types, resize=True)
+            pred_gen = DataGenerator(test_files, tile_inputs=True, shuffle=False)
+            test_gen = DataGenerator(test_files, label_files=test_label_files, label_types=label_types, resize=True, shuffle=False)
 
         logging.info('Creating model.')
         shape = constants.SHAPE
@@ -195,7 +195,7 @@ def main(options):
                     pass
                 else:
                     pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
-                    pred_gen = DataGenerator(pred_files, tile_inputs=True)
+                    pred_gen = DataGenerator(pred_files, tile_inputs=True, shuffle=False)
                     model.predict(pred_gen, f'data/predict/{options.name}/{sample}/')
             except Exception as e:
                 logging.error(f'ERROR during {sample}: {e}')

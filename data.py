@@ -10,7 +10,7 @@ class DataGenerator(Iterator):
                  label_files=None,
                  label_types=None,
                  load_files=True,
-                 augment=True,
+                 augment=False,
                  resize=False,
                  tile_inputs=False,
                  batch_size=1,
