@@ -117,7 +117,7 @@ class DataGenerator(Iterator):
         self.tile_inputs = tile_inputs
         
         if not self.random_gen:
-            for s in self.frames.items():
+            for s in self.frames:
                 for n in self.frames[s]:
                     self.input_files.append(self.input_file_format.format(s=s, n=str(n).zfill(4)))
                     if self.label_file_format:
