@@ -164,7 +164,7 @@ def main(options):
         # train_gen = DataGenerator(train_files, label_files=train_label_files, label_types=label_types, load_files=options.load_files, augment=True)
         train_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in train},
                                   'data/raw/{s}/{s}_{n}.nii.gz',
-                                  f'data/labels/\{s\}/\{s\}_\{n\}_{organ}.nii.gz',
+                                  f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
                                   label_types=label_types,
                                   load_files=options.load_files,
                                   augment=True)
@@ -177,7 +177,7 @@ def main(options):
             # val_gen = DataGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files, resize=True)
             val_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in val},
                                     'data/raw/{s}/{s}_{n}.nii.gz',
-                                    f'data/labels/\{s\}/\{s\}_\{n\}_{organ}.nii.gz',
+                                    f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
                                     label_types=label_types,
                                     load_files=options.load_files,
                                     resize=True)
@@ -196,7 +196,7 @@ def main(options):
                                      tile_inputs=True)
             test_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
-                                     f'data/labels/\{s\}/\{s\}_\{n\}_{organ}.nii.gz',
+                                     f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
                                      label_types=label_types,
                                      load_files=options.load_files,
                                      resize=True)
