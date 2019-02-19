@@ -39,6 +39,7 @@ def save_predictions(preds, generator, path, scale=False):
     os.makedirs(path, exist_ok=True)
 
     if generator.tile_inputs:
+        print(preds.shape)
         preds = np.reshape(preds, (-1, 8) + preds.shape[1:])
 
     for i in range(preds.shape[0]):
