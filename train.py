@@ -181,6 +181,7 @@ def main(options):
         if options.predict_all:
             pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
+                                     load_files=False,
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         else:
