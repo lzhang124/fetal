@@ -137,7 +137,9 @@ class DataGenerator(Iterator):
                 if self.label_files is not None:
                     self.labels = np.reshape(self.labels, (-1,) + np.asarray(self.labels).shape[-4:])
         elif self.tile_inputs:
-            raise ValueError('Input tiling is only supported if files are preloaded.')
+            self.inputs = np.repeat(self.inputs, 8)
+            if self.label_files is not None:
+                self.labels = np.repeat(self.labels, 8)
 
         if self.augment:
             self.image_transformer = ImageTransformer(rotation_range=90.,
@@ -157,12 +159,14 @@ class DataGenerator(Iterator):
             for _, i in enumerate(index_array):
                 if self.load_files:
                     x = self.inputs[i]
+                elif self.tile_inputs:
+                    x = preprocess(self.inputs[i], tile=self.tile_inputs)[i%8]
                 elif self.random_gen:
                     s = self.samples[i]
                     n = np.random.choice(self.frames[s])
                     x = preprocess(self.input_file_format.format(s=s, n=str(n).zfill(4)), resize=self.resize, tile=self.tile_inputs)
                 else:
-                    x = preprocess(self.inputs[i], resize=self.resize, tile=self.tile_inputs)
+                    x = preprocess(self.inputs[i], resize=self.resize)
                 if self.augment:
                     x = self.image_transformer.random_transform(x, seed=self.seed)
                 batch.append(x)
@@ -173,14 +177,17 @@ class DataGenerator(Iterator):
             if self.load_files:
                 x = self.inputs[i]
                 y = self.labels[i]
+            elif self.tile_inputs:
+                x = preprocess(self.inputs[i], tile=self.tile_inputs)[i%8]
+                y = preprocess(self.labels[i], tile=self.tile_inputs)[i%8]
             elif self.random_gen:
                 s = self.samples[i]
                 n = np.random.choice(self.frames[s])
                 x = preprocess(self.input_file_format.format(s=s, n=str(n).zfill(4)), resize=self.resize, tile=self.tile_inputs)
                 y = preprocess(self.label_file_format.format(s=s, n=str(n).zfill(4)), resize=self.resize, tile=self.tile_inputs)
             else:
-                x = preprocess(self.inputs[i], resize=self.resize, tile=self.tile_inputs)
-                y = preprocess(self.labels[i], resize=self.resize, tile=self.tile_inputs)
+                x = preprocess(self.inputs[i], resize=self.resize)
+                y = preprocess(self.labels[i], resize=self.resize)
             if self.augment:
                 x, y = self.image_transformer.random_transform(x, y, seed=self.seed)
             batch.append(x)
