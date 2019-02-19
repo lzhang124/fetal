@@ -221,12 +221,13 @@ def main(options):
         logging.info('Testing model.')
         metrics = model.test(test_gen)
         logging.info(metrics)
+        
         dice = {}
         for i in range(len(test)):
             sample = test[i]
             dice[sample] = util.dice_coef(util.read_vol(f'data/labels/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}_{organ}.nii.gz'),
                                           util.read_vol(f'data/predict/{options.name}/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz'))
-        logging.info(metrics)
+        logging.info(dice)
 
     end = time.time()
     logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
