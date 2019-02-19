@@ -22,6 +22,7 @@ def split(vol):
         for j in slice(constants.SHAPE[1]), slice(-constants.SHAPE[1], vol.shape[1]):
             for k in slice(constants.SHAPE[2]), slice(-constants.SHAPE[2], vol.shape[2]):
                 vols.append(vol[i, j, k])
+    print(len(vols))
     return np.asarray(vols)
 
 
@@ -44,6 +45,7 @@ def preprocess(files, resize=False, tile=False):
         vol = split(vol)
     elif resize:
         vol = crop(vol)
+    print(vol.shape)
     return vol
 
 

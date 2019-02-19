@@ -44,8 +44,6 @@ class DataGenerator(Iterator):
                                              flip=True)
 
         super().__init__(len(input_files), batch_size, self.augment, seed)
-        print(len(input_files))
-        print(len(self))
 
     def _get_batch(self, index_array):
         batch = []
