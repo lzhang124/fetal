@@ -48,7 +48,7 @@ def save_predictions(preds, generator, path, scale=False):
         header = util.header(input_file)
         shape = util.shape(input_file)
         volume = process.postprocess(preds[i], shape, resize=True, tile=generator.tile_inputs)
-        os.makedirs(f'{path}/{sample}/', exist_ok=True)s
+        os.makedirs(f'{path}/{sample}/', exist_ok=True)
         util.save_vol(volume, os.path.join(f'{path}/{sample}/', fname), header, scale)
 
 
