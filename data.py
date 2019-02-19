@@ -34,7 +34,7 @@ class AugmentGenerator(Iterator):
             if label_files is not None:
                 self.labels = [preprocess(file) for file in label_files]
 
-        image_transformer = ImageTransformer(rotation_range=rotation_range,
+        self.image_transformer = ImageTransformer(rotation_range=rotation_range,
                                              shift_range=shift_range,
                                              shear_range=shear_range,
                                              zoom_range=zoom_range,
