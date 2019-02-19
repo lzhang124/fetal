@@ -34,8 +34,6 @@ class DataGenerator(Iterator):
                 self.inputs = np.reshape(self.inputs, (-1,) + np.asarray(self.inputs).shape[-4:])
                 if label_files is not None:
                     self.labels = np.reshape(self.labels, (-1,) + np.asarray(self.labels).shape[-4:])
-                print(np.asarray(self.inputs).shape)
-                print(np.asarray(self.labels).shape)
         if augment:
             self.image_transformer = ImageTransformer(rotation_range=90.,
                                              shift_range=0.1,
@@ -46,6 +44,8 @@ class DataGenerator(Iterator):
                                              cval=0,
                                              flip=True)
 
+        if self.tile_inputs:
+            print(len(input_filess))
         super().__init__(len(input_files), batch_size, self.augment, seed)
 
     def _get_batch(self, index_array):
