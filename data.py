@@ -14,7 +14,6 @@ class DataGenerator(Iterator):
                  resize=False,
                  tile_inputs=False,
                  batch_size=1,
-                 shuffle=True,
                  seed=None):
         self.input_files = input_files
         self.label_files = label_files
@@ -44,7 +43,7 @@ class DataGenerator(Iterator):
                                              cval=0,
                                              flip=True)
 
-        super().__init__(len(input_files), batch_size, shuffle, seed)
+        super().__init__(len(input_files), batch_size, self.augment, seed)
 
     def _get_batch(self, index_array):
         batch = []
