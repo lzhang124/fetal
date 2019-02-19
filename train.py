@@ -168,6 +168,7 @@ def main(options):
                                   label_types=label_types,
                                   load_files=options.load_files,
                                   augment=True)
+        logging.info(f'  Training generator with {len(train_gen)} samples.')
         weights = util.get_weights(train_gen.labels)
 
         val_gen = None
@@ -181,11 +182,13 @@ def main(options):
                                     label_types=label_types,
                                     load_files=options.load_files,
                                     resize=True)
+            logging.info(f'  Validation generator with {len(val_gen)} samples.')
 
         if options.predict_all:
             pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      tile_inputs=True)
+            logging.info(f'  Prediction generator with {len(pred_gen)} samples.')
         else:
             # test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
             # test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
@@ -194,12 +197,14 @@ def main(options):
             pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      tile_inputs=True)
+            logging.info(f'  Prediction generator with {len(pred_gen)} samples.')
             test_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
                                      label_types=label_types,
                                      load_files=options.load_files,
                                      resize=True)
+            logging.info(f'  Testing generator with {len(test_gen)} samples.')
 
         logging.info('Creating model.')
         shape = constants.SHAPE
