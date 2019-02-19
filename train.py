@@ -224,9 +224,8 @@ def main(options):
         dice = {}
         for i in range(len(test)):
             sample = test[i]
-            fname = f'{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz'
-            dice[sample] = util.dice_coef(util.read_vol(f'data/labels/{fname}'),
-                                          util.read_vol(f'data/predict/{options.name}/{fname}'))
+            dice[sample] = util.dice_coef(util.read_vol(f'data/labels/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}_{organ}.nii.gz'),
+                                          util.read_vol(f'data/predict/{options.name}/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz'))
         logging.info(metrics)
 
     end = time.time()
