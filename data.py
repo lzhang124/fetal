@@ -34,19 +34,20 @@ class DataGenerator(Iterator):
                 self.inputs = np.reshape(self.inputs, (-1,) + np.asarray(self.inputs).shape[-4:])
                 if label_files is not None:
                     self.labels = np.reshape(self.labels, (-1,) + np.asarray(self.labels).shape[-4:])
+        elif self.tile_inputs:
+            raise ValueError('Input tiling is only supported if files are preloaded.')
+
         if augment:
             self.image_transformer = ImageTransformer(rotation_range=90.,
-                                             shift_range=0.1,
-                                             shear_range=0.1,
-                                             zoom_range=0.1,
-                                             crop_size=constants.SHAPE,
-                                             fill_mode='nearest',
-                                             cval=0,
-                                             flip=True)
+                                                      shift_range=0.1,
+                                                      shear_range=0.1,
+                                                      zoom_range=0.1,
+                                                      crop_size=constants.SHAPE,
+                                                      fill_mode='nearest',
+                                                      cval=0,
+                                                      flip=True)
 
-        if self.tile_inputs:
-            print(len(input_files))
-        super().__init__(len(input_files), batch_size, self.augment, seed)
+        super().__init__(len(self.inputs), batch_size, self.augment, seed)
 
     def _get_batch(self, index_array):
         batch = []
