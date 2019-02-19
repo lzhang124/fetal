@@ -29,8 +29,8 @@ parser.add_argument('--predict-all',
                     help='Predict all samples',
                     dest='predict_all', action='store_true')
 parser.add_argument('--temporal',
-                    help='Temporal segmentation',
-                    dest='temporal', action='store_true')
+                    help='Temporal segmentation using predictions from model',
+                    dest='temporal', type=str)
 options = parser.parse_args()
 
 import constants
@@ -84,8 +84,8 @@ def main(options):
             frames = constants.GOOD_FRAMES[s]
             train_for.extend([f'data/raw/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
             train_rev.extend([f'data/raw/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
-            train_label_for.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
-            train_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
+            train_label_for.extend([f'data/predict_cleaned/{options.temporal}/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
+            train_label_rev.extend([f'data/predict_cleaned/{options.temporal}/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
             weight_labels.extend(glob.glob(f'data/labels/{s}/{s}_{constants.LABELED_FRAME[s]}_{organ}.nii.gz'))
         train_gen = AugmentGenerator(train_for + train_rev,
                                      label_files=train_label_for + train_label_rev,
@@ -103,17 +103,15 @@ def main(options):
                 frames = constants.GOOD_FRAMES[s]
                 val_for.extend([f'data/raw/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
                 val_rev.extend([f'data/raw/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
-                val_label_for.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
-                val_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
+                val_label_for.extend([f'data/predict_cleaned/{options.temporal}/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
+                val_label_rev.extend([f'data/predict_cleaned/{options.temporal}/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
             val_gen = VolumeGenerator(val_for + val_rev,
                                       label_files=val_label_for + val_label_rev,
                                       concat_files=[val_rev + val_for, val_label_rev + val_label_for],
                                       label_types=label_types,
                                       load_files=options.load_files)
 
-        if options.predict_all:
-            pass
-        else:
+        if not options.predict_all:
             test_for = []
             test_rev = []
             test_label_for = []
@@ -122,8 +120,8 @@ def main(options):
                 frames = constants.GOOD_FRAMES[s]
                 test_for.extend([f'data/raw/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
                 test_rev.extend([f'data/raw/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
-                test_label_for.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
-                test_label_rev.extend([f'data/predict_cleaned/unet3000/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
+                test_label_for.extend([f'data/predict_cleaned/{options.temporal}/{s}/{s}_{str(i).zfill(4)}.nii.gz' for i in frames if i != 0])
+                test_label_rev.extend([f'data/predict_cleaned/{options.temporal}/{s}/{s}_{str(i-1).zfill(4)}.nii.gz' for i in frames if i != 0])
             pred_gen = VolumeGenerator(test_for + test_rev, tile_inputs=True, load_files=options.load_files)
             test_gen = VolumeGenerator(test_for + test_rev,
                                        label_files=test_label_for + test_label_rev,
@@ -153,15 +151,13 @@ def main(options):
         if not options.skip_training:
             val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
             val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
-            val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files)
+            val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
 
-        if options.predict_all:
-            pass
-        else:
+        if not options.predict_all:
             test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
             test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
-            pred_gen = VolumeGenerator(test_files, tile_inputs=True, load_files=options.load_files)
-            test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types, load_files=options.load_files)
+            pred_gen = VolumeGenerator(test_files, tile_inputs=True)
+            test_gen = VolumeGenerator(test_files, label_files=test_label_files, label_types=label_types)
 
         logging.info('Creating model.')
         shape = constants.SHAPE
@@ -172,6 +168,7 @@ def main(options):
         model.train(train_gen, val_gen, options.epochs)
 
     if options.predict_all:
+        logging.info('Making predictions.')
         for folder in glob.glob('data/raw/*'):
             try:
                 sample = folder.split('/')[-1]
