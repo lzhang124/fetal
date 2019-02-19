@@ -147,8 +147,8 @@ def main(options):
     else:
         logging.info('Non-temporal model.')
         logging.info('Splitting data.')
-        n = len(constants.SAMPLES)
-        shuffled = np.random.permutation(constants.SAMPLES)
+        n = len(constants.LABELED_SAMPLES)
+        shuffled = np.random.permutation(constants.LABELED_SAMPLES)
         if options.validate:
             train = shuffled[:(2*n)//3]
             val = shuffled[(2*n)//3:(5*n)//6]
@@ -159,22 +159,47 @@ def main(options):
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
-        train_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in train]
-        train_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in train]
-        train_gen = DataGenerator(train_files, label_files=train_label_files, label_types=label_types, load_files=options.load_files, augment=True)
+        # train_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in train]
+        # train_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in train]
+        # train_gen = DataGenerator(train_files, label_files=train_label_files, label_types=label_types, load_files=options.load_files, augment=True)
+        train_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in train},
+                                  'data/raw/{s}/{s}_{n}.nii.gz',
+                                  f'data/labels/\{s\}/\{s\}_\{n\}_{organ}.nii.gz',
+                                  label_types=label_types,
+                                  load_files=options.load_files,
+                                  augment=True)
         weights = util.get_weights(train_gen.labels)
 
         val_gen = None
         if not options.skip_training and options.validate:
-            val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
-            val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
-            val_gen = DataGenerator(val_files, label_files=val_label_files, label_types=label_types, resize=True)
+            # val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
+            # val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
+            # val_gen = DataGenerator(val_files, label_files=val_label_files, label_types=label_types, load_files=options.load_files, resize=True)
+            val_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in val},
+                                    'data/raw/{s}/{s}_{n}.nii.gz',
+                                    f'data/labels/\{s\}/\{s\}_\{n\}_{organ}.nii.gz',
+                                    label_types=label_types,
+                                    load_files=options.load_files,
+                                    resize=True)
 
-        if not options.predict_all:
-            test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
-            test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
-            pred_gen = DataGenerator(test_files, tile_inputs=True)
-            test_gen = DataGenerator(test_files, label_files=test_label_files, label_types=label_types, resize=True)
+        if options.predict_all:
+            pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
+                                     'data/raw/{s}/{s}_{n}.nii.gz',
+                                     tile_inputs=True)
+        else:
+            # test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
+            # test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
+            # pred_gen = DataGenerator(test_files, tile_inputs=True)
+            # test_gen = DataGenerator(test_files, label_files=test_label_files, label_types=label_types, load_files=options.load_files, resize=True)
+            pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
+                                     'data/raw/{s}/{s}_{n}.nii.gz',
+                                     tile_inputs=True)
+            test_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
+                                     'data/raw/{s}/{s}_{n}.nii.gz',
+                                     f'data/labels/\{s\}/\{s\}_\{n\}_{organ}.nii.gz',
+                                     label_types=label_types,
+                                     load_files=options.load_files,
+                                     resize=True)
 
         logging.info('Creating model.')
         shape = constants.SHAPE
@@ -184,25 +209,10 @@ def main(options):
         logging.info('Training model.')
         model.train(train_gen, val_gen, options.epochs)
 
-    if options.predict_all:
-        logging.info('Making predictions.')
-        for folder in glob.glob('data/raw/*'):
-            try:
-                sample = folder.split('/')[-1]
-                logging.info(f'{sample}..............................')
-                if options.temporal:
-                    # TODO
-                    pass
-                else:
-                    pred_files = glob.glob(f'data/raw/{sample}/{sample}_*.nii.gz')
-                    pred_gen = DataGenerator(pred_files, tile_inputs=True)
-                    model.predict(pred_gen, f'data/predict/{options.name}/{sample}/')
-            except Exception as e:
-                logging.error(f'ERROR during {sample}: {e}')
-    else:
-        logging.info('Making predictions.')
-        model.predict(pred_gen, f'data/predict/{options.name}/')
+    logging.info('Making predictions.')
+    model.predict(pred_gen, f'data/predict/{options.name}/')
 
+    if not options.predict_all:
         logging.info('Testing model.')
         metrics = model.test(test_gen)
         logging.info(metrics)

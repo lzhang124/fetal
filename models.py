@@ -44,10 +44,12 @@ def save_predictions(preds, generator, path, scale=False):
     for i in range(preds.shape[0]):
         input_file = generator.input_files[i]
         fname = input_file.split('/')[-1]
+        sample = fname.split('_')[0]
         header = util.header(input_file)
         shape = util.shape(input_file)
         volume = process.postprocess(preds[i], shape, resize=True, tile=generator.tile_inputs)
-        util.save_vol(volume, os.path.join(path, fname), header, scale)
+        os.makedirs(f'{path}/{sample}/', exist_ok=True)
+        util.save_vol(volume, os.path.join(f'{path}/{sample}/', fname), header, scale)
 
 
 class BaseModel:
@@ -68,11 +70,15 @@ class BaseModel:
     def train(self, generator, val_gen, epochs):
         path = f'models/{self.name}/'
         os.makedirs(path, exist_ok=True)
+        if val_gen:
+            file_name = '{epoch:0>4d}_{val_dice_coef:.4f}.h5'
+        else:
+            file_name = '{epoch:0>4d}.h5'
         self.model.fit_generator(generator,
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=[ModelCheckpoint(path + '{epoch:0>4d}_{val_dice_coef:.4f}.h5', save_weights_only=True, period=50),
+                                 callbacks=[ModelCheckpoint(path + file_name, save_weights_only=True, period=50),
                                             TensorBoard(log_dir=f'logs/{self.name}')])
 
     def predict(self, generator, path):
