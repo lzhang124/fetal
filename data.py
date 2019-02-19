@@ -83,6 +83,8 @@ class AugmentGenerator(Iterator):
         print(np.asarray(all_labels).shape)
         if len(all_labels) == 1:
             all_labels = all_labels[0]
+        print(len(all_labels))
+        print(np.asarray(all_labels).shape)
         return (np.asarray(batch), all_labels)
 
 
