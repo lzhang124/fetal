@@ -79,8 +79,8 @@ class AugmentGenerator(Iterator):
                 all_labels.append(batch)
             else:
                 raise ValueError(f'Label type {label_type} is not supported.')
-        if len(all_labels) == 1:
-            all_labels = all_labels[0]
+        # if len(all_labels) == 1:
+            # all_labels = all_labels[0]
         return (np.asarray(batch), all_labels)
 
 
@@ -126,8 +126,8 @@ class VolumeGenerator(Iterator):
                 all_labels.append(batch)
             else:
                 raise ValueError(f'Label type {label_type} is not supported.')
-        if len(all_labels) == 1:
-            all_labels = all_labels[0]
+        # if len(all_labels) == 1:
+            # all_labels = all_labels[0]
         if len(all_labels) > 0:
             return (np.asarray(batch), np.asarray(all_labels))
         return np.asarray(batch)
