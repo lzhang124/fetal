@@ -4,15 +4,20 @@ from image3d import ImageTransformer, Iterator
 from process import preprocess
 
 
-class DataGenerator(Iterator):
+class AugmentGenerator(Iterator):
     def __init__(self,
                  input_files,
                  label_files=None,
                  label_types=None,
                  load_files=True,
-                 augment=True,
-                 resize=False,
-                 tile_inputs=False,
+                 rotation_range=90.,
+                 shift_range=0.1,
+                 shear_range=0.1,
+                 zoom_range=0.1,
+                 crop_size=constants.SHAPE,
+                 fill_mode='nearest',
+                 cval=0.,
+                 flip=True,
                  batch_size=1,
                  shuffle=True,
                  seed=None):
@@ -20,29 +25,23 @@ class DataGenerator(Iterator):
         self.label_files = label_files
         self.label_types = label_types
         self.load_files = load_files
-        self.augment = augment
-        self.resize = resize
-        self.tile_inputs = tile_inputs
         
         self.inputs = input_files
         self.labels = label_files
 
         if load_files:
-            self.inputs = np.asarray([preprocess(file, resize=self.resize, tile=self.tile_inputs) for file in self.input_files])
-            self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[-4:])
+            self.inputs = [preprocess(file) for file in input_files]
             if label_files is not None:
-                self.labels = np.asarray([preprocess(file, resize=self.resize, tile=self.tile_inputs) for file in self.label_files])
-                self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[-4:])
-        print(self.inputs.shape, self.labels.shape)
-        if augment:
-            self.image_transformer = ImageTransformer(rotation_range=90.,
-                                             shift_range=0.1,
-                                             shear_range=0.1,
-                                             zoom_range=0.1,
-                                             crop_size=constants.SHAPE,
-                                             fill_mode='nearest',
-                                             cval=0,
-                                             flip=True)
+                self.labels = [preprocess(file) for file in label_files]
+
+        self.image_transformer = ImageTransformer(rotation_range=rotation_range,
+                                             shift_range=shift_range,
+                                             shear_range=shear_range,
+                                             zoom_range=zoom_range,
+                                             crop_size=crop_size,
+                                             fill_mode=fill_mode,
+                                             cval=cval,
+                                             flip=flip)
 
         super().__init__(len(input_files), batch_size, shuffle, seed)
 
@@ -53,9 +52,8 @@ class DataGenerator(Iterator):
                 if self.load_files:
                     x = self.inputs[i]
                 else:
-                    x = preprocess(self.inputs[i], resize=self.resize, tile=self.tile_inputs)
-                if self.augment:
-                    x = self.image_transformer.random_transform(x, seed=self.seed)
+                    x = preprocess(self.inputs[i])
+                x = self.image_transformer.random_transform(x, seed=self.seed)
                 batch.append(x)
             return np.asarray(batch)
 
@@ -65,10 +63,9 @@ class DataGenerator(Iterator):
                 x = self.inputs[i]
                 y = self.labels[i]
             else:
-                x = preprocess(self.inputs[i], resize=self.resize, tile=self.tile_inputs)
-                y = preprocess(self.labels[i], resize=self.resize, tile=self.tile_inputs)
-            if self.augment:
-                x, y = self.image_transformer.random_transform(x, y, seed=self.seed)
+                x = preprocess(self.inputs[i])
+                y = preprocess(self.labels[i])
+            x, y = self.image_transformer.random_transform(x, y, seed=self.seed)
             batch.append(x)
             labels.append(y)
 
