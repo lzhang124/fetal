@@ -99,10 +99,10 @@ class VolumeGenerator(Iterator):
         self.inputs = input_files
         self.labels = label_files
 
-        self.inputs = [preprocess(file, resize=True, tile=tile_inputs) for file in input_files]
+        self.inputs = np.asarray([preprocess(file, resize=True, tile=tile_inputs) for file in input_files])
         self.inputs = np.reshape(self.inputs, (-1,) + self.inputs.shape[-4:])
         if label_files is not None:
-            self.labels = [preprocess(file, resize=True, tile=tile_inputs) for file in label_files]
+            self.labels = np.asarray([preprocess(file, resize=True, tile=tile_inputs) for file in label_files])
             self.labels = np.reshape(self.labels, (-1,) + self.labels.shape[-4:])
 
         super().__init__(len(self.inputs), batch_size, shuffle, seed)
