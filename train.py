@@ -25,11 +25,14 @@ parser.add_argument('--load-files',
 parser.add_argument('--skip-training',
                     help='Skip training',
                     dest='skip_training', action='store_true')
+parser.add_argument('--validate',
+                    help='Create validation set',
+                    dest='validate', action='store_true')
 parser.add_argument('--predict-all',
                     help='Predict all samples',
                     dest='predict_all', action='store_true')
 parser.add_argument('--temporal',
-                    help='Temporal segmentation using predictions from model',
+                    help='Temporal segmentation using predictions from model name',
                     dest='temporal', type=str)
 options = parser.parse_args()
 
@@ -69,9 +72,13 @@ def main(options):
         samples = list(constants.GOOD_FRAMES.keys())
         n = len(samples)
         shuffled = np.random.permutation(samples)
-        train = shuffled[:(2*n)//3]
-        val = shuffled[(2*n)//3:(5*n)//6]
-        test = shuffled[(5*n)//6:]
+        if options.validate:
+            train = shuffled[:(2*n)//3]
+            val = shuffled[(2*n)//3:(5*n)//6]
+            test = shuffled[(5*n)//6:]
+        else:
+            train = shuffled[:(9*n)//10]
+            test = shuffled[(9*n)//10:]
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
@@ -94,7 +101,8 @@ def main(options):
                                      load_files=options.load_files)
         weights = util.get_weights(weight_labels)
 
-        if not options.skip_training:
+        val_gen = None
+        if not options.skip_training && options.validate:
             val_for = []
             val_rev = []
             val_label_for = []
@@ -137,9 +145,13 @@ def main(options):
         logging.info('Splitting data.')
         n = len(constants.SAMPLES)
         shuffled = np.random.permutation(constants.SAMPLES)
-        train = shuffled[:(2*n)//3]
-        val = shuffled[(2*n)//3:(5*n)//6]
-        test = shuffled[(5*n)//6:]
+        if options.validate:
+            train = shuffled[:(2*n)//3]
+            val = shuffled[(2*n)//3:(5*n)//6]
+            test = shuffled[(5*n)//6:]
+        else:
+            train = shuffled[:(9*n)//10]
+            test = shuffled[(9*n)//10:]
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
@@ -148,7 +160,8 @@ def main(options):
         train_gen = AugmentGenerator(train_files, label_files=train_label_files, label_types=label_types, load_files=options.load_files)
         weights = util.get_weights(train_gen.labels)
 
-        if not options.skip_training:
+        val_gen = None
+        if not options.skip_training && options.validate:
             val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
             val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
             val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
