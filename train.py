@@ -175,7 +175,7 @@ def main(options):
             test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
             pred_gen = DataGenerator(test_files, tile_inputs=True)
             test_gen = DataGenerator(test_files, label_files=test_label_files, label_types=label_types, resize=True)
-            print(pred_gen[0].shape)
+            print(len(pred_gen))
 
         logging.info('Creating model.')
         shape = constants.SHAPE
