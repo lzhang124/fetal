@@ -45,7 +45,7 @@ class DataGenerator(Iterator):
                                              flip=True)
 
         if self.tile_inputs:
-            print(len(input_filess))
+            print(len(input_files))
         super().__init__(len(input_files), batch_size, self.augment, seed)
 
     def _get_batch(self, index_array):
