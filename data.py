@@ -55,6 +55,7 @@ class AugmentGenerator(Iterator):
                     x = preprocess(self.inputs[i])
                 x = self.image_transformer.random_transform(x, seed=self.seed)
                 batch.append(x)
+            print(np.asarray(batch).shape)
             return np.asarray(batch)
 
         labels = []
@@ -79,6 +80,8 @@ class AugmentGenerator(Iterator):
                 all_labels.append(batch)
             else:
                 raise ValueError(f'Label type {label_type} is not supported.')
+        print(np.asarray(batch).shape)
+        print(np.asarray(all_labels).shape)
         return (np.asarray(batch), np.asarray(all_labels))
 
 
