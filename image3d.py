@@ -18,7 +18,6 @@ import warnings
 import multiprocessing.pool
 from functools import partial
 
-from keras import backend as K
 from keras.utils.data_utils import Sequence
 
 
@@ -243,8 +242,7 @@ class ImageTransformer(object):
 class Iterator(Sequence):
     """Base class for image data iterators.
 
-    Every `Iterator` must implement the `_get_batches_of_transformed_samples`
-    method.
+    Every `Iterator` must implement the `_get_batch` method.
 
     # Arguments
         n: Integer, total number of samples in the dataset to loop over.
@@ -281,7 +279,7 @@ class Iterator(Sequence):
             self._set_index_array()
         index_array = self.index_array[self.batch_size * idx:
                                        self.batch_size * (idx + 1)]
-        return self._get_batches_of_transformed_samples(index_array)
+        return self._get_batch(index_array)
 
     def __len__(self):
         return (self.n + self.batch_size - 1) // self.batch_size  # round up
@@ -316,77 +314,23 @@ class Iterator(Sequence):
     def __next__(self, *args, **kwargs):
         return self.next(*args, **kwargs)
 
-    def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
-        """Gets a batch of transformed samples.
-
-        # Arguments
-            index_array: array of sample indices to include in batch.
-            load_fn: function for loading in data.
-
-        # Returns
-            A batch of transformed samples.
-        """
-        raise NotImplementedError
-
-
-class VolumeIterator(Iterator):
-    """Iterator yielding data for 3D volumes.
-
-    # Arguments
-        x: Numpy array of input data.
-        y: Numpy array of label data.
-        image_transformer: Instance of `ImageTransformer`
-            to use for random transformations.
-        batch_size: Integer, size of a batch.
-        shuffle: Boolean, whether to shuffle the data between epochs.
-        seed: Random seed for data shuffling.
-    """
-
-    def __init__(self, x, y, image_transformer,
-                 batch_size=32, shuffle=True, seed=None):
-        self.x = x
-        if y is not None:
-            self.y = y
-        else:
-            self.y = None
-
-        self.image_transformer = image_transformer
-        super().__init__(len(x), batch_size, shuffle, seed)
-
-    def _get_batches_of_transformed_samples(self, index_array, load_fn=None):
-        batch_x = []
-        if self.y is None:
-            for i, j in enumerate(index_array):
-                if load_fn is None:
-                    x = self.x[j]
-                else:
-                    x = load_fn(self.x[j])
-                x = self.image_transformer.random_transform(x)
-                batch_x.append(x)
-            batch_x = np.asarray(batch_x, dtype=K.floatx())
-            return batch_x
-
-        batch_y = []
-        for i, j in enumerate(index_array):
-            if load_fn is None:
-                x, y = self.x[j], self.y[j]
-            else:
-                x, y = load_fn(self.x[j]), load_fn(self.y[j])
-            x, y = self.image_transformer.random_transform(x, y)
-            batch_x.append(x)
-            batch_y.append(y)
-        return (np.asarray(batch_x, dtype=K.floatx()), np.asarray(batch_y, dtype=K.floatx()))
-
     def next(self):
         """For python 2.x.
 
         # Returns
             The next batch.
         """
-        # Keeps under lock only the mechanism which advances
-        # the indexing of each batch.
         with self.lock:
             index_array = next(self.index_generator)
-        # The transformation of images is not under thread lock
-        # so it can be done in parallel
-        return self._get_batches_of_transformed_samples(index_array)
+        return self._get_batch(index_array)
+
+    def _get_batch(self, index_array):
+        """Gets a batch of samples.
+
+        # Arguments
+            index_array: array of sample indices to include in batch.
+
+        # Returns
+            A batch of samples.
+        """
+        raise NotImplementedError

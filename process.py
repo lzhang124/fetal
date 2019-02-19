@@ -22,12 +22,15 @@ def split(vol):
         for j in slice(constants.SHAPE[1]), slice(-constants.SHAPE[1], vol.shape[1]):
             for k in slice(constants.SHAPE[2]), slice(-constants.SHAPE[2], vol.shape[2]):
                 vols.append(vol[i, j, k])
-    return np.array(vols)
+    return np.asarray(vols)
 
 
-def preprocess(file, resize=False, tile=False):
-    vol = read_vol(file)
-    vol = vol / np.max(vol)
+def preprocess(files, resize=False, tile=False):
+    if isinstance(files, str):
+        vol = read_vol(files)
+    else:
+        vol = np.concatentate([read_vol(f) for f in files], axis=-1)
+    vol = vol / np.max(vol, axis=(0,1,2))
 
     if (vol.shape[0] < constants.SHAPE[0] or
         vol.shape[1] < constants.SHAPE[1] or

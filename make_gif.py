@@ -13,9 +13,9 @@ os.makedirs(f'data/gifs/', exist_ok=True)
 
 for s in sorted(samples):
     print(s)
-    vols = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/raw/{s}/{s}_*.nii.gz'))])
+    vols = np.asarray([util.read_vol(f) for f in sorted(glob.glob(f'data/raw/{s}/{s}_*.nii.gz'))])
     vols = np.clip(np.log(1 + vols / np.percentile(vols, 95)), 0, 1)
-    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
+    segs = np.asarray([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
 
     if s in constants.TWINS:
         brains = [label(seg)[0] for seg in segs]
@@ -29,7 +29,7 @@ for s in sorted(samples):
 
     for c in centers:
         seg_slices = segs[...,c,0]
-        erode = np.array([binary_erosion(slice) for slice in seg_slices])
+        erode = np.asarray([binary_erosion(slice) for slice in seg_slices])
         outline = seg_slices ^ erode
 
         slices = np.repeat(vols[...,c,:], 3, axis=-1)

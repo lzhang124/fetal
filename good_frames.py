@@ -13,7 +13,7 @@ good_frames = {}
 
 for s in sorted(samples):
     print(s)
-    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
+    segs = np.asarray([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
     label = glob.glob(f'data/labels/{s}/{s}_*_all_brains.nii.gz')
     frames = []
     if label:
