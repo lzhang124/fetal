@@ -31,10 +31,10 @@ class DataGenerator(Iterator):
             if label_files is not None:
                 self.labels = [preprocess(file, resize=self.resize, tile=self.tile_inputs) for file in self.label_files]
             if self.tile_inputs:
-                print(np.asarray(self.inputs).shape)
-                print(np.asarray(self.labels).shape)
                 self.inputs = np.reshape(self.inputs, (-1,) + np.asarray(self.inputs).shape[-4:])
                 self.labels = np.reshape(self.labels, (-1,) + np.asarray(self.labels).shape[-4:])
+                print(np.asarray(self.inputs).shape)
+                print(np.asarray(self.labels).shape)
         if augment:
             self.image_transformer = ImageTransformer(rotation_range=90.,
                                              shift_range=0.1,
