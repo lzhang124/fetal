@@ -102,7 +102,7 @@ def main(options):
         weights = util.get_weights(weight_labels)
 
         val_gen = None
-        if not options.skip_training && options.validate:
+        if not options.skip_training and options.validate:
             val_for = []
             val_rev = []
             val_label_for = []
@@ -161,7 +161,7 @@ def main(options):
         weights = util.get_weights(train_gen.labels)
 
         val_gen = None
-        if not options.skip_training && options.validate:
+        if not options.skip_training and options.validate:
             val_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in val]
             val_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in val]
             val_gen = VolumeGenerator(val_files, label_files=val_label_files, label_types=label_types)
