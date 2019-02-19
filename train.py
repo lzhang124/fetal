@@ -188,7 +188,7 @@ def main(options):
             pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      tile_inputs=True)
-            logging.info(f'  Prediction generator with {len(pred_gen)/8} samples.')
+            logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         else:
             # test_files = [f'data/raw/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz' for sample in test]
             # test_label_files = [f'data/labels/{sample}/{sample}_{constants.LABELED_FRAME[sample]}_{organ}.nii.gz' for sample in test]
@@ -197,7 +197,7 @@ def main(options):
             pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      tile_inputs=True)
-            logging.info(f'  Prediction generator with {len(pred_gen)/8} samples.')
+            logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
             test_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
