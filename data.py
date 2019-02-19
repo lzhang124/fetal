@@ -81,6 +81,7 @@ class AugmentGenerator(Iterator):
                 raise ValueError(f'Label type {label_type} is not supported.')
         if len(all_labels) == 1:
             all_labels = all_labels[0]
+        print(all_labels.shape)
         return (np.asarray(batch), all_labels)
 
 
