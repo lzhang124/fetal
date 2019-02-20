@@ -4,6 +4,9 @@ logging.basicConfig(level=logging.INFO)
 
 from argparse import ArgumentParser
 parser = ArgumentParser()
+parser.add_argument('--name',
+                    help='Name of model',
+                    dest='name', type=str, required=True)
 parser.add_argument('--model',
                     help='Model architecture',
                     dest='model', type=str, required=True)
@@ -13,9 +16,9 @@ parser.add_argument('--organ',
 parser.add_argument('--epochs',
                     help='Training epochs',
                     dest='epochs', type=int, default=1000)
-parser.add_argument('--name',
-                    help='Name of model',
-                    dest='name', type=str, required=True)
+parser.add_argument('--split',
+                    help='Train and validation split',
+                    dest='split', type=float, nargs=2, default=[2/3, 1/6])
 parser.add_argument('--model-file',
                     help='Pretrained model file',
                     dest='model_file', type=str)
@@ -25,9 +28,6 @@ parser.add_argument('--load-files',
 parser.add_argument('--skip-training',
                     help='Skip training',
                     dest='skip_training', action='store_true')
-parser.add_argument('--validate',
-                    help='Create validation set',
-                    dest='validate', action='store_true')
 parser.add_argument('--predict-all',
                     help='Predict all samples',
                     dest='predict_all', action='store_true')
@@ -69,9 +69,8 @@ def main(options):
 
     organ = 'all_brains' if options.organ == 'brains' else options.organ
 
-    if options.temporal:
-        pass
-        # logging.info('Temporal model.')
+    if options.good_frames:
+        logging.info('Temporal model.')
         # logging.info('Splitting data.')
         # samples = list(constants.GOOD_FRAMES.keys())
         # n = len(samples)
@@ -86,8 +85,8 @@ def main(options):
 
         # logging.info('Creating data generators.')
         # label_types = LABELS[options.model]
-        # train_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in train},
-        #                           'data/raw/{s}/{s}_{n}.nii.gz',
+        # train_gen = DataGenerator({s: constants.GOOD_FRAMES[s] for s in train},
+        #                           f'data/predict_cleaned/{options.temporal}/{{s}}/{{s}}_{{n}}.nii.gz',
         #                           f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
         #                           label_types=label_types,
         #                           load_files=options.load_files,
@@ -130,15 +129,20 @@ def main(options):
     else:
         logging.info('Non-temporal model.')
         logging.info('Splitting data.')
-        n = len(constants.LABELED_SAMPLES)
-        shuffled = np.random.permutation(constants.LABELED_SAMPLES)
-        if options.validate:
-            train = shuffled[:(2*n)//3]
-            val = shuffled[(2*n)//3:(5*n)//6]
-            test = shuffled[(5*n)//6:]
+        if options.good_frames:
+            samples = list(constants.GOOD_FRAMES.keys())
+            n = len(samples)
+            shuffled = np.random.permutation(samples)
         else:
-            train = shuffled[:(9*n)//10]
-            test = shuffled[(9*n)//10:]
+            n = len(constants.LABELED_SAMPLES)
+            shuffled = np.random.permutation(constants.LABELED_SAMPLES)
+        assert np.sum(options.split) < 1, 'Split is greater than 1.'
+        train_split = int(options.split[0] * n)
+        val_split = int(np.sum(options.split) * n)
+        train = shuffled[:train_split]
+        val = shuffled[train_split:val_split]
+        test = shuffled[val_split:]
+        assert len(test) > 0, 'No test data.'
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
@@ -152,7 +156,7 @@ def main(options):
         weights = util.get_weights(train_gen.labels)
 
         val_gen = None
-        if not options.skip_training and options.validate:
+        if not options.skip_training and len(val) > 0:
             val_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in val},
                                     'data/raw/{s}/{s}_{n}.nii.gz',
                                     f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
