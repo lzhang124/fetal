@@ -78,7 +78,7 @@ class BaseModel:
         for i in range(len(generator)):
             pred = self.model.predict(generator[i])
             input_file = generator.input_files[i]
-            fname = input_files.split('/')[-1]
+            fname = input_file.split('/')[-1]
             sample = fname.split('_')[0]
             path = f'{path}/{sample}'
             shape = util.shape(input_file)
