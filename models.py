@@ -35,7 +35,7 @@ def weighted_crossentropy(weights=None, boundary_weight=None, pool=5):
     return loss_fn
 
 
-def save_prediction(pred, input_file, tile, path, fname, header, scale=False):
+def save_prediction(pred, input_file, tile, path, scale=False):
     fname = input_file.split('/')[-1]
     sample = fname.split('_')[0]
     path = os.path.join(path, sample)
