@@ -36,7 +36,6 @@ def weighted_crossentropy(weights=None, boundary_weight=None, pool=5):
 
 
 def save_prediction(pred, input_file, tile, path, scale=False):
-    print(pred.shape)
     fname = input_file.split('/')[-1]
     sample = fname.split('_')[0]
     path = os.path.join(path, sample)
@@ -84,7 +83,7 @@ class BaseModel:
         for i in range(len(generator)):
             input_file = generator.input_files[i]
             tile = generator.tile_inputs
-            pred = self.model.predict(generator[i:i+8] if tile else generator[i])
+            pred = self.model.predict(np.concatenate([generator[i+j] for j in range(8)]) if tile else generator[i])
             save_prediction(pred, input_file, tile, path)
 
     def test(self, generator):
@@ -264,6 +263,6 @@ class AESeg(BaseModel):
         for i in range(len(generator)):
             input_file = generator.input_files[i]
             tile = generator.tile_inputs
-            pred, vol = self.model.predict(generator[i:i+8] if tile else generator[i])
+            pred, vol = self.model.predict(np.concatenate([generator[i+j] for j in range(8)]) if tile else generator[i])
             save_prediction(pred, input_file, tile, path)
             save_prediction(vol, input_file, tile, os.join(path, 'ae_reconstructions'), scale=True)
