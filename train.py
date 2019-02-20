@@ -174,6 +174,7 @@ def main(options):
         else:
             pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
+                                     load_files=options.load_files,
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         
