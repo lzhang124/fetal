@@ -82,9 +82,10 @@ class BaseModel:
         os.makedirs(path, exist_ok=True)
 
         for i in range(len(generator)):
-            pred = self.model.predict(generator[i])
             input_file = generator.input_files[i]
-            save_prediction(pred, input_file, generator.tile_inputs, path)
+            tile = generator.tile_inputs
+            pred = self.model.predict(generator[i:i+8] if tile else generator[i])
+            save_prediction(pred, input_file, tile, path)
 
     def test(self, generator):
         metrics = self.model.evaluate_generator(generator)
@@ -261,7 +262,8 @@ class AESeg(BaseModel):
         os.makedirs(path, exist_ok=True)
 
         for i in range(len(generator)):
-            pred, vol = self.model.predict(generator[i])
             input_file = generator.input_files[i]
-            save_prediction(pred, input_file, generator.tile_inputs, path)
-            save_prediction(vol, input_file, generator.tile_inputs, os.join(path, 'ae_reconstructions'), scale=True)
+            tile = generator.tile_inputs
+            pred, vol = self.model.predict(generator[i:i+8] if tile else generator[i])
+            save_prediction(pred, input_file, tile, path)
+            save_prediction(vol, input_file, tile, os.join(path, 'ae_reconstructions'), scale=True)

@@ -66,6 +66,8 @@ class DataGenerator(Iterator):
                 self.labels = np.repeat(self.labels, 8)
 
         if self.augment:
+            if self.tile_inputs:
+                raise ValueError('Augmentation not supported if inputs are tiled.')
             self.image_transformer = ImageTransformer(rotation_range=90.,
                                                       shift_range=0.1,
                                                       shear_range=0.1,
