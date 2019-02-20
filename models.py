@@ -35,21 +35,11 @@ def weighted_crossentropy(weights=None, boundary_weight=None, pool=5):
     return loss_fn
 
 
-def save_predictions(preds, generator, path, scale=False):
+def save_prediction(pred, shape, tile, path, fname, header, scale=False):
     os.makedirs(path, exist_ok=True)
-
-    if generator.tile_inputs:
-        preds = np.reshape(preds, (-1, 8) + preds.shape[1:])
-
-    for i in range(preds.shape[0]):
-        input_file = generator.input_files[i]
-        fname = input_file.split('/')[-1]
-        sample = fname.split('_')[0]
-        header = util.header(input_file)
-        shape = util.shape(input_file)
-        volume = process.postprocess(preds[i], shape, resize=True, tile=generator.tile_inputs)
-        os.makedirs(f'{path}/{sample}/', exist_ok=True)
-        util.save_vol(volume, os.path.join(f'{path}/{sample}/', fname), header, scale)
+    vol = process.postprocess(pred[i], shape, resize=True, tile=tile)
+    print(fname)
+    util.save_vol(vol, os.path.join(path, fname), header, scale)
 
 
 class BaseModel:
@@ -68,7 +58,7 @@ class BaseModel:
         raise NotImplementedError()
 
     def train(self, generator, val_gen, epochs):
-        path = f'models/{self.name}/'
+        path = f'models/{self.name}'
         os.makedirs(path, exist_ok=True)
         if val_gen:
             file_name = '{epoch:0>4d}_{val_dice_coef:.4f}.h5'
@@ -78,12 +68,27 @@ class BaseModel:
                                  epochs=epochs,
                                  validation_data=val_gen,
                                  verbose=1,
-                                 callbacks=[ModelCheckpoint(path + file_name, save_weights_only=True, period=50),
+                                 callbacks=[ModelCheckpoint(os.path.join(path, file_name), save_weights_only=True, period=50),
                                             TensorBoard(log_dir=f'logs/{self.name}')])
 
-    def predict(self, generator, path):
-        preds = self.model.predict_generator(generator, verbose=1)
-        save_predictions(preds, generator, path)
+    def predict(self, generator):
+        path = f'data/predict/{self.name}'
+        os.makedirs(path, exist_ok=True)
+
+        for i in range(len(generator)):
+            pred = self.model.predict(generator[i])
+            input_file = generator.input_files[i]
+            fname = input_files.split('/')[-1]
+            sample = fname.split('_')[0]
+            path = f'{path}/{sample}'
+            shape = util.shape(input_file)
+            header = util.header(input_file)
+            for i, label_type in enumerate(generator.label_types):
+                if label_type == 'label':
+                    save_predictions(pred[i], shape, generator.tile_inputs, path, fname, header)
+                elif label_type == 'input':
+                    save_predictions(pred[i], shape, generator.tile_inputs, os.join(path, 'ae_reconstructions'), fname, header, scale=True)
+
 
     def test(self, generator):
         metrics = self.model.evaluate_generator(generator)
@@ -254,9 +259,3 @@ class AESeg(BaseModel):
                            loss={'outputs': weighted_crossentropy(weights=weights, boundary_weight=1.), 'ae_outputs': 'mse'},
                            loss_weights={'outputs': .5, 'ae_outputs': .5},
                            metrics={'outputs': dice_coef, 'ae_outputs': 'accuracy'})
-
-    def predict(self, generator, path):
-        preds = self.model.predict_generator(generator, verbose=1)
-        segs, vols = preds
-        save_predictions(segs, generator, path)
-        save_predictions(vols, generator, path + 'ae_reconstructions/', scale=True)

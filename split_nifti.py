@@ -117,10 +117,10 @@ def main(sample, order):
 
     series = np.moveaxis(series, 0, axis)
 
-    new_folder = f'data/raw/{sample}/'
+    new_folder = f'data/raw/{sample}'
     os.makedirs(new_folder, exist_ok=True)
     for i in range(new_shape[-1]):
-        util.save_vol(series[...,i], new_folder + sample + f'_{str(i).zfill(4)}.nii.gz')
+        util.save_vol(series[...,i], f'{new_folder}/{sample}_{str(i).zfill(4)}.nii.gz')
 
 
 if __name__ == '__main__':

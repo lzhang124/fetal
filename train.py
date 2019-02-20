@@ -194,7 +194,7 @@ def main(options):
         model.train(train_gen, val_gen, options.epochs)
 
     logging.info('Making predictions.')
-    model.predict(pred_gen, f'data/predict/{options.name}/')
+    model.predict(pred_gen)
 
     logging.info('Testing model.')
     metrics = model.test(test_gen)

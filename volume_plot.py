@@ -15,7 +15,7 @@ train = ['031317T', '031616', '013018S', '041318S', '050318S',
          '022318L', '041017']
 
 samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
-os.makedirs(f'data/volumes/', exist_ok=True)
+os.makedirs(f'data/volumes', exist_ok=True)
 var = {}
 
 for s in sorted(samples):
