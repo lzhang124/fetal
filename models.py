@@ -35,11 +35,16 @@ def weighted_crossentropy(weights=None, boundary_weight=None, pool=5):
     return loss_fn
 
 
-def save_prediction(pred, shape, tile, path, fname, header, scale=False):
+def save_prediction(pred, input_file, tile, path, fname, header, scale=False):
+    fname = input_file.split('/')[-1]
+    sample = fname.split('_')[0]
+    path = os.path.join(path, sample)
     os.makedirs(path, exist_ok=True)
+    shape = util.shape(input_file)
+    header = util.header(input_file)
     vol = process.postprocess(pred[i], shape, resize=True, tile=tile)
-    print(fname)
     util.save_vol(vol, os.path.join(path, fname), header, scale)
+    print(fname)
 
 
 class BaseModel:
@@ -78,17 +83,7 @@ class BaseModel:
         for i in range(len(generator)):
             pred = self.model.predict(generator[i])
             input_file = generator.input_files[i]
-            fname = input_file.split('/')[-1]
-            sample = fname.split('_')[0]
-            path = f'{path}/{sample}'
-            shape = util.shape(input_file)
-            header = util.header(input_file)
-            for i, label_type in enumerate(generator.label_types):
-                if label_type == 'label':
-                    save_predictions(pred[i], shape, generator.tile_inputs, path, fname, header)
-                elif label_type == 'input':
-                    save_predictions(pred[i], shape, generator.tile_inputs, os.join(path, 'ae_reconstructions'), fname, header, scale=True)
-
+            save_predictions(pred[i], input_file, generator.tile_inputs, path)
 
     def test(self, generator):
         metrics = self.model.evaluate_generator(generator)
@@ -259,3 +254,13 @@ class AESeg(BaseModel):
                            loss={'outputs': weighted_crossentropy(weights=weights, boundary_weight=1.), 'ae_outputs': 'mse'},
                            loss_weights={'outputs': .5, 'ae_outputs': .5},
                            metrics={'outputs': dice_coef, 'ae_outputs': 'accuracy'})
+
+    def predict(self, generator):        
+        path = f'data/predict/{self.name}'
+        os.makedirs(path, exist_ok=True)
+
+        for i in range(len(generator)):
+            pred = self.model.predict(generator[i])
+            input_file = generator.input_files[i]
+            save_predictions(pred[i], input_file, generator.tile_inputs, path)
+            save_predictions(pred[i], input_file, generator.tile_inputs, os.join(path, 'ae_reconstructions'), scale=True)
