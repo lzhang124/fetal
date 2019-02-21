@@ -83,7 +83,7 @@ def main(options):
             shuffled = np.random.permutation(constants.LABELED_SAMPLES)
             input_file_format = 'data/raw/{s}/{s}_{n}.nii.gz'
             label_file_format = f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz'
-        assert np.sum(options.split) < 1, 'Split is greater than 1.'
+        assert np.sum(options.split) <= 1, 'Split is greater than 1.'
         train_split = int(options.split[0] * n)
         val_split = int(np.sum(options.split) * n)
         train = shuffled[:train_split]
