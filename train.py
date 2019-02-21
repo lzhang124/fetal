@@ -179,7 +179,7 @@ def main(options):
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         else:
             pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
-                                     input_file_format
+                                     input_file_format,
                                      load_files=options.load_files,
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
