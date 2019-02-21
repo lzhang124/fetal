@@ -6,11 +6,11 @@ from process import preprocess
 
 def _format(file_formats, s, n):
     if isinstance(file_formats, str):
-        return file_formats.format(s=s, n=n, p=max(0, n-1))
+        return file_formats.format(s=s, n=str(n).zfill(4), p=str(max(0, n-1)).zfill(4))
     else:
         files = []
         for f in file_formats:
-            files.append(f.format(s=s, n=n, p=max(0, n-1)))
+            files.append(f.format(s=s, n=str(n).zfill(4), p=str(max(0, n-1)).zfill(4)))
         return files
 
 
@@ -43,9 +43,9 @@ class DataGenerator(Iterator):
         if not self.random_gen:
             for s in self.frames:
                 for n in self.frames[s]:
-                    self.input_files.append(_format(self.input_file_format, s, str(n).zfill(4)))
+                    self.input_files.append(_format(self.input_file_format, s, n))
                     if self.label_file_format:
-                        self.label_files.append(_format(self.label_file_format, s, str(n).zfill(4)))
+                        self.label_files.append(_format(self.label_file_format, s, n))
 
         self.inputs = self.input_files
         self.labels = self.label_files
@@ -90,7 +90,7 @@ class DataGenerator(Iterator):
                 elif self.random_gen:
                     s = self.samples[i]
                     n = np.random.choice(self.frames[s])
-                    x = preprocess(_format(self.input_file_format, s, str(n).zfill(4)), resize=self.resize, tile=self.tile_inputs)
+                    x = preprocess(_format(self.input_file_format, s, n), resize=self.resize, tile=self.tile_inputs)
                 else:
                     x = preprocess(self.inputs[i], resize=self.resize)
                 if self.augment:
@@ -109,8 +109,8 @@ class DataGenerator(Iterator):
             elif self.random_gen:
                 s = self.samples[i]
                 n = np.random.choice(self.frames[s])
-                x = preprocess(_format(self.input_file_format, s, str(n).zfill(4)), resize=self.resize, tile=self.tile_inputs)
-                y = preprocess(_format(self.label_file_format, s, str(n).zfill(4)), resize=self.resize, tile=self.tile_inputs)
+                x = preprocess(_format(self.input_file_format, s, n), resize=self.resize, tile=self.tile_inputs)
+                y = preprocess(_format(self.label_file_format, s, n), resize=self.resize, tile=self.tile_inputs)
             else:
                 x = preprocess(self.inputs[i], resize=self.resize)
                 y = preprocess(self.labels[i], resize=self.resize)
