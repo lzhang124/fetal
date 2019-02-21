@@ -78,6 +78,7 @@ def main(options):
                              'data/raw/{s}/{s}_{p}.nii.gz',
                              f'data/predict_cleaned/{options.temporal}/{{s}}/{{s}}_{{p}}.nii.gz']
         label_file_format = f'data/predict_cleaned/{options.temporal}/{{s}}/{{s}}_{{n}}.nii.gz'
+        random_gen = True
         shape = constants.SHAPE[:-1] + (3,)
     elif options.good_frames:
         samples = list(constants.GOOD_FRAMES.keys())
@@ -85,12 +86,14 @@ def main(options):
         shuffled = np.random.permutation(samples)
         input_file_format = 'data/raw/{s}/{s}_{n}.nii.gz'
         label_file_format = f'data/predict_cleaned/{options.good_frames}/{{s}}/{{s}}_{{n}}.nii.gz'
+        random_gen = True
         shape = constants.SHAPE
     else:
         n = len(constants.LABELED_SAMPLES)
         shuffled = np.random.permutation(constants.LABELED_SAMPLES)
         input_file_format = 'data/raw/{s}/{s}_{n}.nii.gz'
         label_file_format = f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz'
+        random_gen = False
         shape = constants.SHAPE
 
     assert np.sum(options.split) <= 1, 'Split is greater than 1.'
@@ -108,9 +111,9 @@ def main(options):
                               label_file_format,
                               label_types=label_types,
                               load_files=options.load_files,
+                              random_gen=random_gen,
                               augment=True)
     logging.info(f'  Training generator with {len(train_gen)} samples.')
-    weights = util.get_weights(train_gen.labels)
 
     val_gen = None
     if not options.skip_training and len(val) > 0:
@@ -119,6 +122,7 @@ def main(options):
                                 label_file_format,
                                 label_types=label_types,
                                 load_files=options.load_files,
+                                random_gen=random_gen,
                                 resize=True)
         logging.info(f'  Validation generator with {len(val_gen)} samples.')
 
@@ -132,6 +136,7 @@ def main(options):
         pred_gen = DataGenerator({s: frame_reference[s] for s in test},
                                  input_file_format,
                                  load_files=options.load_files,
+                                 random_gen=random_gen,
                                  tile_inputs=True)
         logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
     
@@ -141,10 +146,12 @@ def main(options):
                                  label_file_format,
                                  label_types=label_types,
                                  load_files=options.load_files,
+                                 random_gen=random_gen,
                                  resize=True)
         logging.info(f'  Testing generator with {len(test_gen)} samples.')
 
     logging.info('Creating model.')
+    weights = util.get_weights(glob.glob(f'data/labels/*/*_{organ}.nii.gz'))
     model = MODELS[options.model](shape, name=options.name, filename=options.model_file, weights=weights)
 
     if not options.skip_training:
