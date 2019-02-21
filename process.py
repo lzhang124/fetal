@@ -29,7 +29,7 @@ def preprocess(files, resize=False, tile=False):
     if isinstance(files, str):
         vol = read_vol(files)
     else:
-        vol = np.concatentate([read_vol(f) for f in files], axis=-1)
+        vol = np.concatenate([read_vol(f) for f in files], axis=-1)
     vol = vol / np.max(vol, axis=(0,1,2))
 
     if (vol.shape[0] < constants.SHAPE[0] or
