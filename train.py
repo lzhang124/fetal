@@ -85,7 +85,7 @@ def main(options):
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
-        train_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in train},
+        train_gen = DataGenerator({s: [constants.LABELED_FRAMES[s]] for s in train},
                                   'data/raw/{s}/{s}_{n}.nii.gz',
                                   f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
                                   label_types=label_types,
@@ -96,7 +96,7 @@ def main(options):
 
         val_gen = None
         if not options.skip_training and len(val) > 0:
-            val_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in val},
+            val_gen = DataGenerator({s: [constants.LABELED_FRAMES[s]] for s in val},
                                     'data/raw/{s}/{s}_{n}.nii.gz',
                                     f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
                                     label_types=label_types,
@@ -111,13 +111,13 @@ def main(options):
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         else:
-            pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
+            pred_gen = DataGenerator({s: [constants.LABELED_FRAMES[s]] for s in test},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      load_files=options.load_files,
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         
-        test_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
+        test_gen = DataGenerator({s: [constants.LABELED_FRAMES[s]] for s in test},
                                  'data/raw/{s}/{s}_{n}.nii.gz',
                                  f'data/labels/{{s}}/{{s}}_{{n}}_{organ}.nii.gz',
                                  label_types=label_types,
@@ -148,11 +148,11 @@ def main(options):
         train = shuffled[:train_split]
         val = shuffled[train_split:val_split]
         test = shuffled[val_split:]
-        assert len(test) > 0, 'No test data.'
+        frame_reference = constants.GOOD_FRAMES is options.good_frames else constants.LABELED_FRAMES
 
         logging.info('Creating data generators.')
         label_types = LABELS[options.model]
-        train_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in train},
+        train_gen = DataGenerator({s: frame_reference[s] for s in train},
                                   input_file_format,
                                   label_file_format,
                                   label_types=label_types,
@@ -163,7 +163,7 @@ def main(options):
 
         val_gen = None
         if not options.skip_training and len(val) > 0:
-            val_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in val},
+            val_gen = DataGenerator({s: frame_reference[s] for s in val},
                                     input_file_format,
                                     label_file_format,
                                     label_types=label_types,
@@ -171,26 +171,27 @@ def main(options):
                                     resize=True)
             logging.info(f'  Validation generator with {len(val_gen)} samples.')
 
-        if options.predict_all:
+        if options.predict_all or len(test) == 0:
             pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
                                      'data/raw/{s}/{s}_{n}.nii.gz',
                                      load_files=False,
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         else:
-            pred_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
+            pred_gen = DataGenerator({s: frame_reference[s] for s in test},
                                      input_file_format,
                                      load_files=options.load_files,
                                      tile_inputs=True)
             logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
         
-        test_gen = DataGenerator({s: [constants.LABELED_FRAME[s]] for s in test},
-                                 input_file_format,
-                                 label_file_format,
-                                 label_types=label_types,
-                                 load_files=options.load_files,
-                                 resize=True)
-        logging.info(f'  Testing generator with {len(test_gen)} samples.')
+        if len(test) > 0:
+            test_gen = DataGenerator({s: frame_reference[s] for s in test},
+                                     input_file_format,
+                                     label_file_format,
+                                     label_types=label_types,
+                                     load_files=options.load_files,
+                                     resize=True)
+            logging.info(f'  Testing generator with {len(test_gen)} samples.')
 
         logging.info('Creating model.')
         shape = constants.SHAPE
@@ -203,16 +204,10 @@ def main(options):
     logging.info('Making predictions.')
     model.predict(pred_gen)
 
-    logging.info('Testing model.')
-    metrics = model.test(test_gen)
-    logging.info(metrics)
-    
-    dice = {}
-    for i in range(len(test)):
-        sample = test[i]
-        dice[sample] = util.dice_coef(util.read_vol(f'data/labels/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}_{organ}.nii.gz'),
-                                      util.read_vol(f'data/predict/{options.name}/{sample}/{sample}_{str(constants.LABELED_FRAME[sample]).zfill(4)}.nii.gz'))
-    logging.info(dice)
+    if len(test) > 0:
+        logging.info('Testing model.')
+        metrics = model.test(test_gen)
+        logging.info(metrics)
 
     end = time.time()
     logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
