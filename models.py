@@ -44,6 +44,7 @@ def save_prediction(pred, input_file, tile, path, scale=False):
     header = util.header(input_file)
     vol = process.postprocess(pred, shape, resize=True, tile=tile)
     util.save_vol(vol, os.path.join(path, fname), header, scale)
+    print(fname, flush=True)
 
 
 class BaseModel:
