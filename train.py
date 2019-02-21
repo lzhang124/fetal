@@ -76,8 +76,8 @@ def main(options):
         shuffled = np.random.permutation(samples)
         input_file_format = ['data/raw/{s}/{s}_{n}.nii.gz',
                              'data/raw/{s}/{s}_{p}.nii.gz',
-                             f'data/predict_cleaned/{options.good_frames}/{{s}}/{{s}}_{{p}}.nii.gz']
-        label_file_format = f'data/predict_cleaned/{options.good_frames}/{{s}}/{{s}}_{{n}}.nii.gz'
+                             f'data/predict_cleaned/{options.temporal}/{{s}}/{{s}}_{{p}}.nii.gz']
+        label_file_format = f'data/predict_cleaned/{options.temporal}/{{s}}/{{s}}_{{n}}.nii.gz'
         shape = constants.SHAPE[:-1] + (3,)
     elif options.good_frames:
         samples = list(constants.GOOD_FRAMES.keys())
