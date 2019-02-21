@@ -6,11 +6,11 @@ from process import preprocess
 
 def _format(file_formats, s, n):
     if isinstance(file_formats, str):
-        return file_formats.format(s=s, n=n)
+        return file_formats.format(s=s, n=n, p=max(0, n-1))
     else:
         files = []
         for f in file_formats:
-            files.append(f.format(s=s, n=n))
+            files.append(f.format(s=s, n=n, p=max(0, n-1)))
         return files
 
 
