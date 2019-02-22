@@ -47,7 +47,7 @@ class DataGenerator(Iterator):
                     if self.label_file_format:
                         self.label_files.append(_format(self.label_file_format, s, n))
 
-        print(self.input_files(:5))
+        print(self.input_files[:5])
         self.inputs = self.input_files
         self.labels = self.label_files
 
