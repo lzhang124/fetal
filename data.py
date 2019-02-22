@@ -96,6 +96,7 @@ class DataGenerator(Iterator):
                 if self.augment:
                     x = self.image_transformer.random_transform(x, seed=self.seed)
                 batch.append(x)
+            print(np.asarray(batch).shape)
             return np.asarray(batch)
 
         labels = []

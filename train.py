@@ -106,25 +106,26 @@ def main(options):
 
     logging.info('Creating data generators.')
     label_types = LABELS[options.model]
-    train_gen = DataGenerator({s: frame_reference[s] for s in train},
-                              input_file_format,
-                              label_file_format,
-                              label_types=label_types,
-                              load_files=options.load_files,
-                              random_gen=random_gen,
-                              augment=True)
-    logging.info(f'  Training generator with {len(train_gen)} samples.')
+    if not options.skip_training:
+        train_gen = DataGenerator({s: frame_reference[s] for s in train},
+                                  input_file_format,
+                                  label_file_format,
+                                  label_types=label_types,
+                                  load_files=options.load_files,
+                                  random_gen=random_gen,
+                                  augment=True)
+        logging.info(f'  Training generator with {len(train_gen)} samples.')
 
-    val_gen = None
-    if not options.skip_training and len(val) > 0:
-        val_gen = DataGenerator({s: frame_reference[s] for s in val},
-                                input_file_format,
-                                label_file_format,
-                                label_types=label_types,
-                                load_files=options.load_files,
-                                random_gen=random_gen,
-                                resize=True)
-        logging.info(f'  Validation generator with {len(val_gen)} samples.')
+        val_gen = None
+        if len(val) > 0:
+            val_gen = DataGenerator({s: frame_reference[s] for s in val},
+                                    input_file_format,
+                                    label_file_format,
+                                    label_types=label_types,
+                                    load_files=options.load_files,
+                                    random_gen=random_gen,
+                                    resize=True)
+            logging.info(f'  Validation generator with {len(val_gen)} samples.')
 
     if options.predict_all or len(test) == 0:
         pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
