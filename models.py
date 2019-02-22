@@ -84,6 +84,8 @@ class BaseModel:
         n = len(generator)//8 if tile else len(generator)
         for i in range(len(generator)):
             input_file = generator.input_files[i]
+            print(generator[8*i+j].shape)
+            print(np.concatenate([generator[8*i+j] for j in range(8)]).shape)
             pred = self.model.predict(np.concatenate([generator[8*i+j] for j in range(8)]) if tile else generator[i])
             save_prediction(pred, input_file, tile, path)
 
