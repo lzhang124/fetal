@@ -87,7 +87,6 @@ class DataGenerator(Iterator):
                     x = self.inputs[i]
                 elif self.tile_inputs:
                     x = preprocess(self.inputs[i], tile=self.tile_inputs)[i%8]
-                    print(x.shape)
                 elif self.random_gen:
                     s = self.samples[i]
                     n = np.random.choice(self.frames[s])
