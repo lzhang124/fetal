@@ -50,6 +50,7 @@ class DataGenerator(Iterator):
         print(self.input_files[:5])
         self.inputs = self.input_files
         self.labels = self.label_files
+        print(self.inputs[:5])
 
         if self.load_files:
             if self.random_gen:
