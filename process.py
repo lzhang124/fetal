@@ -29,6 +29,7 @@ def preprocess(files, resize=False, tile=False):
     if isinstance(files, str):
         vol = read_vol(files)
     else:
+        print('hello')
         vol = np.concatenate([read_vol(f) for f in files], axis=-1)
     print(vol.shape)
     vol = vol / np.max(vol, axis=(0,1,2))
