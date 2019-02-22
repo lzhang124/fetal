@@ -80,10 +80,11 @@ class BaseModel:
         path = f'data/predict/{self.name}'
         os.makedirs(path, exist_ok=True)
 
+        tile = generator.tile_inputs
+        n = len(generator)//8 if tile else len(generator)
         for i in range(len(generator)):
             input_file = generator.input_files[i]
-            tile = generator.tile_inputs
-            pred = self.model.predict(np.concatenate([generator[i+j] for j in range(8)]) if tile else generator[i])
+            pred = self.model.predict(np.concatenate([generator[8*i+j] for j in range(8)]) if tile else generator[i])
             save_prediction(pred, input_file, tile, path)
 
     def test(self, generator):
