@@ -47,10 +47,8 @@ class DataGenerator(Iterator):
                     if self.label_file_format:
                         self.label_files.append(_format(self.label_file_format, s, n))
 
-        print(self.input_files[:5])
         self.inputs = self.input_files
         self.labels = self.label_files
-        print(self.inputs[:5])
 
         if self.load_files:
             if self.random_gen:
@@ -64,10 +62,10 @@ class DataGenerator(Iterator):
                     self.labels = np.reshape(self.labels, (-1,) + np.asarray(self.labels).shape[-4:])
         elif self.tile_inputs:
             print(self.inputs[:5])
-            self.inputs = np.repeat(self.inputs, 8)
+            self.inputs = np.repeat(self.inputs, 8, axis=0)
             print(self.inputs[:5])
             if self.label_files is not None:
-                self.labels = np.repeat(self.labels, 8)
+                self.labels = np.repeat(self.labels, 8, axis=0)
 
         if self.augment:
             if self.tile_inputs:
