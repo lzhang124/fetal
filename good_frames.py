@@ -2,7 +2,7 @@ import numpy as np
 import glob
 import util
 
-OVERALL_VOL_DIF = 0.1
+OVERALL_VOL_DIF = 0.05
 OVERALL_DICE = 0.8
 SEQ_VOL_DIF = 0.05
 SEQ_DICE = 0.9

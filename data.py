@@ -61,7 +61,9 @@ class DataGenerator(Iterator):
                 if self.label_files is not None:
                     self.labels = np.reshape(self.labels, (-1,) + np.asarray(self.labels).shape[-4:])
         elif self.tile_inputs:
+            print(self.inputs[:5])
             self.inputs = np.repeat(self.inputs, 8)
+            print(self.inputs[:5])
             if self.label_files is not None:
                 self.labels = np.repeat(self.labels, 8)
 

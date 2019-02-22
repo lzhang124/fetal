@@ -33,7 +33,6 @@ def preprocess(files, resize=False, tile=False):
         vol = np.concatenate([read_vol(f) for f in files], axis=-1)
     print(vol.shape)
     vol = vol / np.max(vol, axis=(0,1,2))
-    print(vol.shape)
 
     if (vol.shape[0] < constants.SHAPE[0] or
         vol.shape[1] < constants.SHAPE[1] or
