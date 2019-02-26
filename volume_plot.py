@@ -7,13 +7,6 @@ import matplotlib.pyplot as plt
 from scipy.ndimage import measurements
 
 
-train = ['031317T', '031616', '013018S', '041318S', '050318S',
-         '032318c', '032818', '022318S', '013018L', '021218S',
-         '040218', '013118L', '022618', '031615', '031317L',
-         '012115', '032318d', '031516', '050917', '021218L',
-         '040716', '032318b', '021015', '040417', '041818',
-         '022318L', '041017']
-
 samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
 os.makedirs(f'data/volumes', exist_ok=True)
 var = {}
@@ -43,12 +36,9 @@ for s in sorted(samples):
         plt.savefig(f'data/volumes/{s}_{i}.png')
         plt.close()
 
-sort = sorted(var.items(), key=lambda x: x[1])
+sort = np.sqrt(sorted(var.items(), key=lambda x: x[1]))
 plt.figure(figsize=(10,8))
 bar = plt.bar([s[0] for s in sort], [s[1] for s in sort])
-for i in range(len(sort)):
-    if sort[i][0].split('_')[0] in train:
-        bar[i].set_color('#d65555')
 plt.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
 plt.ylabel('Variance in Volume')
 plt.savefig('data/variance.png')
