@@ -8,7 +8,7 @@ def read_vol(filename):
 
     if vol.ndim == 3:
         vol = vol[..., np.newaxis]
-    return np.asarray(vol, dtype=K.floatx())
+    return np.asarray(vol)
 
 
 def save_vol(vol, filename, header=None, scale=False):
