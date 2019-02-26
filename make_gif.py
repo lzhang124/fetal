@@ -8,14 +8,20 @@ from scipy.ndimage import binary_erosion
 from scipy.ndimage.measurements import center_of_mass, label
 
 
-samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
-os.makedirs(f'data/gifs/', exist_ok=True)
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument('model', type=str)
+options = parser.parse_args()
+
+samples = [i.split('/')[-1] for i in glob.glob(f'data/predict_cleaned/{options.model}/*')]
+os.makedirs(f'data/gifs/{options.model}', exist_ok=True)
 
 for s in sorted(samples):
     print(s)
     vols = np.asarray([util.read_vol(f) for f in sorted(glob.glob(f'data/raw/{s}/{s}_*.nii.gz'))])
     vols = np.clip(np.log(1 + vols / np.percentile(vols, 95)), 0, 1)
-    segs = np.asarray([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
+    segs = np.asarray([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/{options.model}/{s}/{s}_*.nii.gz'))])
 
     if s in constants.TWINS:
         brains = [label(seg)[0] for seg in segs]
@@ -35,4 +41,4 @@ for s in sorted(samples):
         slices = np.repeat(vols[...,c,:], 3, axis=-1)
         slices[outline == 1] = [1, 0, 0]
         slices = (np.moveaxis(slices, -1, 1) * 254).astype(int)
-        write_gif(slices, f'data/gifs/{s}_{c}.gif', fps=5)
+        write_gif(slices, f'data/gifs/{options.model}/{s}_{c}.gif', fps=10)
