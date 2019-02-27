@@ -6,14 +6,20 @@ import util
 import matplotlib.pyplot as plt
 from scipy.ndimage import measurements
 
+from argparse import ArgumentParser
 
-samples = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/unet3000/*')]
-os.makedirs(f'data/volumes', exist_ok=True)
+
+parser = ArgumentParser()
+parser.add_argument('model', type=str)
+options = parser.parse_args()
+
+samples = [i.split('/')[-1] for i in glob.glob(f'data/predict_cleaned/{options.model}/*')]
+os.makedirs(f'data/volumes/{options.model}', exist_ok=True)
 var = {}
 
 for s in sorted(samples):
     print(s)
-    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/unet3000/{s}/{s}_*.nii.gz'))])
+    segs = np.array([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/{options.model}/{s}/{s}_*.nii.gz'))])
 
     if s in constants.TWINS:
         brains = [measurements.label(seg)[0] for seg in segs]
@@ -33,7 +39,7 @@ for s in sorted(samples):
         y = (vols[i] / vols[i][0] - 1) * 100
         plt.ylabel('Change in Volume (%)')
         plt.plot(x, y, marker='', linewidth=1)
-        plt.savefig(f'data/volumes/{s}_{i}.png')
+        plt.savefig(f'data/volumes/{options.model}/{s}_{i}.png')
         plt.close()
 
 sort = np.sqrt(sorted(var.items(), key=lambda x: x[1]))
@@ -41,5 +47,5 @@ plt.figure(figsize=(10,8))
 bar = plt.bar([s[0] for s in sort], [s[1] for s in sort])
 plt.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
 plt.ylabel('Variance in Volume')
-plt.savefig('data/variance.png')
+plt.savefig(f'data/volumes/{options.model}/variance.png')
 plt.close()

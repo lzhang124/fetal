@@ -7,8 +7,8 @@ from array2gif import write_gif
 from scipy.ndimage import binary_erosion
 from scipy.ndimage.measurements import center_of_mass, label
 
-
 from argparse import ArgumentParser
+
 
 parser = ArgumentParser()
 parser.add_argument('model', type=str)
