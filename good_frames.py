@@ -52,5 +52,4 @@ for model in models:
         print(len(frames))
         num_good_frames += len(frames)
         # print(frames)
-    print(len(good_frames))
-    print(num_good_frames)
+    print(model, len(good_frames), num_good_frames)
