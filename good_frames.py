@@ -49,7 +49,7 @@ for model in models:
                 prev_vol = curr_vol
         if len(frames)/len(segs) >= PERCENT_GOOD:
             good_frames[s] = frames
-        print(len(frames))
+        print(len(frames)/len(segs))
         num_good_frames += len(frames)
         # print(frames)
-    print(model, len(good_frames), num_good_frames/len(samples), flush=True)
+    print(model, len(good_frames), num_good_frames, flush=True)
