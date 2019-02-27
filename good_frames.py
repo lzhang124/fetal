@@ -12,6 +12,7 @@ models = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/*')]
 for model in models:
     samples = [i.split('/')[-1] for i in glob.glob(f'data/predict_cleaned/{model}/*')]
     good_frames = {}
+    num_good_frames = 0
 
     for s in sorted(samples):
         print(s)
@@ -49,5 +50,7 @@ for model in models:
         if len(frames)/len(segs) >= PERCENT_GOOD:
             good_frames[s] = frames
         print(len(frames))
+        num_good_frames += len(frames)
         # print(frames)
     print(len(good_frames))
+    print(num_good_frames)
