@@ -34,7 +34,7 @@ for s in sorted(samples):
         vols = [np.sum(segs, axis=(1, 2, 3, 4))]
 
     for i in range(len(vols)):
-        var[f'{s}_{i}'] = np.var(vols[i])
+        var[f'{s}_{i}'] = np.sqrt(np.var(vols[i]))
         x = np.arange(len(segs))
         y = (vols[i] / vols[i][0] - 1) * 100
         plt.ylabel('Change in Volume (%)')
@@ -42,7 +42,7 @@ for s in sorted(samples):
         plt.savefig(f'data/volumes/{options.model}/{s}_{i}.png')
         plt.close()
 
-sort = np.sqrt(sorted(var.items(), key=lambda x: x[1]))
+sort = sorted(var.items(), key=lambda x: x[1])
 plt.figure(figsize=(10,8))
 bar = plt.bar([s[0] for s in sort], [s[1] for s in sort])
 plt.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
