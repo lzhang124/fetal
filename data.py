@@ -77,7 +77,7 @@ class DataGenerator(Iterator):
                                                       cval=0,
                                                       flip=True)
 
-        super().__init__(len(self.inputs), batch_size, self.augment, seed)
+        super().__init__(max(len(self.samples), len(self.inputs)), batch_size, self.augment, seed)
 
     def _get_batch(self, index_array):
         batch = []

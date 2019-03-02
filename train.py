@@ -113,7 +113,6 @@ def main(options):
         if not options.skip_training:
             d = {s: frame_reference[s] for s in train}
             d[sample] = constants.LABELED_FRAMES[sample]
-            logging.info(len(d))
             train_gen = DataGenerator(d,
                                       input_file_format,
                                       label_file_format,
