@@ -82,7 +82,7 @@ class BaseModel:
 
         tile = generator.tile_inputs
         n = len(generator)//8 if tile else len(generator)
-        for i in range(len(generator)):
+        for i in range(n):
             input_file = generator.input_files[i]
             if not isinstance(input_file, str):
                 input_file = input_file[0]
