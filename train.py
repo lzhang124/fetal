@@ -37,6 +37,7 @@ parser.add_argument('--temporal',
 parser.add_argument('--good-frames',
                     help='Train using good frames from model name',
                     dest='good_frames', type=str)
+parser.add_argument('--sample', type=str)
 options = parser.parse_args()
 
 import constants
@@ -104,73 +105,70 @@ def main(options):
     test = shuffled[val_split:]
     frame_reference = constants.GOOD_FRAMES if options.good_frames else constants.LABELED_FRAMES
 
-    for sample in ['052218S','052218L','031616','062515','051215','043015','052516','041818','022618','032818','022415','031317L','061715','102617','050318L','031516','013118S','032318c','083115','040417','021015','050917']:
-        name = f'{options.name}_{sample}'
+    logging.info('Creating data generators.')
+    label_types = LABELS[options.model]
+    if not options.skip_training:
+        d = {s: frame_reference[s] for s in train}
+        d[options.sample] = constants.LABELED_FRAMES[options.sample]
+        train_gen = DataGenerator(d,
+                                  input_file_format,
+                                  label_file_format,
+                                  label_types=label_types,
+                                  load_files=options.load_files,
+                                  random_gen=random_gen,
+                                  augment=True)
+        logging.info(f'  Training generator with {len(train_gen)} samples.')
 
-        logging.info('Creating data generators.')
-        label_types = LABELS[options.model]
-        if not options.skip_training:
-            d = {s: frame_reference[s] for s in train}
-            d[sample] = constants.LABELED_FRAMES[sample]
-            train_gen = DataGenerator(d,
-                                      input_file_format,
-                                      label_file_format,
-                                      label_types=label_types,
-                                      load_files=options.load_files,
-                                      random_gen=random_gen,
-                                      augment=True)
-            logging.info(f'  Training generator with {len(train_gen)} samples.')
+        val_gen = None
+        if len(val) > 0:
+            val_gen = DataGenerator({s: frame_reference[s] for s in val},
+                                    input_file_format,
+                                    label_file_format,
+                                    label_types=label_types,
+                                    load_files=options.load_files,
+                                    random_gen=random_gen,
+                                    resize=True)
+            logging.info(f'  Validation generator with {len(val_gen)} samples.')
 
-            val_gen = None
-            if len(val) > 0:
-                val_gen = DataGenerator({s: frame_reference[s] for s in val},
-                                        input_file_format,
-                                        label_file_format,
-                                        label_types=label_types,
-                                        load_files=options.load_files,
-                                        random_gen=random_gen,
-                                        resize=True)
-                logging.info(f'  Validation generator with {len(val_gen)} samples.')
+    if options.predict_all or len(test) == 0:
+        pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
+                                 input_file_format,
+                                 load_files=False,
+                                 tile_inputs=True)
+        logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
+    else:
+        pred_gen = DataGenerator({s: frame_reference[s] for s in test},
+                                 input_file_format,
+                                 load_files=options.load_files,
+                                 random_gen=random_gen,
+                                 tile_inputs=True)
+        logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
+    
+    if len(test) > 0:
+        test_gen = DataGenerator({s: frame_reference[s] for s in test},
+                                 input_file_format,
+                                 label_file_format,
+                                 label_types=label_types,
+                                 load_files=options.load_files,
+                                 random_gen=random_gen,
+                                 resize=True)
+        logging.info(f'  Testing generator with {len(test_gen)} samples.')
 
-        if options.predict_all or len(test) == 0:
-            pred_gen = DataGenerator({s: np.arange(n) for _, (s, n) in enumerate(constants.SEQ_LENGTH.items())},
-                                     input_file_format,
-                                     load_files=False,
-                                     tile_inputs=True)
-            logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
-        else:
-            pred_gen = DataGenerator({s: frame_reference[s] for s in test},
-                                     input_file_format,
-                                     load_files=options.load_files,
-                                     random_gen=random_gen,
-                                     tile_inputs=True)
-            logging.info(f'  Prediction generator with {len(pred_gen)//8} samples.')
-        
-        if len(test) > 0:
-            test_gen = DataGenerator({s: frame_reference[s] for s in test},
-                                     input_file_format,
-                                     label_file_format,
-                                     label_types=label_types,
-                                     load_files=options.load_files,
-                                     random_gen=random_gen,
-                                     resize=True)
-            logging.info(f'  Testing generator with {len(test_gen)} samples.')
+    logging.info('Creating model.')
+    weights = util.get_weights(glob.glob(f'data/labels/*/*_{organ}.nii.gz'))
+    model = MODELS[options.model](shape, name=options.name, filename=options.model_file, weights=weights)
 
-        logging.info('Creating model.')
-        weights = util.get_weights(glob.glob(f'data/labels/*/*_{organ}.nii.gz'))
-        model = MODELS[options.model](shape, name=name, filename=options.model_file, weights=weights)
+    if not options.skip_training:
+        logging.info('Training model.')
+        model.train(train_gen, val_gen, options.epochs)
 
-        if not options.skip_training:
-            logging.info('Training model.')
-            model.train(train_gen, val_gen, options.epochs)
+    logging.info('Making predictions.')
+    model.predict(pred_gen)
 
-        logging.info('Making predictions.')
-        model.predict(pred_gen)
-
-        if len(test) > 0:
-            logging.info('Testing model.')
-            metrics = model.test(test_gen)
-            logging.info(metrics)
+    if len(test) > 0:
+        logging.info('Testing model.')
+        metrics = model.test(test_gen)
+        logging.info(metrics)
 
     end = time.time()
     logging.info(f'total time: {datetime.timedelta(seconds=(end - start))}')
