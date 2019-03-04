@@ -9,11 +9,13 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument('model', type=str)
+parser.add_argument('--sample', type=str)
 options = parser.parse_args()
 
 
 def main(model):
-    files = f'data/predict/{model}/*/*.nii.gz'
+    folder = options.sample if options.sample else '*'
+    files = f'data/predict/{model}/{folder}/*.nii.gz'
 
     for file in glob.glob(files):
         sample, i = os.path.basename(file).split('_')

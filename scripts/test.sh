@@ -2,5 +2,5 @@ declare -a arr=("052218S" "052218L" "031616" "062515" "051215" "043015" "052516"
 
 for i in "${arr[@]}"
 do
-    scripts/slurm_run.sh unet_frames_${i} --model unet --organ brains --model-file models/unet_frames_full/2000.h5 --split 1 0 --predict-all --good-frames unet3000 --sample ${i}
+    slurm python remove_artifacts.py unet_frames_${i} --sample ${i} &
 done

@@ -11,9 +11,11 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument('model', type=str)
+parser.add_argument('--sample', type=str)
 options = parser.parse_args()
 
-samples = [i.split('/')[-1] for i in glob.glob(f'data/predict_cleaned/{options.model}/*')]
+folder = options.sample if options.sample else '*'
+samples = [i.split('/')[-1] for i in glob.glob(f'data/predict_cleaned/{options.model}/{folder}')]
 os.makedirs(f'data/volumes/{options.model}', exist_ok=True)
 var = {}
 
