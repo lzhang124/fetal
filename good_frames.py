@@ -8,14 +8,20 @@ SEQ_VOL_DIF = 0.05
 SEQ_DICE = 0.9
 PERCENT_GOOD = 0.6
 
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument('--sample', type=str)
+options = parser.parse_args()
+
 models = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/*')]
 for model in models:
+    print(model)
     samples = [i.split('/')[-1] for i in glob.glob(f'data/predict_cleaned/{model}/*')]
     good_frames = {}
     num_good_frames = 0
 
     for s in sorted(samples):
-        print(s)
         segs = np.asarray([util.read_vol(f) for f in sorted(glob.glob(f'data/predict_cleaned/{model}/{s}/{s}_*.nii.gz'))])
         label = glob.glob(f'data/labels/{s}/{s}_*_all_brains.nii.gz')
         frames = []
@@ -49,7 +55,9 @@ for model in models:
                 prev_vol = curr_vol
         if len(frames)/len(segs) >= PERCENT_GOOD:
             good_frames[s] = frames
-        print(len(frames)/len(segs))
+        if s is options.sample:
+            print(s, len(frames)/len(segs))
         num_good_frames += len(frames)
         # print(frames)
-    print(model, len(good_frames), num_good_frames, flush=True)
+    print(len(good_frames), num_good_frames)
+    print('-----')
