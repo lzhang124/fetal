@@ -8,12 +8,6 @@ SEQ_VOL_DIF = 0.05
 SEQ_DICE = 0.9
 PERCENT_GOOD = 0.6
 
-from argparse import ArgumentParser
-
-parser = ArgumentParser()
-parser.add_argument('--sample', type=str)
-options = parser.parse_args()
-
 models = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/*')]
 for model in models:
     print(model)
@@ -55,7 +49,7 @@ for model in models:
                 prev_vol = curr_vol
         if len(frames)/len(segs) >= PERCENT_GOOD:
             good_frames[s] = frames
-        if s is options.sample:
+        if s in ['052218S', '052218L', '031616', '062515', '051215', '043015', '052516', '041818', '022618', '032818', '022415', '031317L', '061715', '102617', '050318L', '031516', '013118S', '032318c', '021015', '040417', '083115', '050917']:
             print(s, len(frames)/len(segs))
         num_good_frames += len(frames)
         # print(frames)
