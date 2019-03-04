@@ -3,9 +3,7 @@ import glob
 import util
 
 OVERALL_VOL_DIF = 0.05
-OVERALL_DICE = 0.8
 SEQ_VOL_DIF = 0.05
-SEQ_DICE = 0.9
 PERCENT_GOOD = 0.6
 
 models = [i.split('/')[-1] for i in glob.glob('data/predict_cleaned/*')]
@@ -29,8 +27,8 @@ for model in models:
                 seg = segs[i]
                 curr_vol = np.sum(seg)
                 dif = abs(volume - curr_vol)
-                if dif / volume <= OVERALL_VOL_DIF and util.dice_coef(vol, seg) >= OVERALL_DICE:
-                    if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF and util.dice_coef(prev, seg) >= SEQ_DICE:
+                if dif / volume <= OVERALL_VOL_DIF:
+                    if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF:
                         frames.append(i)
                 prev = seg
                 prev_vol = curr_vol
@@ -43,7 +41,7 @@ for model in models:
                 curr_vol = np.sum(seg)
                 dif = abs(volume - curr_vol)
                 if dif / volume <= OVERALL_VOL_DIF:
-                    if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF and util.dice_coef(prev, seg) >= SEQ_DICE:
+                    if prev is not None and abs(curr_vol - prev_vol) / prev_vol <= SEQ_VOL_DIF:
                         frames.append(i)
                 prev = seg
                 prev_vol = curr_vol
